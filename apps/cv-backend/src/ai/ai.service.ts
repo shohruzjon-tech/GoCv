@@ -112,7 +112,7 @@ If context about existing CV data is provided, use it to enhance or modify the c
         ],
         response_format: { type: 'json_object' },
         temperature: 0.7,
-        max_tokens: 4000,
+        max_completion_tokens: 4000,
       });
 
       const content = completion.choices[0]?.message?.content;
@@ -149,7 +149,7 @@ If current content is provided, modify it. Otherwise, generate new content for t
         ],
         response_format: { type: 'json_object' },
         temperature: 0.7,
-        max_tokens: 2000,
+        max_completion_tokens: 2000,
       });
 
       const content = completion.choices[0]?.message?.content;
@@ -177,7 +177,7 @@ Return ONLY the HTML string, no JSON wrapping.`;
           },
         ],
         temperature: 0.5,
-        max_tokens: 4000,
+        max_completion_tokens: 4000,
       });
 
       return completion.choices[0]?.message?.content || '';
@@ -200,7 +200,7 @@ Respond in a friendly, professional manner. When suggesting CV changes, be speci
         model: 'gpt-5',
         messages: [{ role: 'system', content: systemPrompt }, ...messages],
         temperature: 0.7,
-        max_tokens: 1500,
+        max_completion_tokens: 1500,
       });
 
       return completion.choices[0]?.message?.content || '';

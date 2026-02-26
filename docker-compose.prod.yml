@@ -5,7 +5,7 @@
 services:
   # ---- MongoDB ----
   mongo:
-    image: mongo:7
+    image: mongo:8.0
     container_name: cv-mongo
     restart: always
     environment:
