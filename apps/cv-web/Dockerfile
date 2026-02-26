@@ -38,6 +38,7 @@ RUN groupadd --gid 1001 nextjs && \
     useradd --uid 1001 --gid nextjs --shell /bin/bash --create-home nextjs
 USER nextjs
 
-EXPOSE 3000
+ENV PORT=4001
+EXPOSE 4001
 
 CMD ["node", "apps/cv-web/server.js"]

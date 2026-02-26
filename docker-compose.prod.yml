@@ -1,5 +1,6 @@
-# Production: Everything runs in Docker
+# Production: Everything runs in Docker with Traefik reverse proxy
 # Usage: docker compose -f docker-compose.prod.yml --env-file .env.prod up -d --build
+# Traefik must already be running on the cu24-network external network
 
 services:
   # ---- MongoDB ----
@@ -11,10 +12,12 @@ services:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME:-cvadmin}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-cvpassword}
       MONGO_INITDB_DATABASE: cv-builder
+    ports:
+      - "127.0.0.1:4002:27017"
     volumes:
       - mongo_data:/data/db
     networks:
-      - cv-network
+      - cv-internal
     healthcheck:
       test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
       interval: 10s
@@ -27,10 +30,12 @@ services:
     container_name: cv-redis
     restart: always
     command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-redispassword}
+    ports:
+      - "127.0.0.1:4003:6379"
     volumes:
       - redis_data:/data
     networks:
-      - cv-network
+      - cv-internal
     healthcheck:
       test:
         ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-redispassword}", "ping"]
@@ -45,8 +50,8 @@ services:
       dockerfile: apps/cv-backend/Dockerfile
     container_name: cv-backend
     restart: always
-    ports:
-      - "${BACKEND_PORT:-4000}:4000"
+    expose:
+      - "4000"
     environment:
       NODE_ENV: production
       PORT: 4000
@@ -64,16 +69,32 @@ services:
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
       AWS_REGION: ${AWS_REGION:-us-east-1}
       AWS_S3_BUCKET: ${AWS_S3_BUCKET:-cv-builder-uploads}
-      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
+      FRONTEND_URL: ${FRONTEND_URL:-https://gocv.live}
       ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@cvbuilder.com}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+    labels:
+      - "traefik.enable=true"
+      # HTTP router
+      - "traefik.http.routers.cv-backend.rule=Host(`api.gocv.live`)"
+      - "traefik.http.routers.cv-backend.entrypoints=websecure"
+      - "traefik.http.routers.cv-backend.tls=true"
+      - "traefik.http.routers.cv-backend.tls.certresolver=letsencrypt"
+      # Service
+      - "traefik.http.services.cv-backend.loadbalancer.server.port=4000"
+      # CORS headers middleware
+      - "traefik.http.middlewares.cv-backend-headers.headers.accesscontrolalloworiginlist=https://gocv.live"
+      - "traefik.http.middlewares.cv-backend-headers.headers.accesscontrolallowmethods=GET,POST,PUT,PATCH,DELETE,OPTIONS"
+      - "traefik.http.middlewares.cv-backend-headers.headers.accesscontrolallowheaders=Content-Type,Authorization"
+      - "traefik.http.middlewares.cv-backend-headers.headers.accesscontrolallowcredentials=true"
+      - "traefik.http.routers.cv-backend.middlewares=cv-backend-headers"
     depends_on:
       mongo:
         condition: service_healthy
       redis:
         condition: service_healthy
     networks:
-      - cv-network
+      - cv-internal
+      - cu24-network
 
   # ---- Next.js Frontend ----
   frontend:
@@ -81,22 +102,34 @@ services:
       context: .
       dockerfile: apps/cv-web/Dockerfile
       args:
-        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:4000}
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-https://api.gocv.live}
     container_name: cv-frontend
     restart: always
-    ports:
-      - "${FRONTEND_PORT:-3000}:3000"
+    expose:
+      - "4001"
     environment:
       NODE_ENV: production
+      PORT: 4001
+    labels:
+      - "traefik.enable=true"
+      # HTTP router
+      - "traefik.http.routers.cv-frontend.rule=Host(`gocv.live`)"
+      - "traefik.http.routers.cv-frontend.entrypoints=websecure"
+      - "traefik.http.routers.cv-frontend.tls=true"
+      - "traefik.http.routers.cv-frontend.tls.certresolver=letsencrypt"
+      # Service
+      - "traefik.http.services.cv-frontend.loadbalancer.server.port=4001"
     depends_on:
       - backend
     networks:
-      - cv-network
+      - cu24-network
 
 volumes:
   mongo_data:
   redis_data:
 
 networks:
-  cv-network:
+  cv-internal:
     driver: bridge
+  cu24-network:
+    external: true
