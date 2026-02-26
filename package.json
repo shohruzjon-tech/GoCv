@@ -1,5 +1,5 @@
 {
-  "name": "abdivakilov-cv",
+  "name": "personal-cv-builder",
   "private": true,
   "scripts": {
     "build": "turbo run build",
