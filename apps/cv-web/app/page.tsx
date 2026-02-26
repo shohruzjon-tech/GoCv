@@ -104,8 +104,24 @@ export default function Home() {
       </main>
 
       <footer className="border-t border-zinc-200 bg-white py-8 dark:border-zinc-800 dark:bg-zinc-950">
-        <div className="mx-auto max-w-7xl px-4 text-center text-sm text-zinc-500 sm:px-6">
-          © {new Date().getFullYear()} CV Builder. All rights reserved.
+        <div className="mx-auto flex max-w-7xl flex-col items-center gap-3 px-4 text-sm text-zinc-500 sm:flex-row sm:justify-between sm:px-6">
+          <span>
+            © {new Date().getFullYear()} CV Builder. All rights reserved.
+          </span>
+          <div className="flex gap-6">
+            <Link
+              href="/privacy-policy"
+              className="hover:text-zinc-900 dark:hover:text-white"
+            >
+              Privacy Policy
+            </Link>
+            <Link
+              href="/terms-of-service"
+              className="hover:text-zinc-900 dark:hover:text-white"
+            >
+              Terms of Service
+            </Link>
+          </div>
         </div>
       </footer>
     </div>
