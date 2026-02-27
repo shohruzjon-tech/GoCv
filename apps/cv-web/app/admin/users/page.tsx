@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { adminApi } from "@/lib/api";
 import { User } from "@/types";
 import { Shield, ShieldOff, Trash2, UserCheck, UserX, Key } from "lucide-react";
+import Select from "@/components/ui/select";
 import toast from "react-hot-toast";
 
 export default function AdminUsersPage() {
@@ -136,14 +137,14 @@ export default function AdminUsersPage() {
                   </div>
                 </td>
                 <td className="px-6 py-4">
-                  <select
+                  <Select
                     value={user.role}
-                    onChange={(e) => changeRole(user._id, e.target.value)}
-                    className="rounded-lg border border-edge bg-card text-content px-2 py-1 text-xs font-medium"
-                  >
-                    <option value="user">User</option>
-                    <option value="admin">Admin</option>
-                  </select>
+                    onChange={(val) => changeRole(user._id, val)}
+                    options={[
+                      { value: "user", label: "User" },
+                      { value: "admin", label: "Admin" },
+                    ]}
+                  />
                 </td>
                 <td className="px-6 py-4">
                   <span

@@ -13,6 +13,7 @@ import {
   XCircle,
   BookOpen,
 } from "lucide-react";
+import Select from "@/components/ui/select";
 
 export default function SkillGapPage() {
   const router = useRouter();
@@ -77,18 +78,16 @@ export default function SkillGapPage() {
           <label className="mb-2 block text-sm font-medium text-content-2">
             Select a CV
           </label>
-          <select
+          <Select
             value={selectedCv}
-            onChange={(e) => setSelectedCv(e.target.value)}
-            className="w-full rounded-xl border border-edge bg-card px-4 py-3 text-sm text-content outline-none focus:border-indigo-500/50"
-          >
-            <option value="">Choose...</option>
-            {cvs.map((cv) => (
-              <option key={cv._id} value={cv._id} className="bg-elevated">
-                {cv.title}
-              </option>
-            ))}
-          </select>
+            onChange={setSelectedCv}
+            placeholder="Choose..."
+            options={[
+              { value: "", label: "Choose..." },
+              ...cvs.map((cv) => ({ value: cv._id, label: cv.title })),
+            ]}
+            searchable={cvs.length > 5}
+          />
         </div>
         <div className="rounded-2xl border border-edge bg-card p-6">
           <label className="mb-2 block text-sm font-medium text-content-2">

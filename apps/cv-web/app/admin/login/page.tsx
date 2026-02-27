@@ -85,10 +85,10 @@ export default function AdminLoginPage() {
           </button>
           <div className="mt-4 text-center">
             <Link
-              href="/login"
+              href="/"
               className="text-sm text-content-3 hover:text-content-2"
             >
-              ← Back to user login
+              ← Back to home
             </Link>
           </div>
         </form>

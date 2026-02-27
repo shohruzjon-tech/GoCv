@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { organizationsApi } from "@/lib/api";
 import { useOrganizationStore } from "@/lib/store";
-import { Organization } from "@/types";
 import toast from "react-hot-toast";
 import {
   Building2,
@@ -22,15 +21,6 @@ import {
 export default function OrganizationsPage() {
   const { organizations, setOrganizations } = useOrganizationStore();
   const [loading, setLoading] = useState(true);
-  const [showCreate, setShowCreate] = useState(false);
-  const [creating, setCreating] = useState(false);
-  const [form, setForm] = useState({
-    name: "",
-    description: "",
-    industry: "",
-    website: "",
-    size: "",
-  });
 
   useEffect(() => {
     loadOrganizations();
@@ -44,37 +34,6 @@ export default function OrganizationsPage() {
       toast.error("Failed to load organizations");
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleCreate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!form.name.trim()) return;
-    setCreating(true);
-    try {
-      const res = await organizationsApi.create({
-        name: form.name,
-        description: form.description || undefined,
-        industry: form.industry || undefined,
-        website: form.website || undefined,
-        size: form.size || undefined,
-      });
-      setOrganizations([...organizations, res.data]);
-      setShowCreate(false);
-      setForm({
-        name: "",
-        description: "",
-        industry: "",
-        website: "",
-        size: "",
-      });
-      toast.success("Organization created!");
-    } catch (err: any) {
-      toast.error(
-        err.response?.data?.message || "Failed to create organization",
-      );
-    } finally {
-      setCreating(false);
     }
   };
 
@@ -111,111 +70,14 @@ export default function OrganizationsPage() {
             Manage your teams and enterprise workspaces
           </p>
         </div>
-        <button
-          onClick={() => setShowCreate(!showCreate)}
+        <Link
+          href="/dashboard/organizations/new"
           className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/25 transition hover:bg-indigo-500"
         >
           <Plus className="h-4 w-4" />
           New Organization
-        </button>
+        </Link>
       </div>
-
-      {/* Create Form */}
-      {showCreate && (
-        <form
-          onSubmit={handleCreate}
-          className="rounded-2xl border border-edge bg-card p-6 shadow-sm space-y-4"
-        >
-          <h2 className="text-lg font-semibold text-content">
-            Create Organization
-          </h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <label className="mb-1 block text-sm font-medium text-content-2">
-                Name <span className="text-red-400">*</span>
-              </label>
-              <input
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                placeholder="Acme Corp"
-                className="w-full rounded-xl border border-edge bg-surface px-4 py-2.5 text-sm text-content placeholder:text-content-4 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                required
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-sm font-medium text-content-2">
-                Industry
-              </label>
-              <input
-                value={form.industry}
-                onChange={(e) => setForm({ ...form, industry: e.target.value })}
-                placeholder="Technology"
-                className="w-full rounded-xl border border-edge bg-surface px-4 py-2.5 text-sm text-content placeholder:text-content-4 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-              />
-            </div>
-            <div className="sm:col-span-2">
-              <label className="mb-1 block text-sm font-medium text-content-2">
-                Description
-              </label>
-              <textarea
-                value={form.description}
-                onChange={(e) =>
-                  setForm({ ...form, description: e.target.value })
-                }
-                placeholder="A brief description of your organization"
-                rows={2}
-                className="w-full rounded-xl border border-edge bg-surface px-4 py-2.5 text-sm text-content placeholder:text-content-4 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 resize-none"
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-sm font-medium text-content-2">
-                Website
-              </label>
-              <input
-                value={form.website}
-                onChange={(e) => setForm({ ...form, website: e.target.value })}
-                placeholder="https://acme.com"
-                className="w-full rounded-xl border border-edge bg-surface px-4 py-2.5 text-sm text-content placeholder:text-content-4 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-sm font-medium text-content-2">
-                Company Size
-              </label>
-              <select
-                value={form.size}
-                onChange={(e) => setForm({ ...form, size: e.target.value })}
-                className="w-full rounded-xl border border-edge bg-surface px-4 py-2.5 text-sm text-content focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-              >
-                <option value="">Select size...</option>
-                <option value="1-10">1-10</option>
-                <option value="11-50">11-50</option>
-                <option value="51-200">51-200</option>
-                <option value="201-500">201-500</option>
-                <option value="501-1000">501-1000</option>
-                <option value="1000+">1000+</option>
-              </select>
-            </div>
-          </div>
-          <div className="flex gap-3 pt-2">
-            <button
-              type="submit"
-              disabled={creating}
-              className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-500 disabled:opacity-50"
-            >
-              {creating && <Loader2 className="h-4 w-4 animate-spin" />}
-              Create Organization
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowCreate(false)}
-              className="rounded-xl border border-edge px-5 py-2.5 text-sm font-medium text-content-2 transition hover:bg-card-hover"
-            >
-              Cancel
-            </button>
-          </div>
-        </form>
-      )}
 
       {/* Organizations Grid */}
       {organizations.length === 0 ? (
@@ -228,13 +90,13 @@ export default function OrganizationsPage() {
             Create your first organization to start collaborating with your team
             on CVs and hiring.
           </p>
-          <button
-            onClick={() => setShowCreate(true)}
+          <Link
+            href="/dashboard/organizations/new"
             className="mt-6 inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/25 transition hover:bg-indigo-500"
           >
             <Plus className="h-4 w-4" />
             Create Organization
-          </button>
+          </Link>
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

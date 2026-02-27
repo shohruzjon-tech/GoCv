@@ -30,6 +30,7 @@ import {
   Plus,
   Hash,
 } from "lucide-react";
+import Select from "@/components/ui/select";
 
 type Tab = "overview" | "members" | "teams" | "settings";
 
@@ -487,16 +488,16 @@ export default function OrgDetailPage({
                   <label className="mb-1 block text-sm font-medium text-content-2">
                     Role
                   </label>
-                  <select
+                  <Select
                     value={inviteRole}
-                    onChange={(e) => setInviteRole(e.target.value)}
-                    className="w-full rounded-xl border border-edge bg-surface px-4 py-2.5 text-sm text-content focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                  >
-                    <option value="viewer">Viewer</option>
-                    <option value="member">Member</option>
-                    <option value="recruiter">Recruiter</option>
-                    <option value="admin">Admin</option>
-                  </select>
+                    onChange={setInviteRole}
+                    options={[
+                      { value: "viewer", label: "Viewer" },
+                      { value: "member", label: "Member" },
+                      { value: "recruiter", label: "Recruiter" },
+                      { value: "admin", label: "Admin" },
+                    ]}
+                  />
                 </div>
               </div>
               <div className="flex gap-3">
@@ -576,19 +577,17 @@ export default function OrgDetailPage({
                             {role.label}
                           </span>
                         ) : (
-                          <select
+                          <Select
                             value={m.role}
-                            onChange={(e) =>
-                              handleRoleChange(userId, e.target.value)
-                            }
+                            onChange={(val) => handleRoleChange(userId, val)}
                             disabled={isCurrentUser}
-                            className="rounded-lg border border-edge bg-surface px-2 py-1 text-xs text-content focus:outline-none focus:ring-1 focus:ring-indigo-500 disabled:opacity-50"
-                          >
-                            <option value="viewer">Viewer</option>
-                            <option value="member">Member</option>
-                            <option value="recruiter">Recruiter</option>
-                            <option value="admin">Admin</option>
-                          </select>
+                            options={[
+                              { value: "viewer", label: "Viewer" },
+                              { value: "member", label: "Member" },
+                              { value: "recruiter", label: "Recruiter" },
+                              { value: "admin", label: "Admin" },
+                            ]}
+                          />
                         )}
                       </td>
                       <td className="px-6 py-4 text-sm text-content-3">

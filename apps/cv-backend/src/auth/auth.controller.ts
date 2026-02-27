@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Body,
+  Param,
   UseGuards,
   Req,
   Res,
@@ -11,6 +12,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AuthService } from './auth.service.js';
+import { ApiKeyService } from './api-key.service.js';
 import { GoogleAuthGuard } from './guards/google-auth.guard.js';
 import { JwtAuthGuard } from './guards/jwt-auth.guard.js';
 import { CurrentUser } from './decorators/current-user.decorator.js';
@@ -21,6 +23,7 @@ import type { Request, Response } from 'express';
 export class AuthController {
   constructor(
     private authService: AuthService,
+    private apiKeyService: ApiKeyService,
     private configService: ConfigService,
   ) {}
 
@@ -61,5 +64,56 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   async getProfile(@CurrentUser('_id') userId: string) {
     return this.authService.getProfile(userId);
+  }
+
+  // ─── API Keys ───
+
+  @Get('api-keys')
+  @UseGuards(JwtAuthGuard)
+  async getApiKeys(@CurrentUser('_id') userId: string) {
+    return this.apiKeyService.findByUser(userId);
+  }
+
+  @Post('api-keys')
+  @UseGuards(JwtAuthGuard)
+  async createApiKey(
+    @CurrentUser('_id') userId: string,
+    @Body()
+    body: {
+      name: string;
+      scopes: string[];
+      expiresIn?: number;
+      allowedIps?: string[];
+    },
+  ) {
+    const result = await this.apiKeyService.createKey(
+      userId,
+      body.name,
+      body.scopes as any[],
+      undefined,
+      body.expiresIn,
+    );
+    return { key: result.key, apiKey: result.apiKey };
+  }
+
+  @Post('api-keys/:id/revoke')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async revokeApiKey(
+    @Param('id') id: string,
+    @CurrentUser('_id') userId: string,
+  ) {
+    await this.apiKeyService.revokeKey(id, userId);
+    return { message: 'API key revoked' };
+  }
+
+  @Post('api-keys/:id/rotate')
+  @UseGuards(JwtAuthGuard)
+  async rotateApiKey(
+    @Param('id') id: string,
+    @CurrentUser('_id') userId: string,
+  ) {
+    const result = await this.apiKeyService.rotateKey(id, userId);
+    return { key: result.key, apiKey: result.apiKey };
   }
 }

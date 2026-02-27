@@ -24,10 +24,10 @@ function AuthCallbackContent() {
         })
         .catch(() => {
           toast.error("Authentication failed");
-          router.push("/login");
+          router.push("/");
         });
     } else {
-      router.push("/login");
+      router.push("/");
     }
   }, [searchParams, router, setAuth]);
 

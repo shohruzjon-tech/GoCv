@@ -23,6 +23,7 @@ import {
   Upload,
   Bot,
 } from "lucide-react";
+import Select from "@/components/ui/select";
 
 const changeTypeConfig: Record<
   string,
@@ -322,23 +323,20 @@ export default function CvVersionsPage({
               <label className="mb-1 block text-sm font-medium text-content-2">
                 From Version (optional)
               </label>
-              <select
-                value={branchFromVersion ?? ""}
-                onChange={(e) =>
-                  setBranchFromVersion(
-                    e.target.value ? Number(e.target.value) : undefined,
-                  )
+              <Select
+                value={String(branchFromVersion ?? "")}
+                onChange={(val) =>
+                  setBranchFromVersion(val ? Number(val) : undefined)
                 }
-                className="w-full rounded-xl border border-edge bg-surface px-4 py-2.5 text-sm text-content focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-              >
-                <option value="">Latest</option>
-                {versions.map((v) => (
-                  <option key={v.version} value={v.version}>
-                    v{v.version} —{" "}
-                    {v.label || v.changeDescription || v.changeType}
-                  </option>
-                ))}
-              </select>
+                placeholder="Latest"
+                options={[
+                  { value: "", label: "Latest" },
+                  ...versions.map((v) => ({
+                    value: String(v.version),
+                    label: `v${v.version} — ${v.label || v.changeDescription || v.changeType}`,
+                  })),
+                ]}
+              />
             </div>
           </div>
           <div className="flex gap-3">
@@ -392,40 +390,36 @@ export default function CvVersionsPage({
             <label className="mb-1 block text-xs text-content-3">
               Version A
             </label>
-            <select
-              value={compareV1 ?? ""}
-              onChange={(e) =>
-                setCompareV1(e.target.value ? Number(e.target.value) : null)
-              }
-              className="rounded-xl border border-edge bg-surface px-3 py-2 text-sm text-content focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-            >
-              <option value="">Select...</option>
-              {versions.map((v) => (
-                <option key={v.version} value={v.version}>
-                  v{v.version}
-                </option>
-              ))}
-            </select>
+            <Select
+              value={String(compareV1 ?? "")}
+              onChange={(val) => setCompareV1(val ? Number(val) : null)}
+              placeholder="Select..."
+              options={[
+                { value: "", label: "Select..." },
+                ...versions.map((v) => ({
+                  value: String(v.version),
+                  label: `v${v.version}`,
+                })),
+              ]}
+            />
           </div>
           <ArrowRight className="mb-2 h-4 w-4 text-content-4" />
           <div>
             <label className="mb-1 block text-xs text-content-3">
               Version B
             </label>
-            <select
-              value={compareV2 ?? ""}
-              onChange={(e) =>
-                setCompareV2(e.target.value ? Number(e.target.value) : null)
-              }
-              className="rounded-xl border border-edge bg-surface px-3 py-2 text-sm text-content focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-            >
-              <option value="">Select...</option>
-              {versions.map((v) => (
-                <option key={v.version} value={v.version}>
-                  v{v.version}
-                </option>
-              ))}
-            </select>
+            <Select
+              value={String(compareV2 ?? "")}
+              onChange={(val) => setCompareV2(val ? Number(val) : null)}
+              placeholder="Select..."
+              options={[
+                { value: "", label: "Select..." },
+                ...versions.map((v) => ({
+                  value: String(v.version),
+                  label: `v${v.version}`,
+                })),
+              ]}
+            />
           </div>
           <button
             onClick={handleCompare}

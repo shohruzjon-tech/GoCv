@@ -42,10 +42,18 @@ export default function Sidebar() {
   const { subscription } = useSubscriptionStore();
   const { isOpen, close } = useSidebarStore();
 
-  const isActive = (path: string) =>
-    path === "/dashboard"
-      ? pathname === "/dashboard"
-      : pathname?.startsWith(path);
+  const isActive = (path: string) => {
+    if (!pathname) return false;
+    if (path === "/dashboard") return pathname === "/dashboard";
+    // For settings root, only match exact — not sub-routes like billing
+    if (path === "/dashboard/settings") {
+      return (
+        pathname === "/dashboard/settings" ||
+        pathname === "/dashboard/settings/api-keys"
+      );
+    }
+    return pathname.startsWith(path);
+  };
 
   // Close sidebar on route change (mobile)
   useEffect(() => {

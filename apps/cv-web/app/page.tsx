@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import {
@@ -18,18 +19,111 @@ import {
   Layers,
   Users,
   TrendingUp,
+  X,
 } from "lucide-react";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
 const ThreeBackground = dynamic(() => import("@/components/three-background"), {
   ssr: false,
 });
 
 export default function Home() {
+  const [showLogin, setShowLogin] = useState(false);
+
+  const handleGoogleLogin = () => {
+    window.location.href = `${API_URL}/api/auth/google`;
+  };
+
+  // Close on Escape
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setShowLogin(false);
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, []);
+
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-page text-content">
       <div style={{ opacity: "var(--t-three-opacity)" }}>
         <ThreeBackground />
       </div>
+
+      {/* ──── Login Modal ──── */}
+      {showLogin && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center">
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-fade-in"
+            onClick={() => setShowLogin(false)}
+          />
+          <div className="relative w-full max-w-md mx-4 animate-fade-up">
+            <div className="rounded-3xl border border-edge bg-popover p-8 shadow-2xl shadow-black/20 backdrop-blur-xl">
+              <button
+                onClick={() => setShowLogin(false)}
+                className="absolute right-4 top-4 rounded-xl p-2 text-content-3 transition hover:bg-card-hover hover:text-content"
+              >
+                <X className="h-4 w-4" />
+              </button>
+
+              <div className="mb-8 text-center">
+                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-600/20 ring-1 ring-indigo-500/30">
+                  <FileText className="h-6 w-6 text-indigo-400" />
+                </div>
+                <h2 className="text-2xl font-bold tracking-tight text-content">
+                  Welcome to Go<span className="text-gradient">CV</span>
+                </h2>
+                <p className="mt-2 text-sm text-content-2">
+                  Sign in to create your professional CV
+                </p>
+              </div>
+
+              <button
+                onClick={handleGoogleLogin}
+                className="group flex w-full items-center justify-center gap-3 rounded-2xl border border-edge bg-card px-6 py-3.5 text-base font-medium text-content transition-all hover:border-edge hover:bg-card-hover"
+              >
+                <svg className="h-5 w-5" viewBox="0 0 24 24">
+                  <path
+                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"
+                    fill="#4285F4"
+                  />
+                  <path
+                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                    fill="#34A853"
+                  />
+                  <path
+                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                    fill="#FBBC05"
+                  />
+                  <path
+                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                    fill="#EA4335"
+                  />
+                </svg>
+                Continue with Google
+                <ArrowRight className="h-4 w-4 text-content-3 transition-transform group-hover:translate-x-0.5 group-hover:text-content" />
+              </button>
+
+              <p className="mt-6 text-center text-xs text-content-4">
+                By signing in, you agree to our{" "}
+                <Link
+                  href="/terms-of-service"
+                  className="text-indigo-400 hover:text-indigo-300"
+                >
+                  Terms
+                </Link>{" "}
+                and{" "}
+                <Link
+                  href="/privacy-policy"
+                  className="text-indigo-400 hover:text-indigo-300"
+                >
+                  Privacy Policy
+                </Link>
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ──── Navbar ──── */}
       <header className="fixed top-0 z-50 w-full">
@@ -71,19 +165,19 @@ export default function Home() {
           </nav>
 
           <div className="flex items-center gap-3">
-            <Link
-              href="/login"
+            <button
+              onClick={() => setShowLogin(true)}
               className="hidden rounded-xl px-5 py-2.5 text-sm font-medium text-content-2 transition hover:text-content sm:inline-flex"
             >
               Sign In
-            </Link>
-            <Link
-              href="/login"
+            </button>
+            <button
+              onClick={() => setShowLogin(true)}
               className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-600/20 transition hover:bg-indigo-500 hover:shadow-indigo-500/30"
             >
               Get Started
               <ArrowRight className="h-4 w-4" />
-            </Link>
+            </button>
           </div>
         </div>
       </header>
@@ -121,14 +215,14 @@ export default function Home() {
 
             {/* CTAs */}
             <div className="animate-fade-up delay-300 flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <Link
-                href="/login"
+              <button
+                onClick={() => setShowLogin(true)}
                 className="group inline-flex h-14 items-center gap-3 rounded-2xl bg-indigo-600 px-10 text-base font-semibold text-white shadow-xl shadow-indigo-600/25 transition-all hover:bg-indigo-500 hover:shadow-indigo-500/30 hover:scale-[1.02]"
               >
                 <Sparkles className="h-5 w-5" />
                 Start Building — Free
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-              </Link>
+              </button>
               <a
                 href="#how-it-works"
                 className="inline-flex h-14 items-center gap-2 rounded-2xl border border-edge bg-card px-8 text-base font-medium text-content-2 backdrop-blur transition-all hover:border-edge hover:bg-card-hover hover:text-content"
@@ -491,12 +585,12 @@ export default function Home() {
                     </li>
                   ))}
                 </ul>
-                <Link
-                  href="/login"
+                <button
+                  onClick={() => setShowLogin(true)}
                   className="block w-full rounded-xl border border-edge bg-card py-3 text-center text-sm font-semibold text-content transition hover:bg-card-hover"
                 >
                   Get Started
-                </Link>
+                </button>
               </div>
 
               {/* Pro */}
@@ -530,12 +624,12 @@ export default function Home() {
                     </li>
                   ))}
                 </ul>
-                <Link
-                  href="/login"
+                <button
+                  onClick={() => setShowLogin(true)}
                   className="block w-full rounded-xl bg-indigo-600 py-3 text-center text-sm font-semibold text-white shadow-lg shadow-indigo-600/20 transition hover:bg-indigo-500"
                 >
                   Start Free Trial
-                </Link>
+                </button>
               </div>
 
               {/* Enterprise */}
@@ -569,12 +663,12 @@ export default function Home() {
                     </li>
                   ))}
                 </ul>
-                <Link
-                  href="/login"
+                <button
+                  onClick={() => setShowLogin(true)}
                   className="block w-full rounded-xl border border-edge bg-card py-3 text-center text-sm font-semibold text-content transition hover:bg-card-hover"
                 >
                   Contact Sales
-                </Link>
+                </button>
               </div>
             </div>
           </div>
@@ -592,14 +686,14 @@ export default function Home() {
                 Join thousands of professionals who&apos;ve already landed their
                 dream jobs. Start free — no credit card required.
               </p>
-              <Link
-                href="/login"
+              <button
+                onClick={() => setShowLogin(true)}
                 className="group inline-flex h-14 items-center gap-3 rounded-2xl bg-indigo-600 px-10 text-base font-semibold text-white shadow-xl shadow-indigo-600/25 transition-all hover:bg-indigo-500 hover:shadow-indigo-500/30 hover:scale-[1.02]"
               >
                 <Sparkles className="h-5 w-5" />
                 Get Started for Free
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-              </Link>
+              </button>
             </div>
           </div>
         </section>

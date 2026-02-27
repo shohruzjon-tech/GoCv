@@ -21,6 +21,7 @@ import {
   Users,
   TrendingUp,
 } from "lucide-react";
+import Select from "@/components/ui/select";
 
 type Plan = "free" | "premium" | "enterprise";
 type Status = "active" | "cancelled" | "expired" | "trial";
@@ -312,53 +313,37 @@ export default function AdminSubscriptionsPage() {
       <div className="flex flex-wrap items-center gap-3">
         <div className="flex items-center gap-2 rounded-xl border border-edge bg-card px-3 py-2">
           <Search className="h-4 w-4 text-content-3" />
-          <select
+          <Select
             value={filterPlan}
-            onChange={(e) => {
-              setFilterPlan(e.target.value);
+            onChange={(val) => {
+              setFilterPlan(val);
               setPage(1);
             }}
-            className="bg-transparent text-sm text-content-2 outline-none"
-          >
-            <option value="" className="bg-surface">
-              All Plans
-            </option>
-            <option value="free" className="bg-surface">
-              Free
-            </option>
-            <option value="premium" className="bg-surface">
-              Premium
-            </option>
-            <option value="enterprise" className="bg-surface">
-              Enterprise
-            </option>
-          </select>
+            placeholder="All Plans"
+            options={[
+              { value: "", label: "All Plans" },
+              { value: "free", label: "Free" },
+              { value: "premium", label: "Premium" },
+              { value: "enterprise", label: "Enterprise" },
+            ]}
+          />
         </div>
         <div className="flex items-center gap-2 rounded-xl border border-edge bg-card px-3 py-2">
-          <select
+          <Select
             value={filterStatus}
-            onChange={(e) => {
-              setFilterStatus(e.target.value);
+            onChange={(val) => {
+              setFilterStatus(val);
               setPage(1);
             }}
-            className="bg-transparent text-sm text-content-2 outline-none"
-          >
-            <option value="" className="bg-surface">
-              All Status
-            </option>
-            <option value="active" className="bg-surface">
-              Active
-            </option>
-            <option value="cancelled" className="bg-surface">
-              Cancelled
-            </option>
-            <option value="expired" className="bg-surface">
-              Expired
-            </option>
-            <option value="trial" className="bg-surface">
-              Trial
-            </option>
-          </select>
+            placeholder="All Status"
+            options={[
+              { value: "", label: "All Status" },
+              { value: "active", label: "Active" },
+              { value: "cancelled", label: "Cancelled" },
+              { value: "expired", label: "Expired" },
+              { value: "trial", label: "Trial" },
+            ]}
+          />
         </div>
         {(filterPlan || filterStatus) && (
           <button
@@ -623,29 +608,20 @@ export default function AdminSubscriptionsPage() {
                 </div>
               </div>
 
-              {/* Status */}
               <div>
                 <label className="mb-1.5 block text-xs font-medium text-content-2">
                   Status
                 </label>
-                <select
+                <Select
                   value={editStatus}
-                  onChange={(e) => setEditStatus(e.target.value as Status)}
-                  className="w-full rounded-xl border border-edge bg-card px-3 py-2.5 text-sm text-content-2 outline-none focus:border-orange-500/30"
-                >
-                  <option value="active" className="bg-surface">
-                    Active
-                  </option>
-                  <option value="cancelled" className="bg-surface">
-                    Cancelled
-                  </option>
-                  <option value="expired" className="bg-surface">
-                    Expired
-                  </option>
-                  <option value="trial" className="bg-surface">
-                    Trial
-                  </option>
-                </select>
+                  onChange={(val) => setEditStatus(val as Status)}
+                  options={[
+                    { value: "active", label: "Active" },
+                    { value: "cancelled", label: "Cancelled" },
+                    { value: "expired", label: "Expired" },
+                    { value: "trial", label: "Trial" },
+                  ]}
+                />
               </div>
 
               {/* Extend Period */}
