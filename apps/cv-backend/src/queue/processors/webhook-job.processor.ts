@@ -50,7 +50,9 @@ export class WebhookJobProcessor extends WorkerHost {
       });
 
       if (!response.ok) {
-        throw new Error(`Webhook returned HTTP ${response.status}: ${response.statusText}`);
+        throw new Error(
+          `Webhook returned HTTP ${response.status}: ${response.statusText}`,
+        );
       }
 
       this.logger.log(`Webhook ${job.id} delivered: HTTP ${response.status}`);

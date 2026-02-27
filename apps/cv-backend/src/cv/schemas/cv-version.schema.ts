@@ -31,7 +31,17 @@ export class CvVersion {
   @Prop()
   changeDescription?: string;
 
-  @Prop({ type: String, enum: ['manual', 'ai-generated', 'auto-save', 'publish', 'restore', 'branch'] })
+  @Prop({
+    type: String,
+    enum: [
+      'manual',
+      'ai-generated',
+      'auto-save',
+      'publish',
+      'restore',
+      'branch',
+    ],
+  })
   changeType: string;
 
   @Prop({ type: Object })
@@ -62,4 +72,7 @@ export const CvVersionSchema = SchemaFactory.createForClass(CvVersion);
 CvVersionSchema.index({ cvId: 1, version: -1 });
 CvVersionSchema.index({ cvId: 1, branchName: 1 });
 CvVersionSchema.index({ userId: 1, createdAt: -1 });
-CvVersionSchema.index({ createdAt: 1 }, { expireAfterSeconds: 180 * 24 * 60 * 60 }); // TTL: 180 days
+CvVersionSchema.index(
+  { createdAt: 1 },
+  { expireAfterSeconds: 180 * 24 * 60 * 60 },
+); // TTL: 180 days

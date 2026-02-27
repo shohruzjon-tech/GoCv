@@ -28,14 +28,19 @@ export class PdfJobProcessor extends WorkerHost {
 
       const browser = await puppeteer.default.launch({
         headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
+        args: [
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-dev-shm-usage',
+        ],
       });
 
       try {
         const page = await browser.newPage();
 
         // Fetch CV HTML from the API or render it
-        const html = job.data.payload?.html || '<html><body>No content</body></html>';
+        const html =
+          job.data.payload?.html || '<html><body>No content</body></html>';
 
         await page.setContent(html, { waitUntil: 'networkidle0' });
 
@@ -44,12 +49,19 @@ export class PdfJobProcessor extends WorkerHost {
         const pdfBuffer = await page.pdf({
           format: format === 'letter' ? 'Letter' : 'A4',
           printBackground: true,
-          margin: { top: '0.5in', right: '0.5in', bottom: '0.5in', left: '0.5in' },
+          margin: {
+            top: '0.5in',
+            right: '0.5in',
+            bottom: '0.5in',
+            left: '0.5in',
+          },
         });
 
         await job.updateProgress(90);
 
-        this.logger.log(`PDF job ${job.id} completed: ${pdfBuffer.length} bytes`);
+        this.logger.log(
+          `PDF job ${job.id} completed: ${pdfBuffer.length} bytes`,
+        );
 
         return {
           size: pdfBuffer.length,

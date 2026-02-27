@@ -44,7 +44,9 @@ export class OrgRoleGuard implements CanActivate {
     }
 
     // Get org ID from route params or body
-    const orgParamName = this.reflector.get<string>(ORG_PARAM_KEY, context.getHandler()) || 'orgId';
+    const orgParamName =
+      this.reflector.get<string>(ORG_PARAM_KEY, context.getHandler()) ||
+      'orgId';
     const orgId =
       request.params?.[orgParamName] ||
       request.body?.organizationId ||
@@ -68,7 +70,9 @@ export class OrgRoleGuard implements CanActivate {
     };
 
     const userLevel = ROLE_HIERARCHY[userRole] || 0;
-    const minLevel = Math.min(...requiredRoles.map((r) => ROLE_HIERARCHY[r] || 0));
+    const minLevel = Math.min(
+      ...requiredRoles.map((r) => ROLE_HIERARCHY[r] || 0),
+    );
 
     if (userLevel < minLevel) {
       throw new ForbiddenException(

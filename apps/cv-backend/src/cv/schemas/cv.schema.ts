@@ -113,4 +113,8 @@ export class Cv {
 export const CvSchema = SchemaFactory.createForClass(Cv);
 CvSchema.index({ organizationId: 1, userId: 1 });
 CvSchema.index({ tags: 1 });
-CvSchema.index({ targetRole: 'text', targetCompany: 'text', 'personalInfo.fullName': 'text' });
+CvSchema.index({
+  targetRole: 'text',
+  targetCompany: 'text',
+  'personalInfo.fullName': 'text',
+});

@@ -53,7 +53,12 @@ export class CvVersionService {
     // Calculate diff from previous version
     const diff = lastVersion
       ? this.calculateDiff(lastVersion.snapshot, snapshot)
-      : { fieldsChanged: ['initial'], sectionsAdded: [], sectionsRemoved: [], sectionsModified: [] };
+      : {
+          fieldsChanged: ['initial'],
+          sectionsAdded: [],
+          sectionsRemoved: [],
+          sectionsModified: [],
+        };
 
     const version = new this.versionModel({
       cvId: new Types.ObjectId(cvId),
@@ -69,7 +74,9 @@ export class CvVersionService {
     });
 
     const saved = await version.save();
-    this.logger.log(`CV version ${nextVersion} created for CV ${cvId} [${changeType}]`);
+    this.logger.log(
+      `CV version ${nextVersion} created for CV ${cvId} [${changeType}]`,
+    );
     return saved;
   }
 
@@ -119,7 +126,8 @@ export class CvVersionService {
     const version = await this.versionModel
       .findOne({ cvId: new Types.ObjectId(cvId), version: versionNumber })
       .exec();
-    if (!version) throw new NotFoundException(`Version ${versionNumber} not found`);
+    if (!version)
+      throw new NotFoundException(`Version ${versionNumber} not found`);
     return version;
   }
 
@@ -133,7 +141,12 @@ export class CvVersionService {
     const version = await this.getVersion(cvId, versionNumber, userId);
 
     // Create a version snapshot of current state before restoring
-    await this.createVersion(cvId, userId, 'restore', `Restored from v${versionNumber}`);
+    await this.createVersion(
+      cvId,
+      userId,
+      'restore',
+      `Restored from v${versionNumber}`,
+    );
 
     // Apply the version snapshot to the CV
     const updated = await this.cvModel
@@ -207,7 +220,10 @@ export class CvVersionService {
     return saved;
   }
 
-  async getBranches(cvId: string, userId: string): Promise<CvVersionDocument[]> {
+  async getBranches(
+    cvId: string,
+    userId: string,
+  ): Promise<CvVersionDocument[]> {
     const cv = await this.cvModel.findById(cvId).exec();
     if (!cv) throw new NotFoundException('CV not found');
     if (cv.userId.toString() !== userId) {
@@ -261,16 +277,23 @@ export class CvVersionService {
 
     // Compare top-level fields
     for (const key of ['title', 'summary', 'templateId']) {
-      if (JSON.stringify(oldSnapshot[key]) !== JSON.stringify(newSnapshot[key])) {
+      if (
+        JSON.stringify(oldSnapshot[key]) !== JSON.stringify(newSnapshot[key])
+      ) {
         fieldsChanged.push(key);
       }
     }
 
-    if (JSON.stringify(oldSnapshot.personalInfo) !== JSON.stringify(newSnapshot.personalInfo)) {
+    if (
+      JSON.stringify(oldSnapshot.personalInfo) !==
+      JSON.stringify(newSnapshot.personalInfo)
+    ) {
       fieldsChanged.push('personalInfo');
     }
 
-    if (JSON.stringify(oldSnapshot.theme) !== JSON.stringify(newSnapshot.theme)) {
+    if (
+      JSON.stringify(oldSnapshot.theme) !== JSON.stringify(newSnapshot.theme)
+    ) {
       fieldsChanged.push('theme');
     }
 

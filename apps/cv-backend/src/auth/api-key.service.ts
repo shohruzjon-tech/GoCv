@@ -8,7 +8,10 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import * as crypto from 'crypto';
 import { ApiKey, ApiKeyDocument } from './schemas/api-key.schema.js';
-import { ApiKeyScope, ApiKeyStatus } from '../common/enums/api-key-scope.enum.js';
+import {
+  ApiKeyScope,
+  ApiKeyStatus,
+} from '../common/enums/api-key-scope.enum.js';
 
 @Injectable()
 export class ApiKeyService {
@@ -38,7 +41,9 @@ export class ApiKeyService {
       keyHash,
       keyPrefix,
       userId: new Types.ObjectId(userId),
-      organizationId: organizationId ? new Types.ObjectId(organizationId) : undefined,
+      organizationId: organizationId
+        ? new Types.ObjectId(organizationId)
+        : undefined,
       scopes,
       status: ApiKeyStatus.ACTIVE,
       expiresAt: expiresInDays
@@ -56,9 +61,7 @@ export class ApiKeyService {
 
   // ─── Validate API Key ───
 
-  async validateKey(
-    rawKey: string,
-  ): Promise<{
+  async validateKey(rawKey: string): Promise<{
     valid: boolean;
     apiKey?: ApiKeyDocument;
     reason?: string;
@@ -132,7 +135,9 @@ export class ApiKeyService {
     apiKey.revokedBy = new Types.ObjectId(revokedBy);
     await apiKey.save();
 
-    this.logger.log(`API key ${apiKey.keyPrefix}... revoked by user ${revokedBy}`);
+    this.logger.log(
+      `API key ${apiKey.keyPrefix}... revoked by user ${revokedBy}`,
+    );
   }
 
   async rotateKey(
@@ -157,7 +162,9 @@ export class ApiKeyService {
       oldKey.scopes,
       oldKey.organizationId?.toString(),
       oldKey.expiresAt
-        ? Math.ceil((oldKey.expiresAt.getTime() - Date.now()) / (24 * 60 * 60 * 1000))
+        ? Math.ceil(
+            (oldKey.expiresAt.getTime() - Date.now()) / (24 * 60 * 60 * 1000),
+          )
         : undefined,
       oldKey.rateLimit as any,
     );

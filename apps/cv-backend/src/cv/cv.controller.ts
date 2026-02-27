@@ -10,6 +10,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { CvService } from './cv.service.js';
+import { CvVersionService } from './cv-version.service.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { CurrentUser } from '../auth/decorators/current-user.decorator.js';
 import {
@@ -21,7 +22,10 @@ import {
 
 @Controller('api/cv')
 export class CvController {
-  constructor(private cvService: CvService) {}
+  constructor(
+    private cvService: CvService,
+    private cvVersionService: CvVersionService,
+  ) {}
 
   // Public route - view published CVs
   @Get('public/:slug')

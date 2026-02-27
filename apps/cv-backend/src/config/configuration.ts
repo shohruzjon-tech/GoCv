@@ -40,10 +40,7 @@ export default () => ({
   ai: {
     primaryProvider: process.env.AI_PRIMARY_PROVIDER || 'openai',
     fallbackProvider: process.env.AI_FALLBACK_PROVIDER || 'anthropic',
-    failoverThreshold: parseInt(
-      process.env.AI_FAILOVER_THRESHOLD ?? '3',
-      10,
-    ),
+    failoverThreshold: parseInt(process.env.AI_FAILOVER_THRESHOLD ?? '3', 10),
     abTestingEnabled: process.env.AI_AB_TESTING_ENABLED === 'true',
     costOptimizationEnabled: process.env.AI_COST_OPTIMIZATION === 'true',
   },
