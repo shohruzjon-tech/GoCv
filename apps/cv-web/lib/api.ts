@@ -203,6 +203,108 @@ export const featureFlagsApi = {
   getClientFlags: () => api.get("/api/feature-flags/client"),
 };
 
+// ========== Organizations API ==========
+export const organizationsApi = {
+  getAll: () => api.get("/api/organizations"),
+
+  getById: (id: string) => api.get(`/api/organizations/${id}`),
+
+  getBySlug: (slug: string) => api.get(`/api/organizations/slug/${slug}`),
+
+  create: (data: {
+    name: string;
+    description?: string;
+    industry?: string;
+    website?: string;
+    size?: string;
+  }) => api.post("/api/organizations", data),
+
+  update: (id: string, data: any) => api.put(`/api/organizations/${id}`, data),
+
+  delete: (id: string) => api.delete(`/api/organizations/${id}`),
+
+  updateBranding: (id: string, data: any) =>
+    api.put(`/api/organizations/${id}/branding`, data),
+
+  updateSettings: (id: string, data: any) =>
+    api.put(`/api/organizations/${id}/settings`, data),
+
+  // Members
+  getMembers: (id: string, page = 1, limit = 20) =>
+    api.get(`/api/organizations/${id}/members`, { params: { page, limit } }),
+
+  inviteMember: (id: string, data: { email: string; role: string }) =>
+    api.post(`/api/organizations/${id}/members/invite`, data),
+
+  updateMemberRole: (id: string, userId: string, role: string) =>
+    api.put(`/api/organizations/${id}/members/${userId}/role`, { role }),
+
+  removeMember: (id: string, userId: string) =>
+    api.delete(`/api/organizations/${id}/members/${userId}`),
+
+  transferOwnership: (id: string, newOwnerId: string) =>
+    api.post(`/api/organizations/${id}/transfer-ownership`, { newOwnerId }),
+
+  // Teams
+  getTeams: (id: string) => api.get(`/api/organizations/${id}/teams`),
+
+  createTeam: (
+    id: string,
+    data: { name: string; description?: string; color?: string; icon?: string },
+  ) => api.post(`/api/organizations/${id}/teams`, data),
+
+  updateTeam: (id: string, teamId: string, data: any) =>
+    api.put(`/api/organizations/${id}/teams/${teamId}`, data),
+
+  deleteTeam: (id: string, teamId: string) =>
+    api.delete(`/api/organizations/${id}/teams/${teamId}`),
+
+  getStats: (id: string) => api.get(`/api/organizations/${id}/stats`),
+};
+
+// ========== CV Versions API ==========
+export const cvVersionsApi = {
+  getVersions: (cvId: string, page = 1, limit = 20) =>
+    api.get(`/api/cv/${cvId}/versions`, { params: { page, limit } }),
+
+  getVersion: (cvId: string, version: number) =>
+    api.get(`/api/cv/${cvId}/versions/${version}`),
+
+  restoreVersion: (cvId: string, version: number) =>
+    api.post(`/api/cv/${cvId}/versions/${version}/restore`),
+
+  createSnapshot: (
+    cvId: string,
+    data: { label?: string; changeDescription?: string },
+  ) => api.post(`/api/cv/${cvId}/versions/snapshot`, data),
+
+  createBranch: (
+    cvId: string,
+    data: { branchName: string; version?: number },
+  ) => api.post(`/api/cv/${cvId}/versions/branch`, data),
+
+  getBranches: (cvId: string) => api.get(`/api/cv/${cvId}/versions/branches`),
+
+  compareVersions: (cvId: string, v1: number, v2: number) =>
+    api.get(`/api/cv/${cvId}/versions/compare`, { params: { v1, v2 } }),
+};
+
+// ========== API Keys API ==========
+export const apiKeysApi = {
+  getAll: () => api.get("/api/auth/api-keys"),
+
+  create: (data: {
+    name: string;
+    scopes: string[];
+    expiresIn?: number;
+    allowedIps?: string[];
+  }) => api.post("/api/auth/api-keys", data),
+
+  revoke: (id: string) => api.post(`/api/auth/api-keys/${id}/revoke`),
+
+  rotate: (id: string) => api.post(`/api/auth/api-keys/${id}/rotate`),
+};
+
 // ========== Admin API ==========
 export const adminApi = {
   getDashboard: () => api.get("/api/admin/dashboard"),

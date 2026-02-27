@@ -12,6 +12,7 @@ import {
   Camera,
   Save,
   Loader2,
+  Key,
 } from "lucide-react";
 
 export default function SettingsPage() {
@@ -88,6 +89,13 @@ export default function SettingsPage() {
         >
           <CreditCard className="mb-0.5 mr-1.5 inline h-4 w-4" />
           Billing
+        </Link>
+        <Link
+          href="/dashboard/settings/api-keys"
+          className="rounded-t-xl border-b-2 border-transparent px-4 py-2 text-sm font-medium text-content-2 hover:text-content"
+        >
+          <Key className="mb-0.5 mr-1.5 inline h-4 w-4" />
+          API Keys
         </Link>
       </div>
 

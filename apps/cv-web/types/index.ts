@@ -2,7 +2,7 @@ export interface User {
   _id: string;
   name: string;
   email: string;
-  role: "user" | "admin";
+  role: "user" | "admin" | "super_admin";
   avatar?: string;
   username?: string;
   bio?: string;
@@ -13,6 +13,15 @@ export interface User {
     linkedin?: string;
     github?: string;
     twitter?: string;
+  };
+  defaultOrganizationId?: string;
+  preferences?: {
+    defaultAiProvider?: string;
+    defaultTemplateId?: string;
+    emailNotifications?: boolean;
+    marketingEmails?: boolean;
+    language?: string;
+    timezone?: string;
   };
 }
 
@@ -51,6 +60,19 @@ export interface Cv {
   lastAiPrompt?: string;
   isPublic: boolean;
   publicUrl?: string;
+  organizationId?: string;
+  teamId?: string;
+  currentVersion?: number;
+  tags?: string[];
+  targetRole?: string;
+  targetCompany?: string;
+  metadata?: {
+    lastAiProvider?: string;
+    lastAiModel?: string;
+    totalAiEdits?: number;
+    exportCount?: number;
+    viewCount?: number;
+  };
   createdAt: string;
   updatedAt: string;
 }
@@ -334,4 +356,165 @@ export interface DashboardStats {
     totalCostUsd: number;
   };
   estimatedMrr?: number;
+}
+
+// ─── Enterprise Types ───
+
+export type OrgRole = "owner" | "admin" | "recruiter" | "member" | "viewer";
+export type OrgStatus = "active" | "suspended" | "trial" | "deactivated";
+export type OrgPlan = "team" | "business" | "enterprise";
+
+export interface Organization {
+  _id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  ownerId: string;
+  status: OrgStatus;
+  plan: OrgPlan;
+  branding?: OrgBranding;
+  settings?: OrgSettings;
+  memberCount: number;
+  maxMembers: number;
+  totalCvsCreated: number;
+  industry?: string;
+  website?: string;
+  size?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface OrgBranding {
+  logoUrl?: string;
+  faviconUrl?: string;
+  primaryColor?: string;
+  accentColor?: string;
+  customDomain?: string;
+  companyName?: string;
+  tagline?: string;
+}
+
+export interface OrgSettings {
+  allowMemberInvites: boolean;
+  allowPublicCvs: boolean;
+  requireApprovalForPublish: boolean;
+  enableAiTools: boolean;
+  enforceTemplates: boolean;
+  allowedTemplateIds: string[];
+  preferredAiProvider: string;
+}
+
+export interface OrgMembership {
+  _id: string;
+  userId:
+    | string
+    | { _id: string; name: string; email: string; avatar?: string };
+  organizationId: string;
+  role: OrgRole;
+  teamIds: string[];
+  isActive: boolean;
+  invitedBy?: string;
+  invitedAt?: string;
+  joinedAt?: string;
+  permissions?: OrgPermissions;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface OrgPermissions {
+  canCreateCv: boolean;
+  canPublishCv: boolean;
+  canUseAi: boolean;
+  canManageTemplates: boolean;
+  canInviteMembers: boolean;
+  canViewAnalytics: boolean;
+  canManageBilling: boolean;
+}
+
+export interface Team {
+  _id: string;
+  organizationId: string;
+  name: string;
+  description?: string;
+  slug: string;
+  memberIds:
+    | string[]
+    | { _id: string; name: string; email: string; avatar?: string }[];
+  leadId?:
+    | string
+    | { _id: string; name: string; email: string; avatar?: string };
+  settings?: {
+    defaultTemplateId?: string;
+    maxCvsPerMember?: number;
+    aiCreditsPool?: number;
+    autoApprovePublish?: boolean;
+  };
+  color: string;
+  icon?: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CvVersion {
+  _id: string;
+  cvId: string;
+  userId: string;
+  version: number;
+  label?: string;
+  snapshot: {
+    title: string;
+    summary?: string;
+    personalInfo?: Record<string, any>;
+    sections: Record<string, any>[];
+    theme?: Record<string, any>;
+    templateId?: string;
+  };
+  changeDescription?: string;
+  changeType:
+    | "manual"
+    | "ai-generated"
+    | "auto-save"
+    | "publish"
+    | "restore"
+    | "branch";
+  diff?: {
+    fieldsChanged: string[];
+    sectionsAdded: string[];
+    sectionsRemoved: string[];
+    sectionsModified: string[];
+  };
+  branchName?: string;
+  isBranch: boolean;
+  sizeBytes?: number;
+  createdAt: string;
+}
+
+export interface ApiKeyInfo {
+  _id: string;
+  name: string;
+  keyPrefix: string;
+  scopes: string[];
+  status: "active" | "revoked" | "expired";
+  expiresAt?: string;
+  lastUsedAt?: string;
+  usageCount: number;
+  createdAt: string;
+}
+
+export interface AiProviderHealth {
+  provider: "openai" | "anthropic";
+  healthy: boolean;
+  latencyMs: number;
+  lastChecked: string;
+  errorRate: number;
+  consecutiveFailures: number;
+}
+
+export interface QueueMetrics {
+  waiting: number;
+  active: number;
+  completed: number;
+  failed: number;
+  delayed: number;
 }

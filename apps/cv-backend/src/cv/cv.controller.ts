@@ -101,4 +101,93 @@ export class CvController {
   async publish(@Param('id') id: string, @CurrentUser('_id') userId: string) {
     return this.cvService.publish(id, userId);
   }
+
+  // ─── Versioning Endpoints ───
+
+  @Get(':id/versions')
+  @UseGuards(JwtAuthGuard)
+  async getVersions(
+    @Param('id') id: string,
+    @CurrentUser('_id') userId: string,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    return this.cvVersionService.getVersions(
+      id,
+      userId,
+      Number(page) || 1,
+      Number(limit) || 20,
+    );
+  }
+
+  @Get(':id/versions/:version')
+  @UseGuards(JwtAuthGuard)
+  async getVersion(
+    @Param('id') id: string,
+    @Param('version') version: string,
+    @CurrentUser('_id') userId: string,
+  ) {
+    return this.cvVersionService.getVersion(id, parseInt(version), userId);
+  }
+
+  @Post(':id/versions/:version/restore')
+  @UseGuards(JwtAuthGuard)
+  async restoreVersion(
+    @Param('id') id: string,
+    @Param('version') version: string,
+    @CurrentUser('_id') userId: string,
+  ) {
+    return this.cvVersionService.restoreVersion(id, parseInt(version), userId);
+  }
+
+  @Post(':id/versions/snapshot')
+  @UseGuards(JwtAuthGuard)
+  async createSnapshot(
+    @Param('id') id: string,
+    @CurrentUser('_id') userId: string,
+    @Body() body: { label?: string; description?: string },
+  ) {
+    return this.cvVersionService.createVersion(
+      id,
+      userId,
+      'manual',
+      body.description,
+      body.label,
+    );
+  }
+
+  @Post(':id/branches')
+  @UseGuards(JwtAuthGuard)
+  async createBranch(
+    @Param('id') id: string,
+    @CurrentUser('_id') userId: string,
+    @Body('name') name: string,
+  ) {
+    return this.cvVersionService.createBranch(id, userId, name);
+  }
+
+  @Get(':id/branches')
+  @UseGuards(JwtAuthGuard)
+  async getBranches(
+    @Param('id') id: string,
+    @CurrentUser('_id') userId: string,
+  ) {
+    return this.cvVersionService.getBranches(id, userId);
+  }
+
+  @Get(':id/versions/compare')
+  @UseGuards(JwtAuthGuard)
+  async compareVersions(
+    @Param('id') id: string,
+    @Query('a') versionA: string,
+    @Query('b') versionB: string,
+    @CurrentUser('_id') userId: string,
+  ) {
+    return this.cvVersionService.compareVersions(
+      id,
+      parseInt(versionA),
+      parseInt(versionB),
+      userId,
+    );
+  }
 }

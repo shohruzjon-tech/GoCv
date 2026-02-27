@@ -300,8 +300,8 @@ export class CvVersionService {
     // Compare sections
     const oldSections = oldSnapshot.sections || [];
     const newSections = newSnapshot.sections || [];
-    const oldTypes = new Set(oldSections.map((s: any) => s.type));
-    const newTypes = new Set(newSections.map((s: any) => s.type));
+    const oldTypes = new Set<string>(oldSections.map((s: any) => s.type));
+    const newTypes = new Set<string>(newSections.map((s: any) => s.type));
 
     for (const type of newTypes) {
       if (!oldTypes.has(type)) sectionsAdded.push(type);

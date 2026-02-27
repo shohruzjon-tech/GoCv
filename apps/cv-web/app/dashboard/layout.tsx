@@ -6,8 +6,13 @@ import {
   useAuthStore,
   useNotificationsStore,
   useSubscriptionStore,
+  useOrganizationStore,
 } from "@/lib/store";
-import { notificationsApi, subscriptionsApi } from "@/lib/api";
+import {
+  notificationsApi,
+  subscriptionsApi,
+  organizationsApi,
+} from "@/lib/api";
 import Sidebar from "@/components/layout/sidebar";
 import DashboardHeader from "@/components/layout/dashboard-header";
 import NotificationDrawer from "@/components/layout/notification-drawer";
@@ -20,6 +25,7 @@ export default function DashboardLayout({
   const { user, isLoading } = useAuthStore();
   const { setNotifications, setUnreadCount } = useNotificationsStore();
   const { setSubscription } = useSubscriptionStore();
+  const { setOrganizations } = useOrganizationStore();
   const router = useRouter();
 
   useEffect(() => {
@@ -42,6 +48,10 @@ export default function DashboardLayout({
       subscriptionsApi
         .getMy()
         .then((r) => setSubscription(r.data))
+        .catch(() => {});
+      organizationsApi
+        .getAll()
+        .then((r) => setOrganizations(r.data))
         .catch(() => {});
     }
   }, [user]);

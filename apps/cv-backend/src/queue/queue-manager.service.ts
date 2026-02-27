@@ -23,6 +23,7 @@ export interface PdfJobData {
   templateId?: string;
   format?: 'a4' | 'letter';
   correlationId?: string;
+  payload?: { html?: string };
 }
 
 export interface WebhookJobData {

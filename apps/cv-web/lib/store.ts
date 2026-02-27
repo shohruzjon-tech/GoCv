@@ -1,7 +1,14 @@
 "use client";
 
 import { create } from "zustand";
-import { User, Subscription, Notification } from "@/types";
+import {
+  User,
+  Subscription,
+  Notification,
+  Organization,
+  OrgMembership,
+  OrgRole,
+} from "@/types";
 
 // ─── Auth Store ───
 
@@ -139,4 +146,57 @@ export const useSidebarStore = create<SidebarState>((set) => ({
   toggle: () => set((s) => ({ isOpen: !s.isOpen })),
   open: () => set({ isOpen: true }),
   close: () => set({ isOpen: false }),
+}));
+
+// ─── Organization Store ───
+
+interface OrganizationState {
+  organizations: Organization[];
+  activeOrg: Organization | null;
+  activeOrgRole: OrgRole | null;
+  isLoading: boolean;
+  setOrganizations: (orgs: Organization[]) => void;
+  setActiveOrg: (org: Organization | null) => void;
+  setActiveOrgRole: (role: OrgRole | null) => void;
+  setLoading: (loading: boolean) => void;
+  addOrganization: (org: Organization) => void;
+  updateOrganization: (id: string, updates: Partial<Organization>) => void;
+  removeOrganization: (id: string) => void;
+  switchOrg: (org: Organization, role: OrgRole) => void;
+}
+
+export const useOrganizationStore = create<OrganizationState>((set, get) => ({
+  organizations: [],
+  activeOrg: null,
+  activeOrgRole: null,
+  isLoading: false,
+  setOrganizations: (organizations) => set({ organizations }),
+  setActiveOrg: (activeOrg) => set({ activeOrg }),
+  setActiveOrgRole: (activeOrgRole) => set({ activeOrgRole }),
+  setLoading: (isLoading) => set({ isLoading }),
+  addOrganization: (org) =>
+    set((state) => ({
+      organizations: [...state.organizations, org],
+    })),
+  updateOrganization: (id, updates) =>
+    set((state) => ({
+      organizations: state.organizations.map((o) =>
+        o._id === id ? { ...o, ...updates } : o,
+      ),
+      activeOrg:
+        state.activeOrg?._id === id
+          ? { ...state.activeOrg, ...updates }
+          : state.activeOrg,
+    })),
+  removeOrganization: (id) =>
+    set((state) => ({
+      organizations: state.organizations.filter((o) => o._id !== id),
+      activeOrg: state.activeOrg?._id === id ? null : state.activeOrg,
+      activeOrgRole: state.activeOrg?._id === id ? null : state.activeOrgRole,
+    })),
+  switchOrg: (org, role) =>
+    set({
+      activeOrg: org,
+      activeOrgRole: role,
+    }),
 }));

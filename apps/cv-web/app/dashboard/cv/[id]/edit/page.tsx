@@ -14,6 +14,7 @@ import {
   Plus,
   Eye,
   EyeOff,
+  History,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -158,6 +159,13 @@ export default function EditCvPage() {
           >
             <Save className="h-4 w-4" />
             {saving ? "Saving..." : "Save"}
+          </button>
+          <button
+            onClick={() => router.push(`/dashboard/cv/${id}/versions`)}
+            className="flex items-center gap-2 rounded-lg border border-edge px-4 py-2 text-sm font-medium text-content-2 transition hover:bg-card-hover"
+          >
+            <History className="h-4 w-4" />
+            History
           </button>
           <button
             onClick={handlePublish}

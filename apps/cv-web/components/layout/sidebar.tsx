@@ -18,6 +18,7 @@ import {
   CreditCard,
   Shield,
   Crown,
+  Building2,
   X,
 } from "lucide-react";
 
@@ -27,6 +28,7 @@ const mainLinks = [
   { href: "/dashboard/projects", label: "Projects", icon: FolderOpen },
   { href: "/dashboard/templates", label: "Templates", icon: Palette },
   { href: "/dashboard/ai-tools", label: "AI Tools", icon: Wand2 },
+  { href: "/dashboard/organizations", label: "Organizations", icon: Building2 },
 ];
 
 const bottomLinks = [
@@ -137,7 +139,7 @@ export default function Sidebar() {
               {link.label}
             </Link>
           ))}
-          {user?.role === "admin" && (
+          {(user?.role === "admin" || user?.role === "super_admin") && (
             <Link
               href="/admin"
               onClick={close}
