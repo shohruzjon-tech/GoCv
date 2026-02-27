@@ -47,7 +47,11 @@ export default function BillingPage() {
     }
 
     Promise.all([
-      subscriptionsApi.getPlans().then((r) => setPlans(r.data)),
+      subscriptionsApi
+        .getPlans()
+        .then((r) =>
+          setPlans(Array.isArray(r.data) ? r.data : r.data?.plans || []),
+        ),
       subscriptionsApi.getMy().then((r) => setSubscription(r.data)),
       subscriptionsApi
         .getInvoices()
