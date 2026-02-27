@@ -3,12 +3,9 @@ FROM node:22-slim AS builder
 
 WORKDIR /app
 
-# Install wdget and curl
-RUN apk add --no-cache wget curl
-
-# Install dependencies for Puppeteer/Chromium
+# Install dependencies for Puppeteer/Chromium build
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3 make g++ \
+    wget curl python3 make g++ \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy workspace root files
