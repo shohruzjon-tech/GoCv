@@ -28,6 +28,7 @@ WORKDIR /app
 
 # Install runtime deps for Puppeteer/Chromium
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
     chromium \
     fonts-liberation \
     libatk-bridge2.0-0 \
