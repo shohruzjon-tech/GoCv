@@ -10,4 +10,5 @@ export enum AiToolType {
   SKILL_GAP_ANALYSIS = 'skill_gap_analysis',
   ATS_OPTIMIZE = 'ats_optimize',
   INTERVIEW_PREP = 'interview_prep',
+  PROFILE_EXTRACT = 'profile_extract',
 }

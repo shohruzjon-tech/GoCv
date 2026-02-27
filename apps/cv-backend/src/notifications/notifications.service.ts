@@ -103,7 +103,7 @@ export class NotificationsService {
       message:
         'Create your first CV using our AI-powered builder. Get started in seconds!',
       type: 'success',
-      actionUrl: '/dashboard/cv/builder',
+      actionUrl: '/dashboard/cv/generate',
       actionLabel: 'Create CV',
     });
   }

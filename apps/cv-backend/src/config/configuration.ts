@@ -63,7 +63,7 @@ export default () => ({
     },
   },
 
-  frontendUrl: process.env.FRONTEND_URL || 'http://localhost:3000',
+  frontendUrl: process.env.FRONTEND_URL || 'http://localhost:4001',
 
   admin: {
     email: process.env.ADMIN_EMAIL || 'admin@cvbuilder.com',

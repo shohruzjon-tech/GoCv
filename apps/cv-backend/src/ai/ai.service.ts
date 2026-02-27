@@ -378,6 +378,132 @@ Respond in a friendly, professional manner. When suggesting CV changes, be speci
   }
 
   // ═══════════════════════════════════════════
+  // PROFILE EXTRACTION FROM TEXT / LINKEDIN / FILE
+  // ═══════════════════════════════════════════
+
+  async extractProfile(
+    text: string,
+    sourceType: 'prompt' | 'linkedin' | 'file',
+    userId: string,
+  ): Promise<any> {
+    await this.checkAndTrackUsage(userId);
+    const startTime = Date.now();
+
+    const sourceHint =
+      sourceType === 'linkedin'
+        ? 'The following text is from a LinkedIn profile.'
+        : sourceType === 'file'
+          ? 'The following text was extracted from an uploaded CV/resume file.'
+          : 'The following is a freeform description of professional background.';
+
+    const systemPrompt = `You are an expert CV data extractor. ${sourceHint}
+Extract ALL available professional information and return a structured JSON object.
+Return ONLY valid JSON with this exact structure (use empty strings or empty arrays where data is not available):
+{
+  "personalInfo": {
+    "fullName": "",
+    "email": "",
+    "phone": "",
+    "location": "",
+    "website": "",
+    "linkedin": "",
+    "github": ""
+  },
+  "summary": "",
+  "skills": {
+    "technical": [],
+    "tools": [],
+    "soft": [],
+    "languages": []
+  },
+  "experience": [
+    {
+      "company": "",
+      "title": "",
+      "location": "",
+      "startDate": "",
+      "endDate": "",
+      "current": false,
+      "bullets": []
+    }
+  ],
+  "projects": [
+    {
+      "name": "",
+      "description": "",
+      "technologies": "",
+      "liveUrl": "",
+      "sourceUrl": ""
+    }
+  ],
+  "education": [
+    {
+      "degree": "",
+      "institution": "",
+      "location": "",
+      "startDate": "",
+      "endDate": "",
+      "gpa": "",
+      "honors": ""
+    }
+  ],
+  "certifications": [
+    {
+      "name": "",
+      "issuer": "",
+      "date": "",
+      "url": ""
+    }
+  ]
+}
+
+Rules:
+- Extract every piece of information you can find
+- For dates use YYYY-MM format when possible
+- If someone is currently working somewhere, set current=true and endDate=""
+- For skills, categorize intelligently: programming/frameworks in "technical", tools/platforms in "tools", interpersonal in "soft", spoken languages with proficiency in "languages"
+- Convert bullet points to concise "Action + Result + Metric" format where possible
+- Do NOT invent data that is not present in the input
+- Omit sections with no data (use empty arrays)`;
+
+    try {
+      const completion = await this.openai.chat.completions.create({
+        model: 'gpt-5',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: text },
+        ],
+        response_format: { type: 'json_object' },
+        max_completion_tokens: 8192,
+      });
+
+      const content = completion.choices[0]?.message?.content;
+      await this.trackCall(
+        userId,
+        AiToolType.PROFILE_EXTRACT,
+        completion,
+        startTime,
+        true,
+        text.substring(0, 500),
+      );
+      return content ? JSON.parse(content) : null;
+    } catch (error: any) {
+      await this.trackCall(
+        userId,
+        AiToolType.PROFILE_EXTRACT,
+        null,
+        startTime,
+        false,
+        text.substring(0, 500),
+        undefined,
+        error.message,
+      );
+      this.logger.error('Profile extraction failed', error);
+      throw error;
+    }
+  }
+
+  // ═══════════════════════════════════════════
   // NEW ADVANCED AI TOOLS
   // ═══════════════════════════════════════════
 

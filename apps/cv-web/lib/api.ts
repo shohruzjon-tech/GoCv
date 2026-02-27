@@ -114,6 +114,14 @@ export const uploadApi = {
       headers: { "Content-Type": "multipart/form-data" },
     });
   },
+
+  parseCvFile: (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    return api.post("/api/upload/parse-cv", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  },
 };
 
 // ========== AI API ==========
@@ -144,6 +152,9 @@ export const aiApi = {
   getUsage: () => api.get("/api/ai/usage"),
 
   getUsageHistory: () => api.get("/api/ai/usage/history"),
+
+  extractProfile: (text: string, sourceType: "prompt" | "linkedin" | "file") =>
+    api.post("/api/ai/extract-profile", { text, sourceType }),
 };
 
 // ========== PDF API ==========
@@ -427,6 +438,15 @@ export const adminApi = {
 
   // Revenue
   getRevenue: () => api.get("/api/admin/revenue"),
+
+  // Site Settings
+  getSiteSettings: () => api.get("/api/site-settings"),
+  updateSiteSettings: (data: any) => api.put("/api/site-settings", data),
+};
+
+// ========== Site Settings (Public) ==========
+export const siteSettingsApi = {
+  getCreatorInfo: () => api.get("/api/site-settings/creator"),
 };
 
 export default api;

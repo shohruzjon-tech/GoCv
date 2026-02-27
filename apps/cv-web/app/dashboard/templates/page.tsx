@@ -185,7 +185,7 @@ export default function TemplatesPage() {
                 <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 backdrop-blur-sm transition group-hover:opacity-100">
                   {canUse(template) ? (
                     <Link
-                      href={`/dashboard/cv/builder?template=${template._id}`}
+                      href={`/dashboard/cv/generate?template=${template._id}`}
                       className="flex items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-gray-900 shadow-xl transition hover:bg-gray-100"
                     >
                       <Eye className="h-4 w-4" />

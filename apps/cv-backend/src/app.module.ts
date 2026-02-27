@@ -22,6 +22,7 @@ import { StripeModule } from './stripe/stripe.module.js';
 import { OrganizationsModule } from './organizations/organizations.module.js';
 import { AiOrchestratorModule } from './ai/orchestrator/ai-orchestrator.module.js';
 import { QueueModule } from './queue/queue.module.js';
+import { SiteSettingsModule } from './site-settings/site-settings.module.js';
 import { CorrelationIdMiddleware } from './common/middleware/correlation-id.middleware.js';
 import { TenantMiddleware } from './common/middleware/tenant.middleware.js';
 import { SecurityHeadersMiddleware } from './common/middleware/security-headers.middleware.js';
@@ -74,6 +75,7 @@ import { RequestLoggerMiddleware } from './common/middleware/request-logger.midd
     AdminModule,
     FeatureFlagsModule,
     NotificationsModule,
+    SiteSettingsModule,
   ],
 })
 export class AppModule implements NestModule {

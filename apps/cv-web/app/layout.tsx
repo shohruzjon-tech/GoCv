@@ -29,7 +29,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${inter.variable} ${jakarta.variable} font-sans antialiased`}
+        className={`${inter.variable} ${jakarta.variable} font-sans antialiased bg-page`}
       >
         <Providers>{children}</Providers>
       </body>

@@ -20,7 +20,13 @@ function AuthCallbackContent() {
         .then((res) => {
           setAuth(res.data, token);
           toast.success("Logged in successfully!");
-          router.push("/dashboard");
+          // Redirect to wizard if user started from landing page smart input
+          const pendingWizard = localStorage.getItem("pending_cv_wizard");
+          if (pendingWizard) {
+            router.push("/dashboard/cv/generate");
+          } else {
+            router.push("/dashboard");
+          }
         })
         .catch(() => {
           toast.error("Authentication failed");

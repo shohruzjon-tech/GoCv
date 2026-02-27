@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import {
@@ -20,9 +20,12 @@ import {
   Users,
   TrendingUp,
   X,
+  Upload,
 } from "lucide-react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+
+import { siteSettingsApi } from "@/lib/api";
 
 const ThreeBackground = dynamic(() => import("@/components/three-background"), {
   ssr: false,
@@ -30,10 +33,79 @@ const ThreeBackground = dynamic(() => import("@/components/three-background"), {
 
 export default function Home() {
   const [showLogin, setShowLogin] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [wizardMode, setWizardMode] = useState<"generate" | "polish">(
+    "generate",
+  );
+  const [inputText, setInputText] = useState("");
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [isDragOver, setIsDragOver] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [creatorInfo, setCreatorInfo] = useState<any>(null);
+
+  useEffect(() => {
+    siteSettingsApi
+      .getCreatorInfo()
+      .then((res) => {
+        if (res.data?.name) setCreatorInfo(res.data);
+      })
+      .catch(() => {});
+  }, []);
 
   const handleGoogleLogin = () => {
     window.location.href = `${API_URL}/api/auth/google`;
   };
+
+  const handleSmartSubmit = () => {
+    const payload: Record<string, string> = {
+      sourceType: wizardMode === "polish" ? "upload" : "prompt",
+      wizardMode,
+    };
+    if (wizardMode === "generate") {
+      payload.sourceText = inputText;
+    }
+    if (wizardMode === "polish" && uploadedFile) {
+      payload.sourceFileName = uploadedFile.name;
+      const reader = new FileReader();
+      reader.onload = () => {
+        payload.fileBase64 = reader.result as string;
+        localStorage.setItem("pending_cv_wizard", JSON.stringify(payload));
+        const token = localStorage.getItem("token");
+        if (token) {
+          window.location.href = "/dashboard/cv/generate";
+        } else {
+          setShowLogin(true);
+        }
+      };
+      reader.readAsDataURL(uploadedFile);
+      return;
+    }
+    localStorage.setItem("pending_cv_wizard", JSON.stringify(payload));
+    const token = localStorage.getItem("token");
+    if (token) {
+      window.location.href = "/dashboard/cv/generate";
+    } else {
+      setShowLogin(true);
+    }
+  };
+
+  const handleFileDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    const file = e.dataTransfer.files[0];
+    if (file) setUploadedFile(file);
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) setUploadedFile(file);
+  };
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   // Close on Escape
   useEffect(() => {
@@ -45,10 +117,8 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="relative min-h-screen overflow-x-hidden bg-page text-content">
-      <div style={{ opacity: "var(--t-three-opacity)" }}>
-        <ThreeBackground />
-      </div>
+    <div className="relative min-h-screen overflow-x-hidden text-content">
+      <ThreeBackground />
 
       {/* ──── Login Modal ──── */}
       {showLogin && (
@@ -126,7 +196,11 @@ export default function Home() {
       )}
 
       {/* ──── Navbar ──── */}
-      <header className="fixed top-0 z-50 w-full">
+      <header
+        className={`fixed top-0 z-50 w-full transition-all duration-500 ${
+          scrolled ? "bg-page/80 backdrop-blur-xl" : ""
+        }`}
+      >
         <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6">
           <Link href="/" className="flex items-center gap-2.5 group">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-600/20 ring-1 ring-indigo-500/30 transition group-hover:ring-indigo-400/50">
@@ -162,6 +236,14 @@ export default function Home() {
             >
               Pricing
             </a>
+            {creatorInfo && (
+              <a
+                href="#creator"
+                className="text-sm font-medium text-content-2 transition hover:text-content"
+              >
+                Creator
+              </a>
+            )}
           </nav>
 
           <div className="flex items-center gap-3">
@@ -199,7 +281,7 @@ export default function Home() {
             </div>
 
             {/* Headline */}
-            <h1 className="animate-fade-up delay-100 mb-8 text-5xl font-extrabold leading-[1.1] tracking-tight sm:text-7xl lg:text-8xl">
+            <h1 className="animate-fade-up delay-100 mb-8 text-3xl font-extrabold leading-[1.1] tracking-tight sm:text-4xl lg:text-5xl">
               Your Career,{" "}
               <span className="text-gradient">Beautifully Crafted</span>
               <br />
@@ -207,28 +289,130 @@ export default function Home() {
             </h1>
 
             {/* Subheading */}
-            <p className="animate-fade-up delay-200 mx-auto mb-12 max-w-2xl text-lg leading-relaxed text-content-2 sm:text-xl">
-              Create stunning, ATS-optimized resumes in minutes — not hours. Our
-              AI understands your experience and crafts the perfect narrative to
-              land your dream job.
+            <p className="animate-fade-up delay-200 mx-auto mb-10 max-w-2xl text-sm leading-relaxed text-content-2 sm:text-base">
+              Describe yourself, paste your LinkedIn profile, or upload an
+              existing CV — our AI crafts a stunning, ATS-optimized resume in
+              minutes.
             </p>
 
-            {/* CTAs */}
-            <div className="animate-fade-up delay-300 flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <button
-                onClick={() => setShowLogin(true)}
-                className="group inline-flex h-14 items-center gap-3 rounded-2xl bg-indigo-600 px-10 text-base font-semibold text-white shadow-xl shadow-indigo-600/25 transition-all hover:bg-indigo-500 hover:shadow-indigo-500/30 hover:scale-[1.02]"
-              >
-                <Sparkles className="h-5 w-5" />
-                Start Building — Free
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-              </button>
-              <a
-                href="#how-it-works"
-                className="inline-flex h-14 items-center gap-2 rounded-2xl border border-edge bg-card px-8 text-base font-medium text-content-2 backdrop-blur transition-all hover:border-edge hover:bg-card-hover hover:text-content"
-              >
-                See How It Works
-              </a>
+            {/* Smart Input */}
+            <div className="animate-fade-up delay-300 mx-auto max-w-2xl text-left">
+              <div className="glass rounded-3xl p-2">
+                {/* Top-Level Mode Router */}
+                <div className="mb-2 flex gap-1 rounded-2xl bg-card/80 p-1">
+                  <button
+                    onClick={() => setWizardMode("generate")}
+                    className={`flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-3.5 text-sm font-semibold transition-all ${
+                      wizardMode === "generate"
+                        ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-600/25"
+                        : "text-content-3 hover:text-content hover:bg-card-hover"
+                    }`}
+                  >
+                    <Sparkles className="h-4 w-4" />
+                    Generate with AI
+                  </button>
+                  <button
+                    onClick={() => setWizardMode("polish")}
+                    className={`flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-3.5 text-sm font-semibold transition-all ${
+                      wizardMode === "polish"
+                        ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg shadow-emerald-600/25"
+                        : "text-content-3 hover:text-content hover:bg-card-hover"
+                    }`}
+                  >
+                    <FileText className="h-4 w-4" />
+                    Polish my CV
+                  </button>
+                </div>
+
+                {/* Input Area */}
+                <div className="p-2">
+                  {wizardMode === "generate" && (
+                    <textarea
+                      value={inputText}
+                      onChange={(e) => setInputText(e.target.value)}
+                      placeholder="I'm a senior software engineer with 5 years of experience in React, Node.js, and cloud technologies. I've led teams of 8+ engineers and shipped products used by millions..."
+                      rows={4}
+                      className="w-full resize-none rounded-2xl border border-edge bg-field p-4 text-base text-content placeholder:text-content-4 focus:border-indigo-500/50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition"
+                    />
+                  )}
+
+                  {wizardMode === "polish" && (
+                    <div
+                      onDragOver={(e) => {
+                        e.preventDefault();
+                        setIsDragOver(true);
+                      }}
+                      onDragLeave={() => setIsDragOver(false)}
+                      onDrop={handleFileDrop}
+                      onClick={() => fileInputRef.current?.click()}
+                      className={`flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed py-10 transition-all ${
+                        isDragOver
+                          ? "border-indigo-500 bg-indigo-500/10"
+                          : uploadedFile
+                            ? "border-emerald-500/50 bg-emerald-500/5"
+                            : "border-edge bg-field hover:border-indigo-500/30 hover:bg-indigo-500/5"
+                      }`}
+                    >
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept=".pdf,.doc,.docx"
+                        onChange={handleFileSelect}
+                        className="hidden"
+                      />
+                      {uploadedFile ? (
+                        <>
+                          <FileText className="mb-2 h-8 w-8 text-emerald-400" />
+                          <p className="text-sm font-medium text-content">
+                            {uploadedFile.name}
+                          </p>
+                          <p className="mt-1 text-xs text-content-3">
+                            Click to replace
+                          </p>
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="mb-2 h-8 w-8 text-content-4" />
+                          <p className="text-sm font-medium text-content-2">
+                            Drop your CV here or{" "}
+                            <span className="text-indigo-400">browse</span>
+                          </p>
+                          <p className="mt-1 text-xs text-content-4">
+                            PDF, DOC, DOCX up to 10MB
+                          </p>
+                        </>
+                      )}
+                    </div>
+                  )}
+
+                  <button
+                    onClick={handleSmartSubmit}
+                    disabled={
+                      wizardMode === "polish"
+                        ? !uploadedFile
+                        : !inputText.trim()
+                    }
+                    className={`mt-3 group flex w-full items-center justify-center gap-3 rounded-2xl py-4 text-base font-semibold text-white shadow-xl transition-all hover:scale-[1.01] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100 ${
+                      wizardMode === "polish"
+                        ? "bg-gradient-to-r from-emerald-600 to-teal-600 shadow-emerald-600/25 hover:shadow-emerald-500/30"
+                        : "bg-indigo-600 shadow-indigo-600/25 hover:bg-indigo-500 hover:shadow-indigo-500/30"
+                    }`}
+                  >
+                    {wizardMode === "polish" ? (
+                      <>
+                        <FileText className="h-5 w-5" />
+                        Polish My CV
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="h-5 w-5" />
+                        Generate My CV
+                      </>
+                    )}
+                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  </button>
+                </div>
+              </div>
             </div>
 
             {/* Social proof */}
@@ -673,6 +857,126 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        {/* ──── About Creator ──── */}
+        {creatorInfo && (
+          <section id="creator" className="py-32">
+            <div className="mx-auto max-w-4xl px-6">
+              <div className="mx-auto mb-16 max-w-2xl text-center">
+                <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-pink-500/20 bg-pink-500/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-pink-400">
+                  <Star className="h-3.5 w-3.5" />
+                  Meet the Creator
+                </div>
+                <h2 className="mb-5 text-4xl font-bold tracking-tight sm:text-5xl">
+                  Built by a <span className="text-gradient">Developer</span>,
+                  for Developers
+                </h2>
+              </div>
+
+              <div className="rounded-3xl border border-edge bg-card p-8 sm:p-10">
+                <div className="flex flex-col items-center gap-8 sm:flex-row sm:items-start">
+                  {/* Avatar */}
+                  <div className="flex-shrink-0">
+                    {creatorInfo.avatar ? (
+                      <img
+                        src={creatorInfo.avatar}
+                        alt={creatorInfo.name}
+                        className="h-28 w-28 rounded-3xl object-cover ring-2 ring-edge shadow-lg"
+                      />
+                    ) : (
+                      <div className="flex h-28 w-28 items-center justify-center rounded-3xl bg-gradient-to-br from-indigo-600 to-purple-600 text-3xl font-bold text-white shadow-lg">
+                        {creatorInfo.name
+                          ?.split(" ")
+                          .map((n: string) => n[0])
+                          .join("")
+                          .toUpperCase()
+                          .slice(0, 2)}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Info */}
+                  <div className="flex-1 text-center sm:text-left">
+                    <h3 className="text-2xl font-bold text-content">
+                      {creatorInfo.name}
+                    </h3>
+                    {creatorInfo.title && (
+                      <p className="mt-1 text-sm font-medium text-indigo-400">
+                        {creatorInfo.title}
+                      </p>
+                    )}
+                    {creatorInfo.location && (
+                      <p className="mt-1 text-sm text-content-3">
+                        📍 {creatorInfo.location}
+                      </p>
+                    )}
+                    {creatorInfo.bio && (
+                      <p className="mt-4 leading-relaxed text-content-2">
+                        {creatorInfo.bio}
+                      </p>
+                    )}
+
+                    {/* Skills */}
+                    {creatorInfo.skills?.length > 0 && (
+                      <div className="mt-5 flex flex-wrap justify-center gap-2 sm:justify-start">
+                        {creatorInfo.skills.map((skill: string, i: number) => (
+                          <span
+                            key={i}
+                            className="rounded-lg bg-indigo-500/10 px-3 py-1 text-xs font-medium text-indigo-400 ring-1 ring-indigo-500/20"
+                          >
+                            {skill}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Social Links */}
+                    <div className="mt-6 flex flex-wrap justify-center gap-3 sm:justify-start">
+                      {creatorInfo.email && (
+                        <a
+                          href={`mailto:${creatorInfo.email}`}
+                          className="inline-flex items-center gap-1.5 rounded-xl border border-edge bg-card px-4 py-2 text-sm font-medium text-content-2 transition hover:bg-card-hover hover:text-content"
+                        >
+                          ✉️ Email
+                        </a>
+                      )}
+                      {creatorInfo.linkedin && (
+                        <a
+                          href={creatorInfo.linkedin}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 rounded-xl border border-edge bg-card px-4 py-2 text-sm font-medium text-content-2 transition hover:bg-card-hover hover:text-content"
+                        >
+                          💼 LinkedIn
+                        </a>
+                      )}
+                      {creatorInfo.github && (
+                        <a
+                          href={creatorInfo.github}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 rounded-xl border border-edge bg-card px-4 py-2 text-sm font-medium text-content-2 transition hover:bg-card-hover hover:text-content"
+                        >
+                          🐙 GitHub
+                        </a>
+                      )}
+                      {creatorInfo.website && (
+                        <a
+                          href={creatorInfo.website}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 rounded-xl border border-edge bg-card px-4 py-2 text-sm font-medium text-content-2 transition hover:bg-card-hover hover:text-content"
+                        >
+                          🌐 Website
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* ──── Final CTA ──── */}
         <section className="py-32">

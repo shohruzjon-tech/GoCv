@@ -145,7 +145,7 @@ export default function DashboardPage() {
       {/* Quick Actions */}
       <div className="grid gap-3 sm:grid-cols-3 sm:gap-4">
         <Link
-          href="/dashboard/cv/builder"
+          href="/dashboard/cv/generate"
           className="group flex items-center gap-4 rounded-2xl border border-edge bg-card p-4 transition-all hover:border-indigo-500/20 hover:bg-card-hover hover:shadow-lg hover:shadow-indigo-500/5 sm:p-5"
         >
           <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-indigo-600/15 text-indigo-400 ring-1 ring-indigo-500/20 transition group-hover:bg-indigo-600/25">
@@ -194,7 +194,7 @@ export default function DashboardPage() {
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-base font-semibold text-content">My CVs</h2>
           <Link
-            href="/dashboard/cv/builder"
+            href="/dashboard/cv/generate"
             className="flex items-center gap-1.5 text-xs font-medium text-indigo-400 hover:text-indigo-300"
           >
             <Plus className="h-3.5 w-3.5" /> New CV
@@ -211,7 +211,7 @@ export default function DashboardPage() {
               Create your first CV with our AI builder
             </p>
             <Link
-              href="/dashboard/cv/builder"
+              href="/dashboard/cv/generate"
               className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-indigo-600/25 hover:bg-indigo-500 transition"
             >
               <Sparkles className="h-4 w-4" /> Generate with AI

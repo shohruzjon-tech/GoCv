@@ -20,6 +20,7 @@ import {
   DollarSign,
   Bell,
   Tag,
+  UserCircle,
 } from "lucide-react";
 
 export default function AdminLayout({
@@ -58,6 +59,7 @@ export default function AdminLayout({
       links: [
         { href: "/admin", icon: LayoutDashboard, label: "Dashboard" },
         { href: "/admin/revenue", icon: DollarSign, label: "Revenue" },
+        { href: "/admin/creator", icon: UserCircle, label: "About Creator" },
       ],
     },
     {

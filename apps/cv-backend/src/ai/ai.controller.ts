@@ -92,6 +92,17 @@ export class AiController {
     return this.aiService.interviewPrep(cvData, jobDescription, userId);
   }
 
+  // ─── Profile Extraction ───
+
+  @Post('extract-profile')
+  async extractProfile(
+    @CurrentUser('_id') userId: string,
+    @Body('text') text: string,
+    @Body('sourceType') sourceType: 'prompt' | 'linkedin' | 'file',
+  ) {
+    return this.aiService.extractProfile(text, sourceType, userId);
+  }
+
   // ─── Usage Stats ───
   @Get('usage')
   async getMyUsage(@CurrentUser('_id') userId: string) {

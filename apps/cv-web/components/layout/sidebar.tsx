@@ -24,7 +24,7 @@ import {
 
 const mainLinks = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/dashboard/cv/builder", label: "CV Builder", icon: FileText },
+  { href: "/dashboard/cv/generate", label: "CV Builder", icon: FileText },
   { href: "/dashboard/projects", label: "Projects", icon: FolderOpen },
   { href: "/dashboard/templates", label: "Templates", icon: Palette },
   { href: "/dashboard/ai-tools", label: "AI Tools", icon: Wand2 },
