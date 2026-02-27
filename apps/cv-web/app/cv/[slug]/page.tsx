@@ -51,19 +51,17 @@ export default function PublicCvPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-white dark:bg-zinc-950">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
+      <div className="flex min-h-screen items-center justify-center bg-[#08081a]">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-500 border-t-transparent" />
       </div>
     );
   }
 
   if (notFound || !cv) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-white dark:bg-zinc-950">
+      <div className="flex min-h-screen flex-col items-center justify-center bg-[#08081a]">
         <FileText className="mb-4 h-16 w-16 text-zinc-300" />
-        <h1 className="mb-2 text-2xl font-bold text-zinc-900 dark:text-white">
-          CV Not Found
-        </h1>
+        <h1 className="mb-2 text-2xl font-bold text-white">CV Not Found</h1>
         <p className="text-zinc-500">
           This CV does not exist or is not publicly available.
         </p>
@@ -80,8 +78,8 @@ export default function PublicCvPage() {
           dangerouslySetInnerHTML={{ __html: cv.aiGeneratedHtml }}
         />
         {projects.length > 0 && (
-          <div className="mx-auto max-w-4xl border-t border-zinc-200 px-8 py-12">
-            <h2 className="mb-8 text-2xl font-bold text-zinc-900">Projects</h2>
+          <div className="mx-auto max-w-4xl border-t border-white/[0.06] px-8 py-12">
+            <h2 className="mb-8 text-2xl font-bold text-white">Projects</h2>
             <div className="grid gap-6 md:grid-cols-2">
               {projects
                 .filter((p) => p.isVisible)
@@ -99,7 +97,7 @@ export default function PublicCvPage() {
   const primaryColor = cv.theme?.primaryColor || "#2563eb";
 
   return (
-    <div className="min-h-screen bg-zinc-50 py-12 dark:bg-zinc-950">
+    <div className="min-h-screen bg-[#08081a] py-12">
       <div className="mx-auto max-w-3xl">
         {/* Header */}
         <div
@@ -166,7 +164,7 @@ export default function PublicCvPage() {
         </div>
 
         {/* Sections */}
-        <div className="rounded-b-2xl bg-white px-8 py-8 shadow-sm dark:bg-zinc-900">
+        <div className="rounded-b-2xl bg-white/[0.02] border border-white/[0.06] px-8 py-8">
           {cv.sections
             .filter((s) => s.visible)
             .sort((a, b) => a.order - b.order)
@@ -189,9 +187,7 @@ export default function PublicCvPage() {
         {/* Projects */}
         {projects.length > 0 && (
           <div className="mt-8">
-            <h2 className="mb-6 text-2xl font-bold text-zinc-900 dark:text-white">
-              Projects
-            </h2>
+            <h2 className="mb-6 text-2xl font-bold text-white">Projects</h2>
             <div className="grid gap-6 md:grid-cols-2">
               {projects
                 .filter((p) => p.isVisible)
@@ -216,15 +212,12 @@ function SectionContent({ section }: { section: any }) {
     return (
       <div className="space-y-4">
         {content.items.map((item: any, i: number) => (
-          <div
-            key={i}
-            className="border-l-2 border-zinc-200 pl-4 dark:border-zinc-700"
-          >
-            <p className="font-semibold text-zinc-900 dark:text-white">
+          <div key={i} className="border-l-2 border-white/10 pl-4">
+            <p className="font-semibold text-white">
               {item.title || item.degree || item.name}
             </p>
             {(item.company || item.institution) && (
-              <p className="text-sm text-zinc-600 dark:text-zinc-400">
+              <p className="text-sm text-zinc-400">
                 {item.company || item.institution}
               </p>
             )}
@@ -234,9 +227,7 @@ function SectionContent({ section }: { section: any }) {
               </p>
             )}
             {item.description && (
-              <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-                {item.description}
-              </p>
+              <p className="mt-1 text-sm text-zinc-400">{item.description}</p>
             )}
           </div>
         ))}
@@ -251,7 +242,7 @@ function SectionContent({ section }: { section: any }) {
         {content.skills.map((skill: string, i: number) => (
           <span
             key={i}
-            className="rounded-full bg-zinc-100 px-3 py-1 text-sm text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
+            className="rounded-full bg-white/5 px-3 py-1 text-sm text-zinc-300 ring-1 ring-white/10"
           >
             {skill}
           </span>
@@ -263,9 +254,7 @@ function SectionContent({ section }: { section: any }) {
   // Plain text
   if (typeof content.text === "string") {
     return (
-      <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
-        {content.text}
-      </p>
+      <p className="text-sm leading-relaxed text-zinc-400">{content.text}</p>
     );
   }
 
@@ -279,7 +268,7 @@ function SectionContent({ section }: { section: any }) {
 
 function ProjectCard({ project }: { project: Project }) {
   return (
-    <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+    <div className="overflow-hidden rounded-2xl border border-white/[0.06] bg-white/[0.02]">
       {project.images?.[0] && (
         <img
           src={project.images[0].url}
@@ -288,9 +277,7 @@ function ProjectCard({ project }: { project: Project }) {
         />
       )}
       <div className="p-5">
-        <h3 className="font-bold text-zinc-900 dark:text-white">
-          {project.title}
-        </h3>
+        <h3 className="font-bold text-white">{project.title}</h3>
         {project.description && (
           <p className="mt-1 text-sm text-zinc-500">{project.description}</p>
         )}
@@ -299,7 +286,7 @@ function ProjectCard({ project }: { project: Project }) {
             {project.technologies.map((tech) => (
               <span
                 key={tech}
-                className="rounded-md bg-blue-50 px-2 py-0.5 text-xs text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
+                className="rounded-md bg-indigo-500/10 px-2 py-0.5 text-xs text-indigo-400 ring-1 ring-indigo-500/20"
               >
                 {tech}
               </span>
@@ -312,7 +299,7 @@ function ProjectCard({ project }: { project: Project }) {
               href={project.liveUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1 text-sm text-blue-600 hover:underline"
+              className="flex items-center gap-1 text-sm text-indigo-400 hover:underline"
             >
               <ExternalLink className="h-3.5 w-3.5" />
               Live Demo
@@ -323,7 +310,7 @@ function ProjectCard({ project }: { project: Project }) {
               href={project.sourceUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1 text-sm text-zinc-600 hover:underline dark:text-zinc-400"
+              className="flex items-center gap-1 text-sm text-zinc-400 hover:underline"
             >
               <Github className="h-3.5 w-3.5" />
               Source

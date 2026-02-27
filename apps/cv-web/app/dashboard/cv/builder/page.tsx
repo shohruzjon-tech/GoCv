@@ -158,9 +158,7 @@ export default function CvBuilderPage() {
     <div className="relative">
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">
-            AI CV Builder
-          </h1>
+          <h1 className="text-2xl font-bold text-white">AI CV Builder</h1>
           <p className="text-sm text-zinc-500">
             Describe your background and let AI create your CV
           </p>
@@ -170,21 +168,21 @@ export default function CvBuilderPage() {
             <button
               onClick={handleSave}
               disabled={saving}
-              className="flex items-center gap-2 rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 transition hover:bg-zinc-50 disabled:opacity-50 dark:border-zinc-700 dark:text-zinc-300"
+              className="flex items-center gap-2 rounded-xl border border-white/10 px-4 py-2 text-sm font-medium text-zinc-300 transition hover:bg-white/[0.04] disabled:opacity-50"
             >
               <Save className="h-4 w-4" />
               {saving ? "Saving..." : "Save"}
             </button>
             <button
               onClick={handlePublish}
-              className="flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-green-700"
+              className="flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-500 shadow-lg shadow-emerald-600/25"
             >
               <Globe className="h-4 w-4" />
               Publish
             </button>
             <button
               onClick={handleDownloadPdf}
-              className="flex items-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-purple-700"
+              className="flex items-center gap-2 rounded-xl bg-purple-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-purple-500 shadow-lg shadow-purple-600/25"
             >
               <Download className="h-4 w-4" />
               PDF
@@ -194,22 +192,22 @@ export default function CvBuilderPage() {
       </div>
 
       {/* AI Prompt Input */}
-      <div className="mb-8 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-        <label className="mb-2 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+      <div className="mb-8 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 backdrop-blur-sm">
+        <label className="mb-2 block text-sm font-medium text-zinc-300">
           Tell AI about yourself
         </label>
         <textarea
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
           placeholder="I'm a Full Stack Developer with 5 years of experience in React, Node.js, and TypeScript. I've worked at Google and Amazon, building scalable web applications. I have a CS degree from MIT..."
-          className="mb-4 w-full rounded-xl border border-zinc-300 bg-white p-4 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+          className="mb-4 w-full rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-white placeholder:text-zinc-600 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
           rows={4}
         />
         <div className="flex items-center gap-3">
           <button
             onClick={handleGenerate}
             disabled={loading}
-            className="flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-blue-600/25 transition hover:bg-blue-700 disabled:opacity-50"
+            className="flex items-center gap-2 rounded-xl bg-indigo-600 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-600/25 transition hover:bg-indigo-500 disabled:opacity-50"
           >
             {loading ? (
               <>
@@ -227,7 +225,7 @@ export default function CvBuilderPage() {
             <button
               onClick={handleRegenerateHtml}
               disabled={loading}
-              className="flex items-center gap-2 rounded-xl border border-zinc-300 px-4 py-2.5 text-sm font-medium text-zinc-700 transition hover:bg-zinc-50 disabled:opacity-50 dark:border-zinc-700 dark:text-zinc-300"
+              className="flex items-center gap-2 rounded-xl border border-white/10 px-4 py-2.5 text-sm font-medium text-zinc-300 transition hover:bg-white/[0.04] disabled:opacity-50"
             >
               <RefreshCw className="h-4 w-4" />
               Refresh Layout
@@ -241,19 +239,15 @@ export default function CvBuilderPage() {
         <div className="grid gap-6 lg:grid-cols-3">
           {/* Sections Editor */}
           <div className="space-y-4 lg:col-span-1">
-            <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">
-              Sections
-            </h3>
+            <h3 className="text-lg font-semibold text-white">Sections</h3>
             {cv.sections?.map((section, idx) => (
               <div
                 key={idx}
-                className="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900"
+                className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4"
               >
                 <div className="mb-2 flex items-center justify-between">
-                  <h4 className="font-medium text-zinc-900 dark:text-white">
-                    {section.title}
-                  </h4>
-                  <span className="rounded-md bg-zinc-100 px-2 py-0.5 text-xs text-zinc-500 dark:bg-zinc-800">
+                  <h4 className="font-medium text-white">{section.title}</h4>
+                  <span className="rounded-md bg-white/5 px-2 py-0.5 text-xs text-zinc-500 ring-1 ring-white/10">
                     {section.type}
                   </span>
                 </div>
@@ -266,7 +260,7 @@ export default function CvBuilderPage() {
                       handleEditSection(section.type, editPrompt);
                     }
                   }}
-                  className="flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-700"
+                  className="flex items-center gap-1 text-xs font-medium text-indigo-400 hover:text-indigo-300"
                 >
                   <Sparkles className="h-3 w-3" /> Edit with AI
                 </button>
@@ -277,22 +271,20 @@ export default function CvBuilderPage() {
           {/* HTML Preview */}
           <div className="lg:col-span-2">
             <div className="mb-3 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">
-                Preview
-              </h3>
+              <h3 className="text-lg font-semibold text-white">Preview</h3>
               {cv.isPublic && cv.slug && (
                 <a
                   href={`/cv/${cv.slug}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700"
+                  className="flex items-center gap-1 text-sm text-indigo-400 hover:text-indigo-300"
                 >
                   <Globe className="h-4 w-4" />
                   Public URL
                 </a>
               )}
             </div>
-            <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800">
+            <div className="overflow-hidden rounded-2xl border border-white/[0.06] bg-white shadow-sm">
               {cv.aiGeneratedHtml ? (
                 <iframe
                   srcDoc={cv.aiGeneratedHtml}
@@ -300,7 +292,7 @@ export default function CvBuilderPage() {
                   title="CV Preview"
                 />
               ) : (
-                <div className="flex h-96 items-center justify-center text-zinc-400">
+                <div className="flex h-96 items-center justify-center bg-white/[0.02] text-zinc-600">
                   <div className="text-center">
                     <FileText className="mx-auto mb-2 h-10 w-10" />
                     <p>HTML preview will appear after generation</p>
@@ -315,7 +307,7 @@ export default function CvBuilderPage() {
       {/* AI Chat Widget */}
       <button
         onClick={() => setChatOpen(!chatOpen)}
-        className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg shadow-blue-600/30 transition hover:bg-blue-700"
+        className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-indigo-600 text-white shadow-lg shadow-indigo-600/30 transition hover:bg-indigo-500"
       >
         {chatOpen ? (
           <X className="h-6 w-6" />
@@ -325,16 +317,14 @@ export default function CvBuilderPage() {
       </button>
 
       {chatOpen && (
-        <div className="fixed bottom-24 right-6 z-50 flex h-[500px] w-96 flex-col rounded-2xl border border-zinc-200 bg-white shadow-2xl dark:border-zinc-700 dark:bg-zinc-900">
-          <div className="flex items-center gap-2 border-b border-zinc-200 p-4 dark:border-zinc-700">
-            <Sparkles className="h-5 w-5 text-blue-600" />
-            <h3 className="font-semibold text-zinc-900 dark:text-white">
-              AI CV Assistant
-            </h3>
+        <div className="fixed bottom-24 right-6 z-50 flex h-[500px] w-96 flex-col rounded-2xl border border-white/[0.06] bg-[#0e0e24] shadow-2xl shadow-black/50">
+          <div className="flex items-center gap-2 border-b border-white/[0.06] p-4">
+            <Sparkles className="h-5 w-5 text-indigo-400" />
+            <h3 className="font-semibold text-white">AI CV Assistant</h3>
           </div>
           <div className="flex-1 overflow-y-auto p-4 space-y-3">
             {chatMessages.length === 0 && (
-              <p className="text-center text-sm text-zinc-400">
+              <p className="text-center text-sm text-zinc-500">
                 Ask me anything about your CV!
               </p>
             )}
@@ -346,8 +336,8 @@ export default function CvBuilderPage() {
                 <div
                   className={`max-w-[80%] rounded-2xl px-4 py-2 text-sm ${
                     msg.role === "user"
-                      ? "bg-blue-600 text-white"
-                      : "bg-zinc-100 text-zinc-900 dark:bg-zinc-800 dark:text-white"
+                      ? "bg-indigo-600 text-white"
+                      : "bg-white/5 text-zinc-200 ring-1 ring-white/10"
                   }`}
                 >
                   {msg.content}
@@ -356,30 +346,30 @@ export default function CvBuilderPage() {
             ))}
             {chatLoading && (
               <div className="flex justify-start">
-                <div className="rounded-2xl bg-zinc-100 px-4 py-2 dark:bg-zinc-800">
+                <div className="rounded-2xl bg-white/5 px-4 py-2 ring-1 ring-white/10">
                   <div className="flex gap-1">
-                    <div className="h-2 w-2 animate-bounce rounded-full bg-zinc-400" />
-                    <div className="h-2 w-2 animate-bounce rounded-full bg-zinc-400 [animation-delay:0.1s]" />
-                    <div className="h-2 w-2 animate-bounce rounded-full bg-zinc-400 [animation-delay:0.2s]" />
+                    <div className="h-2 w-2 animate-bounce rounded-full bg-indigo-400" />
+                    <div className="h-2 w-2 animate-bounce rounded-full bg-indigo-400 [animation-delay:0.1s]" />
+                    <div className="h-2 w-2 animate-bounce rounded-full bg-indigo-400 [animation-delay:0.2s]" />
                   </div>
                 </div>
               </div>
             )}
             <div ref={chatEndRef} />
           </div>
-          <div className="border-t border-zinc-200 p-3 dark:border-zinc-700">
+          <div className="border-t border-white/[0.06] p-3">
             <div className="flex gap-2">
               <input
                 value={chatInput}
                 onChange={(e) => setChatInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleChatSend()}
                 placeholder="Ask about your CV..."
-                className="flex-1 rounded-xl border border-zinc-300 px-4 py-2 text-sm focus:border-blue-500 focus:outline-none dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
+                className="flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white focus:border-indigo-500 focus:outline-none"
               />
               <button
                 onClick={handleChatSend}
                 disabled={chatLoading}
-                className="rounded-xl bg-blue-600 p-2 text-white transition hover:bg-blue-700 disabled:opacity-50"
+                className="rounded-xl bg-indigo-600 p-2 text-white transition hover:bg-indigo-500 disabled:opacity-50"
               >
                 <Send className="h-4 w-4" />
               </button>

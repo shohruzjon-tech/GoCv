@@ -106,7 +106,11 @@ export class CvService {
           }
         : undefined);
 
-    const aiResult = await this.aiService.generateCv(dto.prompt, context);
+    const aiResult = await this.aiService.generateCv(
+      dto.prompt,
+      context,
+      userId,
+    );
 
     if (existingCv) {
       existingCv.sections = aiResult.sections;
@@ -149,6 +153,7 @@ export class CvService {
       dto.prompt,
       dto.sectionType,
       dto.currentContent || existingSection?.content,
+      userId,
     );
 
     if (existingSection) {
@@ -165,12 +170,15 @@ export class CvService {
     }
 
     // Regenerate HTML
-    const html = await this.aiService.generateCvHtml({
-      personalInfo: cv.personalInfo,
-      sections: cv.sections,
-      summary: cv.summary,
-      theme: cv.theme,
-    });
+    const html = await this.aiService.generateCvHtml(
+      {
+        personalInfo: cv.personalInfo,
+        sections: cv.sections,
+        summary: cv.summary,
+        theme: cv.theme,
+      },
+      userId,
+    );
     cv.aiGeneratedHtml = html;
 
     return cv.save();
@@ -183,12 +191,15 @@ export class CvService {
       throw new ForbiddenException('Not authorized');
     }
 
-    const html = await this.aiService.generateCvHtml({
-      personalInfo: cv.personalInfo,
-      sections: cv.sections,
-      summary: cv.summary,
-      theme: cv.theme,
-    });
+    const html = await this.aiService.generateCvHtml(
+      {
+        personalInfo: cv.personalInfo,
+        sections: cv.sections,
+        summary: cv.summary,
+        theme: cv.theme,
+      },
+      userId,
+    );
 
     cv.aiGeneratedHtml = html;
     return cv.save();

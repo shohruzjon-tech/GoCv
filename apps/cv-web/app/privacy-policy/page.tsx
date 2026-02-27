@@ -3,25 +3,27 @@ import { FileText, ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy - CV Builder",
-  description: "Privacy Policy for CV Builder AI-Powered Resume Builder",
+  title: "Privacy Policy - GoCV",
+  description: "Privacy Policy for GoCV AI-Powered Resume Builder",
 };
 
 export default function PrivacyPolicyPage() {
   return (
-    <div className="min-h-screen bg-white dark:bg-zinc-950">
+    <div className="min-h-screen bg-[#08081a]">
       {/* Header */}
-      <header className="border-b border-zinc-200 bg-white/60 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/60">
+      <header className="border-b border-white/[0.06] bg-[#08081a]/80 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
           <Link href="/" className="flex items-center gap-2">
-            <FileText className="h-6 w-6 text-blue-600" />
-            <span className="text-lg font-bold text-zinc-900 dark:text-white">
-              CV Builder
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600/20 ring-1 ring-indigo-500/30">
+              <FileText className="h-4 w-4 text-indigo-400" />
+            </div>
+            <span className="text-lg font-bold tracking-tight text-white">
+              Go<span className="text-gradient">CV</span>
             </span>
           </Link>
           <Link
             href="/"
-            className="flex items-center gap-1.5 text-sm text-zinc-500 transition hover:text-zinc-900 dark:hover:text-white"
+            className="flex items-center gap-1.5 text-sm text-zinc-500 transition hover:text-white"
           >
             <ArrowLeft className="h-4 w-4" />
             Back to Home
@@ -30,18 +32,16 @@ export default function PrivacyPolicyPage() {
       </header>
 
       <main className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
-        <h1 className="mb-2 text-4xl font-bold text-zinc-900 dark:text-white">
-          Privacy Policy
-        </h1>
+        <h1 className="mb-2 text-4xl font-bold text-white">Privacy Policy</h1>
         <p className="mb-12 text-sm text-zinc-500">
           Last updated: February 26, 2026
         </p>
 
-        <div className="space-y-10 text-zinc-600 dark:text-zinc-400 [&_h2]:mb-4 [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:text-zinc-900 dark:[&_h2]:text-white [&_h3]:mb-2 [&_h3]:mt-4 [&_h3]:text-base [&_h3]:font-semibold [&_h3]:text-zinc-800 dark:[&_h3]:text-zinc-200 [&_p]:mb-3 [&_p]:leading-relaxed [&_ul]:mb-3 [&_ul]:list-disc [&_ul]:space-y-1.5 [&_ul]:pl-6">
+        <div className="space-y-10 text-zinc-400 [&_h2]:mb-4 [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:text-white [&_h3]:mb-2 [&_h3]:mt-4 [&_h3]:text-base [&_h3]:font-semibold [&_h3]:text-zinc-200 [&_p]:mb-3 [&_p]:leading-relaxed [&_ul]:mb-3 [&_ul]:list-disc [&_ul]:space-y-1.5 [&_ul]:pl-6">
           <section>
             <h2>1. Introduction</h2>
             <p>
-              Welcome to CV Builder (&quot;we,&quot; &quot;our,&quot; or
+              Welcome to GoCV (&quot;we,&quot; &quot;our,&quot; or
               &quot;us&quot;). We are committed to protecting your personal
               information and your right to privacy. This Privacy Policy
               explains what information we collect, how we use it, and what
@@ -152,7 +152,7 @@ export default function PrivacyPolicyPage() {
                   href="https://policies.google.com/privacy"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-600 underline hover:text-blue-700"
+                  className="text-indigo-400 underline hover:text-indigo-300"
                 >
                   Google Privacy Policy
                 </a>
@@ -165,7 +165,7 @@ export default function PrivacyPolicyPage() {
                   href="https://openai.com/privacy"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-600 underline hover:text-blue-700"
+                  className="text-indigo-400 underline hover:text-indigo-300"
                 >
                   OpenAI Privacy Policy
                 </a>
@@ -178,7 +178,7 @@ export default function PrivacyPolicyPage() {
                   href="https://aws.amazon.com/privacy/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-600 underline hover:text-blue-700"
+                  className="text-indigo-400 underline hover:text-indigo-300"
                 >
                   AWS Privacy Policy
                 </a>
@@ -288,7 +288,7 @@ export default function PrivacyPolicyPage() {
               <strong>Email:</strong>{" "}
               <a
                 href="mailto:privacy@cvbuilder.com"
-                className="text-blue-600 underline hover:text-blue-700"
+                className="text-indigo-400 underline hover:text-indigo-300"
               >
                 privacy@cvbuilder.com
               </a>
@@ -297,22 +297,14 @@ export default function PrivacyPolicyPage() {
         </div>
       </main>
 
-      <footer className="border-t border-zinc-200 bg-white py-8 dark:border-zinc-800 dark:bg-zinc-950">
+      <footer className="border-t border-white/[0.06] py-8">
         <div className="mx-auto flex max-w-7xl flex-col items-center gap-3 px-4 text-sm text-zinc-500 sm:flex-row sm:justify-between sm:px-6">
-          <span>
-            © {new Date().getFullYear()} CV Builder. All rights reserved.
-          </span>
+          <span>© {new Date().getFullYear()} GoCV. All rights reserved.</span>
           <div className="flex gap-6">
-            <Link
-              href="/privacy-policy"
-              className="hover:text-zinc-900 dark:hover:text-white"
-            >
+            <Link href="/privacy-policy" className="hover:text-white">
               Privacy Policy
             </Link>
-            <Link
-              href="/terms-of-service"
-              className="hover:text-zinc-900 dark:hover:text-white"
-            >
+            <Link href="/terms-of-service" className="hover:text-white">
               Terms of Service
             </Link>
           </div>

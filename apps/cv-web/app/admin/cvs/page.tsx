@@ -31,7 +31,7 @@ export default function AdminCvsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-orange-600 border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-orange-500 border-t-transparent" />
       </div>
     );
   }
@@ -39,16 +39,14 @@ export default function AdminCvsPage() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">
-          All CVs ({total})
-        </h1>
+        <h1 className="text-2xl font-bold text-white">All CVs ({total})</h1>
         <p className="text-sm text-zinc-500">Overview of all user CVs</p>
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
+      <div className="overflow-hidden rounded-2xl border border-white/[0.06] bg-white/[0.02]">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-800/50">
+            <tr className="border-b border-white/[0.06] bg-white/[0.03]">
               <th className="px-6 py-3 text-left text-xs font-medium uppercase text-zinc-500">
                 Title
               </th>
@@ -66,31 +64,28 @@ export default function AdminCvsPage() {
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
+          <tbody className="divide-y divide-white/[0.06]">
             {cvs.map((cv) => (
-              <tr
-                key={cv._id}
-                className="hover:bg-zinc-50 dark:hover:bg-zinc-800/30"
-              >
+              <tr key={cv._id} className="hover:bg-white/[0.02]">
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-2">
                     <FileText className="h-4 w-4 text-zinc-400" />
-                    <span className="text-sm font-medium text-zinc-900 dark:text-white">
+                    <span className="text-sm font-medium text-white">
                       {cv.title}
                     </span>
                   </div>
                 </td>
-                <td className="px-6 py-4 text-sm text-zinc-600 dark:text-zinc-400">
+                <td className="px-6 py-4 text-sm text-zinc-400">
                   {cv.userId?.name || cv.userId?.email || "Unknown"}
                 </td>
                 <td className="px-6 py-4">
                   <span
                     className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${
                       cv.status === "published"
-                        ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                        ? "bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/20"
                         : cv.status === "draft"
-                          ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400"
-                          : "bg-zinc-100 text-zinc-600"
+                          ? "bg-yellow-500/10 text-yellow-400 ring-1 ring-yellow-500/20"
+                          : "bg-white/5 text-zinc-500 ring-1 ring-white/10"
                     }`}
                   >
                     {cv.status}
@@ -117,7 +112,7 @@ export default function AdminCvsPage() {
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1}
-            className="rounded-lg border border-zinc-300 px-4 py-2 text-sm disabled:opacity-50 dark:border-zinc-700"
+            className="rounded-lg border border-white/10 px-4 py-2 text-sm text-zinc-300 hover:bg-white/[0.04] disabled:opacity-50"
           >
             Previous
           </button>
@@ -127,7 +122,7 @@ export default function AdminCvsPage() {
           <button
             onClick={() => setPage((p) => p + 1)}
             disabled={page * 20 >= total}
-            className="rounded-lg border border-zinc-300 px-4 py-2 text-sm disabled:opacity-50 dark:border-zinc-700"
+            className="rounded-lg border border-white/10 px-4 py-2 text-sm text-zinc-300 hover:bg-white/[0.04] disabled:opacity-50"
           >
             Next
           </button>

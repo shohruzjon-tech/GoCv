@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { FileText, Chrome } from "lucide-react";
+import { FileText, ArrowRight } from "lucide-react";
 import toast from "react-hot-toast";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
@@ -16,24 +16,31 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-zinc-50 to-blue-50 px-4 dark:from-zinc-950 dark:to-zinc-900">
-      <div className="w-full max-w-md">
-        <div className="mb-8 text-center">
-          <Link href="/" className="inline-flex items-center gap-2">
-            <FileText className="h-8 w-8 text-blue-600" />
-            <span className="text-2xl font-bold text-zinc-900 dark:text-white">
-              CV Builder
+    <div className="relative flex min-h-screen items-center justify-center bg-[#08081a] px-4">
+      {/* Background glow */}
+      <div className="pointer-events-none absolute left-1/2 top-1/3 -translate-x-1/2 -translate-y-1/2">
+        <div className="h-[400px] w-[400px] rounded-full bg-indigo-600/10 blur-[120px]" />
+      </div>
+
+      <div className="relative w-full max-w-md">
+        <div className="mb-10 text-center">
+          <Link href="/" className="mb-6 inline-flex items-center gap-2.5">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-600/20 ring-1 ring-indigo-500/30">
+              <FileText className="h-5 w-5 text-indigo-400" />
+            </div>
+            <span className="text-2xl font-bold tracking-tight text-white">
+              Go<span className="text-gradient">CV</span>
             </span>
           </Link>
-          <p className="mt-2 text-zinc-600 dark:text-zinc-400">
+          <p className="mt-3 text-zinc-400">
             Sign in to create your professional CV
           </p>
         </div>
 
-        <div className="rounded-2xl border border-zinc-200 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="rounded-3xl border border-white/[0.06] bg-white/[0.03] p-8 backdrop-blur-xl">
           <button
             onClick={handleGoogleLogin}
-            className="flex w-full items-center justify-center gap-3 rounded-xl border border-zinc-300 bg-white px-6 py-3 text-base font-medium text-zinc-700 transition hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+            className="group flex w-full items-center justify-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-6 py-3.5 text-base font-medium text-white transition-all hover:border-white/20 hover:bg-white/10"
           >
             <svg className="h-5 w-5" viewBox="0 0 24 24">
               <path
@@ -54,21 +61,39 @@ export default function LoginPage() {
               />
             </svg>
             Continue with Google
+            <ArrowRight className="h-4 w-4 text-zinc-500 transition-transform group-hover:translate-x-0.5 group-hover:text-white" />
           </button>
 
           <div className="my-6 flex items-center gap-3">
-            <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-700" />
-            <span className="text-sm text-zinc-500">or</span>
-            <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-700" />
+            <div className="h-px flex-1 bg-white/[0.06]" />
+            <span className="text-xs font-medium text-zinc-600">or</span>
+            <div className="h-px flex-1 bg-white/[0.06]" />
           </div>
 
           <Link
             href="/admin/login"
-            className="flex w-full items-center justify-center gap-2 rounded-xl border border-zinc-300 px-6 py-3 text-sm font-medium text-zinc-600 transition hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-800"
+            className="flex w-full items-center justify-center gap-2 rounded-2xl border border-white/[0.06] bg-white/[0.02] px-6 py-3.5 text-sm font-medium text-zinc-400 transition-all hover:border-white/10 hover:bg-white/[0.04] hover:text-white"
           >
             Admin Login
           </Link>
         </div>
+
+        <p className="mt-8 text-center text-xs text-zinc-600">
+          By signing in, you agree to our{" "}
+          <Link
+            href="/terms-of-service"
+            className="text-indigo-400 hover:text-indigo-300"
+          >
+            Terms
+          </Link>{" "}
+          and{" "}
+          <Link
+            href="/privacy-policy"
+            className="text-indigo-400 hover:text-indigo-300"
+          >
+            Privacy Policy
+          </Link>
+        </p>
       </div>
     </div>
   );

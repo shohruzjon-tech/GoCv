@@ -1,0 +1,196 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { cvApi, aiApi } from "@/lib/api";
+import { Cv, AiSummaryResult } from "@/types";
+import toast from "react-hot-toast";
+import { FileText, ArrowLeft, Loader2, Copy, Check } from "lucide-react";
+
+const tones = [
+  {
+    value: "professional",
+    label: "Professional",
+    desc: "Formal, polished tone",
+  },
+  { value: "creative", label: "Creative", desc: "Unique, personality-driven" },
+  { value: "technical", label: "Technical", desc: "Skills & tech focused" },
+  { value: "executive", label: "Executive", desc: "Leadership & strategy" },
+];
+
+export default function SummaryPage() {
+  const router = useRouter();
+  const [cvs, setCvs] = useState<Cv[]>([]);
+  const [selectedCv, setSelectedCv] = useState("");
+  const [tone, setTone] = useState("professional");
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<AiSummaryResult | null>(null);
+  const [copied, setCopied] = useState<number | null>(null);
+
+  useEffect(() => {
+    cvApi
+      .getAll()
+      .then((r) => setCvs(r.data))
+      .catch(() => {});
+  }, []);
+
+  const handleGenerate = async () => {
+    if (!selectedCv) return toast.error("Select a CV");
+    setLoading(true);
+    setResult(null);
+    try {
+      const cv = cvs.find((c) => c._id === selectedCv);
+      const res = await aiApi.generateSummary(
+        { sections: cv?.sections, personalInfo: cv?.personalInfo },
+        tone,
+      );
+      setResult(res.data);
+      toast.success("Summary generated!");
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const copyText = (text: string, idx: number) => {
+    navigator.clipboard.writeText(text);
+    setCopied(idx);
+    setTimeout(() => setCopied(null), 2000);
+  };
+
+  return (
+    <div className="space-y-8">
+      <div className="flex items-center gap-4">
+        <button
+          onClick={() => router.back()}
+          className="rounded-xl p-2 text-zinc-500 hover:bg-white/[0.04] hover:text-white"
+        >
+          <ArrowLeft className="h-5 w-5" />
+        </button>
+        <div>
+          <h1 className="text-2xl font-bold text-white">
+            <span className="text-gradient">Summary Generator</span>
+          </h1>
+          <p className="text-sm text-zinc-400">
+            Generate compelling professional summaries
+          </p>
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 space-y-6">
+        <div>
+          <label className="mb-2 block text-sm font-medium text-zinc-300">
+            Select a CV
+          </label>
+          <select
+            value={selectedCv}
+            onChange={(e) => setSelectedCv(e.target.value)}
+            className="w-full rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-3 text-sm text-white outline-none focus:border-indigo-500/50"
+          >
+            <option value="">Choose a CV...</option>
+            {cvs.map((cv) => (
+              <option key={cv._id} value={cv._id} className="bg-[#0f0f23]">
+                {cv.title}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label className="mb-2 block text-sm font-medium text-zinc-300">
+            Tone
+          </label>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {tones.map((t) => (
+              <button
+                key={t.value}
+                onClick={() => setTone(t.value)}
+                className={`rounded-xl border p-3 text-left transition ${
+                  tone === t.value
+                    ? "border-amber-500/30 bg-amber-500/5"
+                    : "border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04]"
+                }`}
+              >
+                <p
+                  className={`text-sm font-medium ${tone === t.value ? "text-amber-300" : "text-white"}`}
+                >
+                  {t.label}
+                </p>
+                <p className="text-xs text-zinc-500">{t.desc}</p>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <button
+          onClick={handleGenerate}
+          disabled={loading || !selectedCv}
+          className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-amber-600 to-orange-600 px-6 py-3 text-sm font-semibold text-white shadow-lg transition disabled:opacity-50"
+        >
+          {loading ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <FileText className="h-4 w-4" />
+          )}
+          {loading ? "Generating..." : "Generate Summary"}
+        </button>
+      </div>
+
+      {result && (
+        <div className="space-y-4">
+          <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-5">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-sm font-semibold text-amber-300">
+                  Primary Summary
+                </p>
+                <p className="text-xs text-amber-400/60">
+                  {result.wordCount} words
+                </p>
+              </div>
+              <button
+                onClick={() => copyText(result.summary, -1)}
+                className="rounded-lg p-1.5 text-amber-400 hover:bg-amber-500/10"
+              >
+                {copied === -1 ? (
+                  <Check className="h-4 w-4" />
+                ) : (
+                  <Copy className="h-4 w-4" />
+                )}
+              </button>
+            </div>
+            <p className="mt-3 text-sm leading-relaxed text-zinc-200">
+              {result.summary}
+            </p>
+          </div>
+          {result.alternatives?.map((alt, i) => (
+            <div
+              key={i}
+              className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5"
+            >
+              <div className="flex items-start justify-between">
+                <p className="text-xs font-medium text-zinc-400">
+                  Alternative {i + 1}
+                </p>
+                <button
+                  onClick={() => copyText(alt, i)}
+                  className="rounded-lg p-1.5 text-zinc-500 hover:bg-white/[0.04] hover:text-white"
+                >
+                  {copied === i ? (
+                    <Check className="h-4 w-4" />
+                  ) : (
+                    <Copy className="h-4 w-4" />
+                  )}
+                </button>
+              </div>
+              <p className="mt-2 text-sm leading-relaxed text-zinc-300">
+                {alt}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}

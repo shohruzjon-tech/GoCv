@@ -124,7 +124,7 @@ export default function EditCvPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-500 border-t-transparent" />
       </div>
     );
   }
@@ -137,7 +137,7 @@ export default function EditCvPage() {
         <div className="flex items-center gap-3">
           <button
             onClick={() => router.push("/dashboard")}
-            className="rounded-lg p-2 text-zinc-500 transition hover:bg-zinc-100 dark:hover:bg-zinc-800"
+            className="rounded-lg p-2 text-zinc-500 transition hover:bg-white/[0.04]"
           >
             <ArrowLeft className="h-5 w-5" />
           </button>
@@ -145,7 +145,7 @@ export default function EditCvPage() {
             <input
               value={cv.title}
               onChange={(e) => setCv({ ...cv, title: e.target.value })}
-              className="bg-transparent text-2xl font-bold text-zinc-900 focus:outline-none dark:text-white"
+              className="bg-transparent text-2xl font-bold text-white focus:outline-none"
             />
             <p className="text-sm text-zinc-500">Edit your CV details</p>
           </div>
@@ -154,21 +154,21 @@ export default function EditCvPage() {
           <button
             onClick={handleSave}
             disabled={saving}
-            className="flex items-center gap-2 rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 transition hover:bg-zinc-50 disabled:opacity-50 dark:border-zinc-700 dark:text-zinc-300"
+            className="flex items-center gap-2 rounded-lg border border-white/10 px-4 py-2 text-sm font-medium text-zinc-300 transition hover:bg-white/[0.04] disabled:opacity-50"
           >
             <Save className="h-4 w-4" />
             {saving ? "Saving..." : "Save"}
           </button>
           <button
             onClick={handlePublish}
-            className="flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-green-700"
+            className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-500 shadow-lg shadow-emerald-600/25"
           >
             <Globe className="h-4 w-4" />
             Publish
           </button>
           <button
             onClick={handleDownloadPdf}
-            className="flex items-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-purple-700"
+            className="flex items-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-purple-500 shadow-lg shadow-purple-600/25"
           >
             <Download className="h-4 w-4" />
             PDF
@@ -180,8 +180,8 @@ export default function EditCvPage() {
         {/* Editor Panel */}
         <div className="space-y-6">
           {/* Personal Info */}
-          <div className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
-            <h3 className="mb-4 text-lg font-semibold text-zinc-900 dark:text-white">
+          <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6">
+            <h3 className="mb-4 text-lg font-semibold text-white">
               Personal Information
             </h3>
             <div className="grid gap-4 sm:grid-cols-2">
@@ -201,7 +201,7 @@ export default function EditCvPage() {
                   <input
                     value={(cv.personalInfo as any)?.[field] || ""}
                     onChange={(e) => updatePersonalInfo(field, e.target.value)}
-                    className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+                    className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:border-indigo-500 focus:outline-none"
                   />
                 </div>
               ))}
@@ -209,15 +209,13 @@ export default function EditCvPage() {
           </div>
 
           {/* Summary */}
-          <div className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
-            <h3 className="mb-4 text-lg font-semibold text-zinc-900 dark:text-white">
-              Summary
-            </h3>
+          <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6">
+            <h3 className="mb-4 text-lg font-semibold text-white">Summary</h3>
             <textarea
               value={cv.summary || ""}
               onChange={(e) => setCv({ ...cv, summary: e.target.value })}
               rows={4}
-              className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+              className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:border-indigo-500 focus:outline-none"
             />
           </div>
 
@@ -225,10 +223,10 @@ export default function EditCvPage() {
           {cv.sections?.map((section, idx) => (
             <div
               key={idx}
-              className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900"
+              className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6"
             >
               <div className="mb-4 flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">
+                <h3 className="text-lg font-semibold text-white">
                   {section.title}
                 </h3>
                 <div className="flex items-center gap-2">
@@ -236,7 +234,7 @@ export default function EditCvPage() {
                     onClick={() =>
                       updateSection(idx, { visible: !section.visible })
                     }
-                    className="rounded-lg p-1.5 text-zinc-400 hover:text-zinc-600"
+                    className="rounded-lg p-1.5 text-zinc-500 hover:text-zinc-300"
                     title={section.visible ? "Hide" : "Show"}
                   >
                     {section.visible ? (
@@ -247,13 +245,13 @@ export default function EditCvPage() {
                   </button>
                   <button
                     onClick={() => handleAiEditSection(section.type)}
-                    className="flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium text-blue-600 transition hover:bg-blue-50"
+                    className="flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium text-indigo-400 transition hover:bg-indigo-500/10"
                   >
                     <Sparkles className="h-3 w-3" /> AI Edit
                   </button>
                 </div>
               </div>
-              <pre className="max-h-40 overflow-auto rounded-lg bg-zinc-50 p-3 text-xs text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
+              <pre className="max-h-40 overflow-auto rounded-lg bg-white/[0.03] p-3 text-xs text-zinc-400 ring-1 ring-white/10">
                 {JSON.stringify(section.content, null, 2)}
               </pre>
             </div>
@@ -262,10 +260,8 @@ export default function EditCvPage() {
 
         {/* Preview Panel */}
         <div className="sticky top-24">
-          <h3 className="mb-3 text-lg font-semibold text-zinc-900 dark:text-white">
-            Preview
-          </h3>
-          <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800">
+          <h3 className="mb-3 text-lg font-semibold text-white">Preview</h3>
+          <div className="overflow-hidden rounded-2xl border border-white/[0.06] bg-white">
             {cv.aiGeneratedHtml ? (
               <iframe
                 srcDoc={cv.aiGeneratedHtml}
@@ -273,7 +269,7 @@ export default function EditCvPage() {
                 title="CV Preview"
               />
             ) : (
-              <div className="flex h-96 items-center justify-center text-zinc-400">
+              <div className="flex h-96 items-center justify-center text-zinc-600">
                 No HTML preview available
               </div>
             )}

@@ -79,7 +79,7 @@ export default function AdminUsersPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-orange-600 border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-orange-500 border-t-transparent" />
       </div>
     );
   }
@@ -88,19 +88,17 @@ export default function AdminUsersPage() {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">
-            Users ({total})
-          </h1>
+          <h1 className="text-2xl font-bold text-white">Users ({total})</h1>
           <p className="text-sm text-zinc-500">
             Manage user accounts and access
           </p>
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
+      <div className="overflow-hidden rounded-2xl border border-white/[0.06] bg-white/[0.02]">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-800/50">
+            <tr className="border-b border-white/[0.06] bg-white/[0.03]">
               <th className="px-6 py-3 text-left text-xs font-medium uppercase text-zinc-500">
                 User
               </th>
@@ -115,12 +113,9 @@ export default function AdminUsersPage() {
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
+          <tbody className="divide-y divide-white/[0.06]">
             {users.map((user) => (
-              <tr
-                key={user._id}
-                className="hover:bg-zinc-50 dark:hover:bg-zinc-800/30"
-              >
+              <tr key={user._id} className="hover:bg-white/[0.02]">
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-3">
                     {user.avatar ? (
@@ -130,14 +125,12 @@ export default function AdminUsersPage() {
                         className="h-9 w-9 rounded-full"
                       />
                     ) : (
-                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-600 text-sm font-medium text-white">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-600/30 text-indigo-300 ring-1 ring-indigo-500/30 text-sm font-medium">
                         {user.name?.charAt(0)}
                       </div>
                     )}
                     <div>
-                      <p className="font-medium text-zinc-900 dark:text-white">
-                        {user.name}
-                      </p>
+                      <p className="font-medium text-white">{user.name}</p>
                       <p className="text-xs text-zinc-500">{user.email}</p>
                     </div>
                   </div>
@@ -146,7 +139,7 @@ export default function AdminUsersPage() {
                   <select
                     value={user.role}
                     onChange={(e) => changeRole(user._id, e.target.value)}
-                    className="rounded-lg border border-zinc-300 bg-white px-2 py-1 text-xs font-medium dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+                    className="rounded-lg border border-white/10 bg-white/5 text-white px-2 py-1 text-xs font-medium"
                   >
                     <option value="user">User</option>
                     <option value="admin">Admin</option>
@@ -156,8 +149,8 @@ export default function AdminUsersPage() {
                   <span
                     className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium ${
                       (user as any).isActive !== false
-                        ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                        : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+                        ? "bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/20"
+                        : "bg-red-500/10 text-red-400 ring-1 ring-red-500/20"
                     }`}
                   >
                     {(user as any).isActive !== false ? "Active" : "Inactive"}
@@ -169,7 +162,7 @@ export default function AdminUsersPage() {
                       onClick={() =>
                         toggleActive(user._id, (user as any).isActive !== false)
                       }
-                      className="rounded-lg p-2 text-zinc-400 transition hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-800"
+                      className="rounded-lg p-2 text-zinc-500 transition hover:bg-white/[0.04] hover:text-zinc-300"
                       title={
                         (user as any).isActive !== false
                           ? "Deactivate"
@@ -184,14 +177,14 @@ export default function AdminUsersPage() {
                     </button>
                     <button
                       onClick={() => terminateAllSessions(user._id)}
-                      className="rounded-lg p-2 text-zinc-400 transition hover:bg-zinc-100 hover:text-orange-600 dark:hover:bg-zinc-800"
+                      className="rounded-lg p-2 text-zinc-500 transition hover:bg-orange-500/10 hover:text-orange-400"
                       title="Terminate all sessions"
                     >
                       <Key className="h-4 w-4" />
                     </button>
                     <button
                       onClick={() => deleteUser(user._id)}
-                      className="rounded-lg p-2 text-zinc-400 transition hover:bg-zinc-100 hover:text-red-600 dark:hover:bg-zinc-800"
+                      className="rounded-lg p-2 text-zinc-500 transition hover:bg-red-500/10 hover:text-red-400"
                       title="Delete user"
                     >
                       <Trash2 className="h-4 w-4" />
@@ -210,7 +203,7 @@ export default function AdminUsersPage() {
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1}
-            className="rounded-lg border border-zinc-300 px-4 py-2 text-sm disabled:opacity-50 dark:border-zinc-700"
+            className="rounded-lg border border-white/10 text-zinc-300 hover:bg-white/[0.04] px-4 py-2 text-sm disabled:opacity-50"
           >
             Previous
           </button>
@@ -220,7 +213,7 @@ export default function AdminUsersPage() {
           <button
             onClick={() => setPage((p) => p + 1)}
             disabled={page * 20 >= total}
-            className="rounded-lg border border-zinc-300 px-4 py-2 text-sm disabled:opacity-50 dark:border-zinc-700"
+            className="rounded-lg border border-white/10 text-zinc-300 hover:bg-white/[0.04] px-4 py-2 text-sm disabled:opacity-50"
           >
             Next
           </button>

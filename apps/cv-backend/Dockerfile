@@ -3,6 +3,9 @@ FROM node:22-slim AS builder
 
 WORKDIR /app
 
+# Install wdget and curl
+RUN apk add --no-cache wget curl
+
 # Install dependencies for Puppeteer/Chromium
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 make g++ \

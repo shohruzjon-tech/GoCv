@@ -35,6 +35,17 @@ export default () => ({
     s3Bucket: process.env.AWS_S3_BUCKET || 'cv-builder-uploads',
   },
 
+  stripe: {
+    secretKey: process.env.STRIPE_SECRET_KEY || '',
+    webhookSecret: process.env.STRIPE_WEBHOOK_SECRET || '',
+    prices: {
+      premiumMonthly: process.env.STRIPE_PRICE_PREMIUM_MONTHLY || '',
+      premiumYearly: process.env.STRIPE_PRICE_PREMIUM_YEARLY || '',
+      enterpriseMonthly: process.env.STRIPE_PRICE_ENTERPRISE_MONTHLY || '',
+      enterpriseYearly: process.env.STRIPE_PRICE_ENTERPRISE_YEARLY || '',
+    },
+  },
+
   frontendUrl: process.env.FRONTEND_URL || 'http://localhost:3000',
 
   admin: {

@@ -120,6 +120,30 @@ export const uploadApi = {
 export const aiApi = {
   chat: (messages: { role: string; content: string }[], cvContext?: any) =>
     api.post("/api/ai/chat", { messages, cvContext }),
+
+  enhance: (cvData: any) => api.post("/api/ai/enhance", { cvData }),
+
+  tailor: (cvData: any, jobDescription: string) =>
+    api.post("/api/ai/tailor", { cvData, jobDescription }),
+
+  improveBullets: (bulletPoints: string[], context: string) =>
+    api.post("/api/ai/improve-bullets", { bulletPoints, context }),
+
+  generateSummary: (cvData: any, tone: string) =>
+    api.post("/api/ai/generate-summary", { cvData, tone }),
+
+  skillGap: (cvData: any, targetRole: string) =>
+    api.post("/api/ai/skill-gap", { cvData, targetRole }),
+
+  atsScore: (cvData: any, jobDescription?: string) =>
+    api.post("/api/ai/ats-score", { cvData, jobDescription }),
+
+  interviewPrep: (cvData: any, jobDescription: string) =>
+    api.post("/api/ai/interview-prep", { cvData, jobDescription }),
+
+  getUsage: () => api.get("/api/ai/usage"),
+
+  getUsageHistory: () => api.get("/api/ai/usage/history"),
 };
 
 // ========== PDF API ==========
@@ -128,14 +152,68 @@ export const pdfApi = {
     api.get(`/api/pdf/${cvId}`, { responseType: "blob" }),
 };
 
+// ========== Templates API ==========
+export const templatesApi = {
+  getAll: (category?: string) =>
+    api.get("/api/templates", { params: { category } }),
+
+  getById: (id: string) => api.get(`/api/templates/${id}`),
+
+  getBySlug: (slug: string) => api.get(`/api/templates/slug/${slug}`),
+
+  getForMyPlan: () => api.get("/api/templates/my-plan"),
+};
+
+// ========== Subscriptions API ==========
+export const subscriptionsApi = {
+  getMy: () => api.get("/api/subscriptions/my"),
+
+  getPlans: () => api.get("/api/subscriptions/plans"),
+
+  getUsage: () => api.get("/api/subscriptions/usage"),
+
+  upgrade: (plan: string, billingCycle?: string) =>
+    api.post("/api/subscriptions/upgrade", { plan, billingCycle }),
+
+  cancel: (reason?: string) =>
+    api.post("/api/subscriptions/cancel", { reason }),
+
+  getBillingPortal: () => api.post("/api/subscriptions/billing-portal"),
+
+  getInvoices: () => api.get("/api/subscriptions/invoices"),
+};
+
+// ========== Notifications API ==========
+export const notificationsApi = {
+  getAll: () => api.get("/api/notifications"),
+
+  getUnreadCount: () => api.get("/api/notifications/count"),
+
+  markAsRead: (id: string) => api.put(`/api/notifications/${id}/read`),
+
+  markAllAsRead: () => api.put("/api/notifications/read-all"),
+
+  delete: (id: string) => api.delete(`/api/notifications/${id}`),
+};
+
+// ========== Feature Flags API ==========
+export const featureFlagsApi = {
+  check: (key: string) => api.get(`/api/feature-flags/check/${key}`),
+
+  getClientFlags: () => api.get("/api/feature-flags/client"),
+};
+
 // ========== Admin API ==========
 export const adminApi = {
   getDashboard: () => api.get("/api/admin/dashboard"),
 
+  // Users
   getUsers: (page = 1, limit = 20) =>
     api.get(`/api/admin/users?page=${page}&limit=${limit}`),
 
   getUser: (id: string) => api.get(`/api/admin/users/${id}`),
+
+  getUserDetail: (id: string) => api.get(`/api/admin/users/${id}/detail`),
 
   toggleUserActive: (id: string, isActive: boolean) =>
     api.put(`/api/admin/users/${id}/toggle-active`, { isActive }),
@@ -145,6 +223,10 @@ export const adminApi = {
 
   deleteUser: (id: string) => api.delete(`/api/admin/users/${id}`),
 
+  impersonateUser: (id: string) =>
+    api.post(`/api/admin/users/${id}/impersonate`),
+
+  // Sessions
   getSessions: (page = 1, limit = 20) =>
     api.get(`/api/admin/sessions?page=${page}&limit=${limit}`),
 
@@ -156,8 +238,93 @@ export const adminApi = {
   terminateAllUserSessions: (userId: string) =>
     api.delete(`/api/admin/sessions/user/${userId}`),
 
+  // CVs
   getAllCvs: (page = 1, limit = 20) =>
     api.get(`/api/admin/cvs?page=${page}&limit=${limit}`),
+
+  // Templates
+  getTemplates: (page = 1, limit = 20) =>
+    api.get(`/api/admin/templates?page=${page}&limit=${limit}`),
+
+  createTemplate: (data: any) => api.post("/api/admin/templates", data),
+
+  updateTemplate: (id: string, data: any) =>
+    api.put(`/api/admin/templates/${id}`, data),
+
+  deleteTemplate: (id: string) => api.delete(`/api/admin/templates/${id}`),
+
+  // Subscriptions
+  getSubscriptions: (
+    page = 1,
+    limit = 20,
+    filters?: { plan?: string; status?: string },
+  ) =>
+    api.get(`/api/admin/subscriptions`, {
+      params: { page, limit, ...filters },
+    }),
+
+  getSubscriptionStats: () => api.get("/api/admin/subscriptions/stats"),
+
+  updateSubscription: (id: string, data: any) =>
+    api.put(`/api/admin/subscriptions/${id}`, data),
+
+  cancelSubscription: (id: string) =>
+    api.post(`/api/admin/subscriptions/${id}/cancel`),
+
+  resetSubscriptionUsage: (id: string) =>
+    api.post(`/api/admin/subscriptions/${id}/reset-usage`),
+
+  // Plan Configurations
+  getPlans: () => api.get("/api/admin/plans"),
+
+  getPlan: (id: string) => api.get(`/api/admin/plans/${id}`),
+
+  createPlan: (data: any) => api.post("/api/admin/plans", data),
+
+  updatePlan: (id: string, data: any) =>
+    api.put(`/api/admin/plans/${id}`, data),
+
+  deletePlan: (id: string) => api.delete(`/api/admin/plans/${id}`),
+
+  // AI Usage
+  getAiUsage: (page = 1, limit = 50) =>
+    api.get(`/api/admin/ai-usage?page=${page}&limit=${limit}`),
+
+  getAiGlobalStats: () => api.get("/api/admin/ai-usage/stats"),
+
+  getUserAiStats: (userId: string) =>
+    api.get(`/api/admin/ai-usage/user/${userId}`),
+
+  // Audit Logs
+  getAuditLogs: (page = 1, limit = 50, filters?: Record<string, string>) =>
+    api.get("/api/admin/audit-logs", { params: { page, limit, ...filters } }),
+
+  getUserAuditLogs: (userId: string) =>
+    api.get(`/api/admin/audit-logs/user/${userId}`),
+
+  // Feature Flags
+  getFeatureFlags: () => api.get("/api/admin/feature-flags"),
+
+  createFeatureFlag: (data: any) => api.post("/api/admin/feature-flags", data),
+
+  updateFeatureFlag: (id: string, data: any) =>
+    api.put(`/api/admin/feature-flags/${id}`, data),
+
+  toggleFeatureFlag: (id: string) =>
+    api.put(`/api/admin/feature-flags/${id}/toggle`),
+
+  deleteFeatureFlag: (id: string) =>
+    api.delete(`/api/admin/feature-flags/${id}`),
+
+  // Notifications
+  sendNotification: (userId: string, data: any) =>
+    api.post("/api/admin/notifications/send", { userId, ...data }),
+
+  broadcastNotification: (data: any) =>
+    api.post("/api/admin/notifications/broadcast", data),
+
+  // Revenue
+  getRevenue: () => api.get("/api/admin/revenue"),
 };
 
 export default api;

@@ -40,7 +40,7 @@ export default function ProjectsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-500 border-t-transparent" />
       </div>
     );
   }
@@ -49,26 +49,24 @@ export default function ProjectsPage() {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">
-            My Projects
-          </h1>
+          <h1 className="text-2xl font-bold text-white">My Projects</h1>
           <p className="text-sm text-zinc-500">Showcase your work</p>
         </div>
         <Link
           href="/dashboard/projects/new"
-          className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
+          className="flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-500 shadow-lg shadow-indigo-600/25"
         >
           <Plus className="h-4 w-4" /> Add Project
         </Link>
       </div>
 
       {projects.length === 0 ? (
-        <div className="rounded-2xl border-2 border-dashed border-zinc-300 p-16 text-center dark:border-zinc-700">
+        <div className="rounded-2xl border-2 border-dashed border-white/10 p-16 text-center">
           <FolderOpen className="mx-auto mb-3 h-12 w-12 text-zinc-400" />
           <p className="mb-4 text-lg text-zinc-500">No projects yet</p>
           <Link
             href="/dashboard/projects/new"
-            className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-blue-700"
+            className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-indigo-500 shadow-lg shadow-indigo-600/25"
           >
             <Plus className="h-4 w-4" /> Create Your First Project
           </Link>
@@ -78,7 +76,7 @@ export default function ProjectsPage() {
           {projects.map((project) => (
             <div
               key={project._id}
-              className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm transition hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900"
+              className="overflow-hidden rounded-2xl border border-white/[0.06] bg-white/[0.02] transition hover:bg-white/[0.04]"
             >
               {project.images?.[0] ? (
                 <img
@@ -87,17 +85,15 @@ export default function ProjectsPage() {
                   className="h-48 w-full object-cover"
                 />
               ) : (
-                <div className="flex h-48 items-center justify-center bg-zinc-100 dark:bg-zinc-800">
-                  <FolderOpen className="h-12 w-12 text-zinc-300 dark:text-zinc-600" />
+                <div className="flex h-48 items-center justify-center bg-white/[0.03]">
+                  <FolderOpen className="h-12 w-12 text-zinc-700" />
                 </div>
               )}
               <div className="p-5">
                 <div className="mb-2 flex items-start justify-between">
-                  <h3 className="font-semibold text-zinc-900 dark:text-white">
-                    {project.title}
-                  </h3>
+                  <h3 className="font-semibold text-white">{project.title}</h3>
                   {project.isFeatured && (
-                    <span className="rounded-full bg-yellow-100 px-2 py-0.5 text-xs font-medium text-yellow-700">
+                    <span className="rounded-full bg-yellow-500/10 px-2 py-0.5 text-xs font-medium text-yellow-400 ring-1 ring-yellow-500/20">
                       Featured
                     </span>
                   )}
@@ -110,17 +106,17 @@ export default function ProjectsPage() {
                     {project.technologies.map((tech) => (
                       <span
                         key={tech}
-                        className="rounded-md bg-zinc-100 px-2 py-0.5 text-xs text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"
+                        className="rounded-md bg-white/5 px-2 py-0.5 text-xs text-zinc-400 ring-1 ring-white/10"
                       >
                         {tech}
                       </span>
                     ))}
                   </div>
                 )}
-                <div className="flex items-center gap-2 border-t border-zinc-100 pt-3 dark:border-zinc-800">
+                <div className="flex items-center gap-2 border-t border-white/[0.06] pt-3">
                   <Link
                     href={`/dashboard/projects/${project._id}/edit`}
-                    className="flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium text-zinc-600 transition hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
+                    className="flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium text-zinc-400 transition hover:bg-white/[0.04] hover:text-white"
                   >
                     <Edit className="h-3.5 w-3.5" /> Edit
                   </Link>
@@ -129,14 +125,14 @@ export default function ProjectsPage() {
                       href={project.liveUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium text-blue-600 transition hover:bg-blue-50"
+                      className="flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium text-indigo-400 transition hover:bg-indigo-500/10"
                     >
                       <ExternalLink className="h-3.5 w-3.5" /> Live
                     </a>
                   )}
                   <button
                     onClick={() => deleteProject(project._id)}
-                    className="ml-auto flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium text-red-600 transition hover:bg-red-50"
+                    className="ml-auto flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium text-red-400 transition hover:bg-red-500/10"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </button>

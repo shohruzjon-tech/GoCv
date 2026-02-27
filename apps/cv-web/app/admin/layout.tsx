@@ -12,6 +12,14 @@ import {
   LayoutDashboard,
   LogOut,
   ArrowLeft,
+  Palette,
+  CreditCard,
+  Brain,
+  ScrollText,
+  Flag,
+  DollarSign,
+  Bell,
+  Tag,
 } from "lucide-react";
 
 export default function AdminLayout({
@@ -30,26 +38,51 @@ export default function AdminLayout({
     }
   }, [user, isLoading, router, isLoginPage]);
 
-  // Skip auth check for admin login page
   if (isLoginPage) {
     return <>{children}</>;
   }
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-orange-600 border-t-transparent" />
+      <div className="flex min-h-screen items-center justify-center bg-[#08081a]">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-orange-500 border-t-transparent" />
       </div>
     );
   }
 
   if (!user || user.role !== "admin") return null;
 
-  const links = [
-    { href: "/admin", icon: LayoutDashboard, label: "Dashboard" },
-    { href: "/admin/users", icon: Users, label: "Users" },
-    { href: "/admin/sessions", icon: Key, label: "Sessions" },
-    { href: "/admin/cvs", icon: FileText, label: "CVs" },
+  const sections = [
+    {
+      title: "Overview",
+      links: [
+        { href: "/admin", icon: LayoutDashboard, label: "Dashboard" },
+        { href: "/admin/revenue", icon: DollarSign, label: "Revenue" },
+      ],
+    },
+    {
+      title: "Management",
+      links: [
+        { href: "/admin/users", icon: Users, label: "Users" },
+        { href: "/admin/cvs", icon: FileText, label: "CVs" },
+        { href: "/admin/templates", icon: Palette, label: "Templates" },
+        {
+          href: "/admin/subscriptions",
+          icon: CreditCard,
+          label: "Subscriptions",
+        },
+        { href: "/admin/plans", icon: Tag, label: "Plans & Pricing" },
+      ],
+    },
+    {
+      title: "AI & System",
+      links: [
+        { href: "/admin/ai-usage", icon: Brain, label: "AI Usage" },
+        { href: "/admin/feature-flags", icon: Flag, label: "Feature Flags" },
+        { href: "/admin/audit-logs", icon: ScrollText, label: "Audit Logs" },
+        { href: "/admin/sessions", icon: Key, label: "Sessions" },
+      ],
+    },
   ];
 
   const handleLogout = () => {
@@ -58,42 +91,51 @@ export default function AdminLayout({
   };
 
   return (
-    <div className="flex min-h-screen bg-zinc-50 dark:bg-zinc-950">
+    <div className="flex min-h-screen bg-[#08081a]">
       {/* Sidebar */}
-      <aside className="fixed left-0 top-0 z-40 flex h-screen w-64 flex-col border-r border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
-        <div className="flex h-16 items-center gap-2 border-b border-zinc-200 px-6 dark:border-zinc-800">
-          <Shield className="h-6 w-6 text-orange-600" />
-          <span className="text-lg font-bold text-zinc-900 dark:text-white">
-            Admin Panel
-          </span>
+      <aside className="fixed left-0 top-0 z-40 flex h-screen w-64 flex-col border-r border-white/[0.06] bg-[#0a0a1e]">
+        <div className="flex h-16 items-center gap-2 border-b border-white/[0.06] px-6">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-500/10 ring-1 ring-orange-500/20">
+            <Shield className="h-4 w-4 text-orange-400" />
+          </div>
+          <span className="text-lg font-bold text-white">Admin Panel</span>
         </div>
-        <nav className="flex-1 space-y-1 p-4">
-          {links.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition ${
-                pathname === link.href
-                  ? "bg-orange-50 text-orange-700 dark:bg-orange-950 dark:text-orange-400"
-                  : "text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
-              }`}
-            >
-              <link.icon className="h-4 w-4" />
-              {link.label}
-            </Link>
+        <nav className="flex-1 overflow-y-auto p-4 space-y-6">
+          {sections.map((section) => (
+            <div key={section.title}>
+              <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
+                {section.title}
+              </p>
+              <div className="space-y-1">
+                {section.links.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
+                      pathname === link.href
+                        ? "bg-orange-500/10 text-orange-400 ring-1 ring-orange-500/20"
+                        : "text-zinc-400 hover:bg-white/[0.04] hover:text-white"
+                    }`}
+                  >
+                    <link.icon className="h-4 w-4" />
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
           ))}
         </nav>
-        <div className="border-t border-zinc-200 p-4 dark:border-zinc-800">
+        <div className="border-t border-white/[0.06] p-4">
           <Link
             href="/dashboard"
-            className="mb-2 flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-zinc-500 transition hover:bg-zinc-100 dark:hover:bg-zinc-800"
+            className="mb-2 flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-zinc-500 transition hover:bg-white/[0.04] hover:text-zinc-300"
           >
             <ArrowLeft className="h-4 w-4" />
             Back to App
           </Link>
           <button
             onClick={handleLogout}
-            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-red-600 transition hover:bg-red-50 dark:hover:bg-red-950"
+            className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm text-red-400 transition hover:bg-red-500/10"
           >
             <LogOut className="h-4 w-4" />
             Logout
