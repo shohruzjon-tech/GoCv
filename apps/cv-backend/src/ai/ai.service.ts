@@ -173,11 +173,19 @@ If context about existing CV data is provided, use it to enhance or modify the c
           { role: 'user', content: userPrompt },
         ],
         response_format: { type: 'json_object' },
-        max_completion_tokens: 4000,
+        max_completion_tokens: 16384,
       });
 
-      const content = completion.choices[0]?.message?.content;
-      if (!content) throw new Error('No response from AI');
+      const choice = completion.choices[0];
+      const content = choice?.message?.content;
+      if (!content) {
+        this.logger.error(
+          `Empty AI response — finish_reason: ${choice?.finish_reason}, usage: ${JSON.stringify(completion.usage)}`,
+        );
+        throw new Error(
+          `No response from AI (finish_reason: ${choice?.finish_reason ?? 'unknown'})`,
+        );
+      }
 
       if (userId) {
         await this.trackCall(
@@ -288,7 +296,7 @@ Return ONLY the HTML string, no JSON wrapping.`;
             content: `Generate a professional CV HTML page with this data: ${JSON.stringify(cvData)}`,
           },
         ],
-        max_completion_tokens: 4000,
+        max_completion_tokens: 16384,
       });
 
       if (userId) {
@@ -414,7 +422,7 @@ Focus on:
           },
         ],
         response_format: { type: 'json_object' },
-        max_completion_tokens: 4000,
+        max_completion_tokens: 8192,
       });
 
       const content = completion.choices[0]?.message?.content;
@@ -485,7 +493,7 @@ Focus on:
           },
         ],
         response_format: { type: 'json_object' },
-        max_completion_tokens: 4000,
+        max_completion_tokens: 8192,
       });
 
       const content = completion.choices[0]?.message?.content;

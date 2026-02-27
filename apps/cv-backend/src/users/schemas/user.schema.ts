@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 import { Role } from '../../common/enums/role.enum.js';
 
 export type UserDocument = HydratedDocument<User>;
@@ -50,6 +50,29 @@ export class User {
     linkedin?: string;
     github?: string;
     twitter?: string;
+  };
+
+  // ─── Enterprise Fields ───
+
+  @Prop({ type: Types.ObjectId, ref: 'Organization' })
+  defaultOrganizationId?: Types.ObjectId;
+
+  @Prop({ type: Object })
+  preferences?: {
+    defaultAiProvider?: string;
+    defaultTemplateId?: string;
+    emailNotifications?: boolean;
+    marketingEmails?: boolean;
+    language?: string;
+    timezone?: string;
+  };
+
+  @Prop({ type: Object })
+  mfaConfig?: {
+    enabled: boolean;
+    method?: 'totp' | 'sms' | 'email';
+    secret?: string;
+    verifiedAt?: Date;
   };
 
   createdAt?: Date;

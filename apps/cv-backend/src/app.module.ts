@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ThrottlerModule } from '@nestjs/throttler';
@@ -19,6 +19,13 @@ import { AuditModule } from './audit/audit.module.js';
 import { FeatureFlagsModule } from './feature-flags/feature-flags.module.js';
 import { NotificationsModule } from './notifications/notifications.module.js';
 import { StripeModule } from './stripe/stripe.module.js';
+import { OrganizationsModule } from './organizations/organizations.module.js';
+import { AiOrchestratorModule } from './ai/orchestrator/ai-orchestrator.module.js';
+import { QueueModule } from './queue/queue.module.js';
+import { CorrelationIdMiddleware } from './common/middleware/correlation-id.middleware.js';
+import { TenantMiddleware } from './common/middleware/tenant.middleware.js';
+import { SecurityHeadersMiddleware } from './common/middleware/security-headers.middleware.js';
+import { RequestLoggerMiddleware } from './common/middleware/request-logger.middleware.js';
 
 @Module({
   imports: [
@@ -38,22 +45,46 @@ import { StripeModule } from './stripe/stripe.module.js';
         uri: configService.get<string>('mongodb.uri'),
       }),
     }),
+
+    // ── Core Infrastructure ──
     AuditModule,
+    AiOrchestratorModule,
+    QueueModule,
+
+    // ── Auth & Users ──
     StripeModule,
     AuthModule,
     UsersModule,
     SessionsModule,
+
+    // ── Business Logic ──
     CvModule,
     AiModule,
     AiUsageModule,
     ProjectsModule,
     UploadModule,
     PdfModule,
-    AdminModule,
     TemplatesModule,
     SubscriptionsModule,
+
+    // ── Enterprise ──
+    OrganizationsModule,
+
+    // ── Platform ──
+    AdminModule,
     FeatureFlagsModule,
     NotificationsModule,
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(
+        CorrelationIdMiddleware,
+        SecurityHeadersMiddleware,
+        RequestLoggerMiddleware,
+        TenantMiddleware,
+      )
+      .forRoutes('*');
+  }
+}

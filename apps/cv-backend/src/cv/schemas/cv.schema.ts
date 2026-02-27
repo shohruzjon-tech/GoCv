@@ -77,8 +77,40 @@ export class Cv {
   @Prop()
   publicUrl?: string;
 
+  // ─── Enterprise Fields ───
+
+  @Prop({ type: Types.ObjectId, ref: 'Organization' })
+  organizationId?: Types.ObjectId;
+
+  @Prop({ type: Types.ObjectId, ref: 'Team' })
+  teamId?: Types.ObjectId;
+
+  @Prop({ default: 1 })
+  currentVersion: number;
+
+  @Prop({ type: [String], default: [] })
+  tags: string[];
+
+  @Prop()
+  targetRole?: string;
+
+  @Prop()
+  targetCompany?: string;
+
+  @Prop({ type: Object })
+  metadata?: {
+    lastAiProvider?: string;
+    lastAiModel?: string;
+    totalAiEdits?: number;
+    exportCount?: number;
+    viewCount?: number;
+  };
+
   createdAt?: Date;
   updatedAt?: Date;
 }
 
 export const CvSchema = SchemaFactory.createForClass(Cv);
+CvSchema.index({ organizationId: 1, userId: 1 });
+CvSchema.index({ tags: 1 });
+CvSchema.index({ targetRole: 'text', targetCompany: 'text', 'personalInfo.fullName': 'text' });
