@@ -114,7 +114,7 @@ export default function AdminSubscriptionsPage() {
     if (plan === "enterprise")
       return <Shield className="h-4 w-4 text-purple-400" />;
     if (plan === "premium") return <Crown className="h-4 w-4 text-amber-400" />;
-    return <Zap className="h-4 w-4 text-zinc-400" />;
+    return <Zap className="h-4 w-4 text-content-2" />;
   };
 
   const statusColor = (status: string) => {
@@ -126,9 +126,9 @@ export default function AdminSubscriptionsPage() {
       case "cancelled":
         return "bg-red-500/10 text-red-400";
       case "expired":
-        return "bg-zinc-500/10 text-zinc-400";
+        return "bg-zinc-500/10 text-content-2";
       default:
-        return "bg-zinc-500/10 text-zinc-400";
+        return "bg-zinc-500/10 text-content-2";
     }
   };
 
@@ -139,7 +139,7 @@ export default function AdminSubscriptionsPage() {
       case "premium":
         return "bg-amber-500/10 text-amber-400";
       default:
-        return "bg-zinc-500/10 text-zinc-400";
+        return "bg-zinc-500/10 text-content-2";
     }
   };
 
@@ -221,14 +221,14 @@ export default function AdminSubscriptionsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Subscriptions</h1>
-          <p className="text-sm text-zinc-500">
+          <h1 className="text-2xl font-bold text-content">Subscriptions</h1>
+          <p className="text-sm text-content-3">
             Manage user subscriptions, plans, and usage
           </p>
         </div>
         <button
           onClick={load}
-          className="flex items-center gap-2 rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-2 text-sm text-zinc-400 transition hover:bg-white/[0.04] hover:text-white"
+          className="flex items-center gap-2 rounded-xl border border-edge bg-card px-4 py-2 text-sm text-content-2 transition hover:bg-card-hover hover:text-content"
         >
           <RefreshCw className="h-4 w-4" />
           Refresh
@@ -238,14 +238,14 @@ export default function AdminSubscriptionsPage() {
       {/* Stats Cards */}
       {stats && (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-          <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5">
+          <div className="rounded-2xl border border-edge bg-card p-5">
             <div className="flex items-center gap-3">
               <div className="rounded-xl bg-indigo-400/10 p-2.5">
                 <Users className="h-4 w-4 text-indigo-400" />
               </div>
               <div>
-                <p className="text-xs text-zinc-500">Total</p>
-                <p className="text-lg font-bold text-white">
+                <p className="text-xs text-content-3">Total</p>
+                <p className="text-lg font-bold text-content">
                   {(stats.totalFree || 0) +
                     (stats.totalPremium || 0) +
                     (stats.totalEnterprise || 0)}
@@ -253,53 +253,53 @@ export default function AdminSubscriptionsPage() {
               </div>
             </div>
           </div>
-          <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5">
+          <div className="rounded-2xl border border-edge bg-card p-5">
             <div className="flex items-center gap-3">
               <div className="rounded-xl bg-zinc-400/10 p-2.5">
-                <Zap className="h-4 w-4 text-zinc-400" />
+                <Zap className="h-4 w-4 text-content-2" />
               </div>
               <div>
-                <p className="text-xs text-zinc-500">Free</p>
-                <p className="text-lg font-bold text-white">
+                <p className="text-xs text-content-3">Free</p>
+                <p className="text-lg font-bold text-content">
                   {stats.totalFree || 0}
                 </p>
               </div>
             </div>
           </div>
-          <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5">
+          <div className="rounded-2xl border border-edge bg-card p-5">
             <div className="flex items-center gap-3">
               <div className="rounded-xl bg-amber-400/10 p-2.5">
                 <Crown className="h-4 w-4 text-amber-400" />
               </div>
               <div>
-                <p className="text-xs text-zinc-500">Premium</p>
-                <p className="text-lg font-bold text-white">
+                <p className="text-xs text-content-3">Premium</p>
+                <p className="text-lg font-bold text-content">
                   {stats.totalPremium || 0}
                 </p>
               </div>
             </div>
           </div>
-          <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5">
+          <div className="rounded-2xl border border-edge bg-card p-5">
             <div className="flex items-center gap-3">
               <div className="rounded-xl bg-purple-400/10 p-2.5">
                 <Shield className="h-4 w-4 text-purple-400" />
               </div>
               <div>
-                <p className="text-xs text-zinc-500">Enterprise</p>
-                <p className="text-lg font-bold text-white">
+                <p className="text-xs text-content-3">Enterprise</p>
+                <p className="text-lg font-bold text-content">
                   {stats.totalEnterprise || 0}
                 </p>
               </div>
             </div>
           </div>
-          <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5">
+          <div className="rounded-2xl border border-edge bg-card p-5">
             <div className="flex items-center gap-3">
               <div className="rounded-xl bg-emerald-400/10 p-2.5">
                 <TrendingUp className="h-4 w-4 text-emerald-400" />
               </div>
               <div>
-                <p className="text-xs text-zinc-500">Est. MRR</p>
-                <p className="text-lg font-bold text-white">
+                <p className="text-xs text-content-3">Est. MRR</p>
+                <p className="text-lg font-bold text-content">
                   ${((stats.totalRevenue || 0) / 100).toLocaleString()}
                 </p>
               </div>
@@ -310,52 +310,52 @@ export default function AdminSubscriptionsPage() {
 
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3">
-        <div className="flex items-center gap-2 rounded-xl border border-white/[0.06] bg-white/[0.02] px-3 py-2">
-          <Search className="h-4 w-4 text-zinc-500" />
+        <div className="flex items-center gap-2 rounded-xl border border-edge bg-card px-3 py-2">
+          <Search className="h-4 w-4 text-content-3" />
           <select
             value={filterPlan}
             onChange={(e) => {
               setFilterPlan(e.target.value);
               setPage(1);
             }}
-            className="bg-transparent text-sm text-zinc-300 outline-none"
+            className="bg-transparent text-sm text-content-2 outline-none"
           >
-            <option value="" className="bg-[#0a0a1e]">
+            <option value="" className="bg-surface">
               All Plans
             </option>
-            <option value="free" className="bg-[#0a0a1e]">
+            <option value="free" className="bg-surface">
               Free
             </option>
-            <option value="premium" className="bg-[#0a0a1e]">
+            <option value="premium" className="bg-surface">
               Premium
             </option>
-            <option value="enterprise" className="bg-[#0a0a1e]">
+            <option value="enterprise" className="bg-surface">
               Enterprise
             </option>
           </select>
         </div>
-        <div className="flex items-center gap-2 rounded-xl border border-white/[0.06] bg-white/[0.02] px-3 py-2">
+        <div className="flex items-center gap-2 rounded-xl border border-edge bg-card px-3 py-2">
           <select
             value={filterStatus}
             onChange={(e) => {
               setFilterStatus(e.target.value);
               setPage(1);
             }}
-            className="bg-transparent text-sm text-zinc-300 outline-none"
+            className="bg-transparent text-sm text-content-2 outline-none"
           >
-            <option value="" className="bg-[#0a0a1e]">
+            <option value="" className="bg-surface">
               All Status
             </option>
-            <option value="active" className="bg-[#0a0a1e]">
+            <option value="active" className="bg-surface">
               Active
             </option>
-            <option value="cancelled" className="bg-[#0a0a1e]">
+            <option value="cancelled" className="bg-surface">
               Cancelled
             </option>
-            <option value="expired" className="bg-[#0a0a1e]">
+            <option value="expired" className="bg-surface">
               Expired
             </option>
-            <option value="trial" className="bg-[#0a0a1e]">
+            <option value="trial" className="bg-surface">
               Trial
             </option>
           </select>
@@ -367,12 +367,12 @@ export default function AdminSubscriptionsPage() {
               setFilterStatus("");
               setPage(1);
             }}
-            className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-zinc-500 hover:text-zinc-300"
+            className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-content-3 hover:text-content-2"
           >
             <X className="h-3 w-3" /> Clear filters
           </button>
         )}
-        <span className="ml-auto text-xs text-zinc-600">
+        <span className="ml-auto text-xs text-content-4">
           {total} subscription{total !== 1 ? "s" : ""}
         </span>
       </div>
@@ -383,33 +383,33 @@ export default function AdminSubscriptionsPage() {
           <Loader2 className="h-8 w-8 animate-spin text-orange-500" />
         </div>
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-white/[0.06]">
+        <div className="overflow-hidden rounded-2xl border border-edge">
           <div className="overflow-x-auto">
             <table className="w-full min-w-[900px]">
               <thead>
-                <tr className="border-b border-white/[0.06] bg-white/[0.02]">
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-zinc-400">
+                <tr className="border-b border-edge bg-card">
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-content-2">
                     User
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-zinc-400">
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-content-2">
                     Plan
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-zinc-400">
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-content-2">
                     Status
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-zinc-400">
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-content-2">
                     AI Usage
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-zinc-400">
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-content-2">
                     PDF Exports
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-zinc-400">
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-content-2">
                     Period End
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-zinc-400">
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-content-2">
                     Price
                   </th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-zinc-400">
+                  <th className="px-4 py-3 text-right text-xs font-semibold text-content-2">
                     Actions
                   </th>
                 </tr>
@@ -428,14 +428,14 @@ export default function AdminSubscriptionsPage() {
                   return (
                     <tr
                       key={s._id}
-                      className="border-b border-white/[0.04] transition hover:bg-white/[0.02]"
+                      className="border-b border-edge transition hover:bg-card-hover"
                     >
                       <td className="px-4 py-3">
                         <div>
-                          <p className="text-sm font-medium text-white">
+                          <p className="text-sm font-medium text-content">
                             {user.name}
                           </p>
-                          <p className="text-xs text-zinc-500">{user.email}</p>
+                          <p className="text-xs text-content-3">{user.email}</p>
                         </div>
                       </td>
                       <td className="px-4 py-3">
@@ -459,7 +459,7 @@ export default function AdminSubscriptionsPage() {
                       </td>
                       <td className="px-4 py-3">
                         <div className="w-24">
-                          <div className="flex items-center justify-between text-[10px] text-zinc-500 mb-0.5">
+                          <div className="flex items-center justify-between text-[10px] text-content-3 mb-0.5">
                             <span>{s.currentUsage?.aiCreditsUsed || 0}</span>
                             <span>
                               {s.limits?.maxAiCreditsPerMonth === -1
@@ -467,7 +467,7 @@ export default function AdminSubscriptionsPage() {
                                 : s.limits?.maxAiCreditsPerMonth}
                             </span>
                           </div>
-                          <div className="h-1.5 overflow-hidden rounded-full bg-white/[0.04]">
+                          <div className="h-1.5 overflow-hidden rounded-full bg-card-hover">
                             <div
                               className={`h-full rounded-full transition-all ${aiPct > 80 ? "bg-red-500" : aiPct > 50 ? "bg-amber-500" : "bg-emerald-500"}`}
                               style={{
@@ -479,7 +479,7 @@ export default function AdminSubscriptionsPage() {
                       </td>
                       <td className="px-4 py-3">
                         <div className="w-20">
-                          <div className="flex items-center justify-between text-[10px] text-zinc-500 mb-0.5">
+                          <div className="flex items-center justify-between text-[10px] text-content-3 mb-0.5">
                             <span>{s.currentUsage?.pdfExportsUsed || 0}</span>
                             <span>
                               {s.limits?.maxPdfExportsPerMonth === -1
@@ -487,7 +487,7 @@ export default function AdminSubscriptionsPage() {
                                 : s.limits?.maxPdfExportsPerMonth}
                             </span>
                           </div>
-                          <div className="h-1.5 overflow-hidden rounded-full bg-white/[0.04]">
+                          <div className="h-1.5 overflow-hidden rounded-full bg-card-hover">
                             <div
                               className={`h-full rounded-full transition-all ${pdfPct > 80 ? "bg-red-500" : pdfPct > 50 ? "bg-amber-500" : "bg-indigo-500"}`}
                               style={{
@@ -497,12 +497,12 @@ export default function AdminSubscriptionsPage() {
                           </div>
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-xs text-zinc-500">
+                      <td className="px-4 py-3 text-xs text-content-3">
                         {s.currentPeriodEnd
                           ? new Date(s.currentPeriodEnd).toLocaleDateString()
                           : "—"}
                       </td>
-                      <td className="px-4 py-3 text-sm text-zinc-300">
+                      <td className="px-4 py-3 text-sm text-content-2">
                         {s.pricePerMonth
                           ? `$${(s.pricePerMonth / 100).toFixed(0)}/mo`
                           : "Free"}
@@ -511,14 +511,14 @@ export default function AdminSubscriptionsPage() {
                         <div className="flex items-center justify-end gap-1">
                           <button
                             onClick={() => openEdit(s)}
-                            className="rounded-lg p-1.5 text-zinc-500 transition hover:bg-white/[0.06] hover:text-white"
+                            className="rounded-lg p-1.5 text-content-3 transition hover:bg-card-hover hover:text-content"
                             title="Edit subscription"
                           >
                             <FileText className="h-3.5 w-3.5" />
                           </button>
                           <button
                             onClick={() => handleResetUsage(s)}
-                            className="rounded-lg p-1.5 text-zinc-500 transition hover:bg-amber-500/10 hover:text-amber-400"
+                            className="rounded-lg p-1.5 text-content-3 transition hover:bg-amber-500/10 hover:text-amber-400"
                             title="Reset usage"
                           >
                             <RotateCcw className="h-3.5 w-3.5" />
@@ -526,7 +526,7 @@ export default function AdminSubscriptionsPage() {
                           {s.plan !== "free" && (
                             <button
                               onClick={() => handleCancel(s)}
-                              className="rounded-lg p-1.5 text-zinc-500 transition hover:bg-red-500/10 hover:text-red-400"
+                              className="rounded-lg p-1.5 text-content-3 transition hover:bg-red-500/10 hover:text-red-400"
                               title="Cancel subscription"
                             >
                               <Ban className="h-3.5 w-3.5" />
@@ -541,7 +541,7 @@ export default function AdminSubscriptionsPage() {
                   <tr>
                     <td
                       colSpan={8}
-                      className="px-4 py-12 text-center text-sm text-zinc-500"
+                      className="px-4 py-12 text-center text-sm text-content-3"
                     >
                       No subscriptions found
                     </td>
@@ -556,21 +556,21 @@ export default function AdminSubscriptionsPage() {
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex items-center justify-between">
-          <p className="text-xs text-zinc-600">
+          <p className="text-xs text-content-4">
             Page {page} of {totalPages}
           </p>
           <div className="flex gap-1">
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}
-              className="rounded-lg border border-white/[0.06] p-2 text-zinc-400 transition hover:bg-white/[0.04] disabled:opacity-30"
+              className="rounded-lg border border-edge p-2 text-content-2 transition hover:bg-card-hover disabled:opacity-30"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
             <button
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
-              className="rounded-lg border border-white/[0.06] p-2 text-zinc-400 transition hover:bg-white/[0.04] disabled:opacity-30"
+              className="rounded-lg border border-edge p-2 text-content-2 transition hover:bg-card-hover disabled:opacity-30"
             >
               <ChevronRight className="h-4 w-4" />
             </button>
@@ -581,20 +581,20 @@ export default function AdminSubscriptionsPage() {
       {/* Edit Modal */}
       {editingSub && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="w-full max-w-lg rounded-2xl border border-white/[0.08] bg-[#0c0c20] p-6 shadow-2xl">
+          <div className="w-full max-w-lg rounded-2xl border border-edge bg-elevated p-6 shadow-2xl">
             <div className="mb-6 flex items-center justify-between">
               <div>
-                <h2 className="text-lg font-bold text-white">
+                <h2 className="text-lg font-bold text-content">
                   Edit Subscription
                 </h2>
-                <p className="text-sm text-zinc-500">
+                <p className="text-sm text-content-3">
                   {getUserInfo(editingSub).name} —{" "}
                   {getUserInfo(editingSub).email}
                 </p>
               </div>
               <button
                 onClick={() => setEditingSub(null)}
-                className="rounded-lg p-1.5 text-zinc-500 transition hover:bg-white/[0.06] hover:text-white"
+                className="rounded-lg p-1.5 text-content-3 transition hover:bg-card-hover hover:text-content"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -603,7 +603,7 @@ export default function AdminSubscriptionsPage() {
             <div className="space-y-5">
               {/* Plan */}
               <div>
-                <label className="mb-1.5 block text-xs font-medium text-zinc-400">
+                <label className="mb-1.5 block text-xs font-medium text-content-2">
                   Plan
                 </label>
                 <div className="grid grid-cols-3 gap-2">
@@ -614,7 +614,7 @@ export default function AdminSubscriptionsPage() {
                       className={`flex items-center justify-center gap-1.5 rounded-xl border px-3 py-2.5 text-sm font-medium capitalize transition ${
                         editPlan === p
                           ? "border-orange-500/30 bg-orange-500/10 text-orange-400"
-                          : "border-white/[0.06] bg-white/[0.02] text-zinc-400 hover:bg-white/[0.04]"
+                          : "border-edge bg-card text-content-2 hover:bg-card-hover"
                       }`}
                     >
                       {planIcon(p)} {p}
@@ -625,24 +625,24 @@ export default function AdminSubscriptionsPage() {
 
               {/* Status */}
               <div>
-                <label className="mb-1.5 block text-xs font-medium text-zinc-400">
+                <label className="mb-1.5 block text-xs font-medium text-content-2">
                   Status
                 </label>
                 <select
                   value={editStatus}
                   onChange={(e) => setEditStatus(e.target.value as Status)}
-                  className="w-full rounded-xl border border-white/[0.06] bg-white/[0.02] px-3 py-2.5 text-sm text-zinc-300 outline-none focus:border-orange-500/30"
+                  className="w-full rounded-xl border border-edge bg-card px-3 py-2.5 text-sm text-content-2 outline-none focus:border-orange-500/30"
                 >
-                  <option value="active" className="bg-[#0a0a1e]">
+                  <option value="active" className="bg-surface">
                     Active
                   </option>
-                  <option value="cancelled" className="bg-[#0a0a1e]">
+                  <option value="cancelled" className="bg-surface">
                     Cancelled
                   </option>
-                  <option value="expired" className="bg-[#0a0a1e]">
+                  <option value="expired" className="bg-surface">
                     Expired
                   </option>
-                  <option value="trial" className="bg-[#0a0a1e]">
+                  <option value="trial" className="bg-surface">
                     Trial
                   </option>
                 </select>
@@ -650,7 +650,7 @@ export default function AdminSubscriptionsPage() {
 
               {/* Extend Period */}
               <div>
-                <label className="mb-1.5 block text-xs font-medium text-zinc-400">
+                <label className="mb-1.5 block text-xs font-medium text-content-2">
                   Extend Period (days)
                 </label>
                 <input
@@ -659,10 +659,10 @@ export default function AdminSubscriptionsPage() {
                   max="365"
                   value={editExtendDays}
                   onChange={(e) => setEditExtendDays(Number(e.target.value))}
-                  className="w-full rounded-xl border border-white/[0.06] bg-white/[0.02] px-3 py-2.5 text-sm text-zinc-300 outline-none focus:border-orange-500/30"
+                  className="w-full rounded-xl border border-edge bg-card px-3 py-2.5 text-sm text-content-2 outline-none focus:border-orange-500/30"
                   placeholder="0"
                 />
-                <p className="mt-1 text-[10px] text-zinc-600">
+                <p className="mt-1 text-[10px] text-content-4">
                   Current period ends:{" "}
                   {editingSub.currentPeriodEnd
                     ? new Date(editingSub.currentPeriodEnd).toLocaleDateString()
@@ -671,14 +671,14 @@ export default function AdminSubscriptionsPage() {
               </div>
 
               {/* Current Usage Summary */}
-              <div className="rounded-xl border border-white/[0.04] bg-white/[0.01] p-3">
-                <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
+              <div className="rounded-xl border border-edge bg-card p-3">
+                <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-content-4">
                   Current Usage
                 </p>
                 <div className="grid grid-cols-2 gap-3 text-xs">
                   <div>
-                    <span className="text-zinc-500">AI Credits: </span>
-                    <span className="text-white">
+                    <span className="text-content-3">AI Credits: </span>
+                    <span className="text-content">
                       {editingSub.currentUsage?.aiCreditsUsed || 0} /{" "}
                       {editingSub.limits?.maxAiCreditsPerMonth === -1
                         ? "∞"
@@ -686,8 +686,8 @@ export default function AdminSubscriptionsPage() {
                     </span>
                   </div>
                   <div>
-                    <span className="text-zinc-500">PDF Exports: </span>
-                    <span className="text-white">
+                    <span className="text-content-3">PDF Exports: </span>
+                    <span className="text-content">
                       {editingSub.currentUsage?.pdfExportsUsed || 0} /{" "}
                       {editingSub.limits?.maxPdfExportsPerMonth === -1
                         ? "∞"
@@ -695,8 +695,8 @@ export default function AdminSubscriptionsPage() {
                     </span>
                   </div>
                   <div>
-                    <span className="text-zinc-500">CVs: </span>
-                    <span className="text-white">
+                    <span className="text-content-3">CVs: </span>
+                    <span className="text-content">
                       {editingSub.currentUsage?.cvsCreated || 0} /{" "}
                       {editingSub.limits?.maxCvs === -1
                         ? "∞"
@@ -704,8 +704,8 @@ export default function AdminSubscriptionsPage() {
                     </span>
                   </div>
                   <div>
-                    <span className="text-zinc-500">Projects: </span>
-                    <span className="text-white">
+                    <span className="text-content-3">Projects: </span>
+                    <span className="text-content">
                       {editingSub.currentUsage?.projectsCreated || 0} /{" "}
                       {editingSub.limits?.maxProjects === -1
                         ? "∞"
@@ -714,11 +714,11 @@ export default function AdminSubscriptionsPage() {
                   </div>
                 </div>
                 {editingSub.stripeSubscriptionId && (
-                  <div className="mt-2 border-t border-white/[0.04] pt-2">
-                    <span className="text-[10px] text-zinc-600">
+                  <div className="mt-2 border-t border-edge pt-2">
+                    <span className="text-[10px] text-content-4">
                       Stripe ID:{" "}
                     </span>
-                    <span className="text-[10px] font-mono text-zinc-500">
+                    <span className="text-[10px] font-mono text-content-3">
                       {editingSub.stripeSubscriptionId}
                     </span>
                   </div>
@@ -730,7 +730,7 @@ export default function AdminSubscriptionsPage() {
             <div className="mt-6 flex items-center justify-end gap-3">
               <button
                 onClick={() => setEditingSub(null)}
-                className="rounded-xl border border-white/[0.06] px-4 py-2 text-sm text-zinc-400 transition hover:bg-white/[0.04]"
+                className="rounded-xl border border-edge px-4 py-2 text-sm text-content-2 transition hover:bg-card-hover"
               >
                 Cancel
               </button>

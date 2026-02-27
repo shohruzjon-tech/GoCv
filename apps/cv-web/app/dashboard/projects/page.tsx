@@ -49,8 +49,8 @@ export default function ProjectsPage() {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">My Projects</h1>
-          <p className="text-sm text-zinc-500">Showcase your work</p>
+          <h1 className="text-2xl font-bold text-content">My Projects</h1>
+          <p className="text-sm text-content-3">Showcase your work</p>
         </div>
         <Link
           href="/dashboard/projects/new"
@@ -61,9 +61,9 @@ export default function ProjectsPage() {
       </div>
 
       {projects.length === 0 ? (
-        <div className="rounded-2xl border-2 border-dashed border-white/10 p-16 text-center">
-          <FolderOpen className="mx-auto mb-3 h-12 w-12 text-zinc-400" />
-          <p className="mb-4 text-lg text-zinc-500">No projects yet</p>
+        <div className="rounded-2xl border-2 border-dashed border-edge p-16 text-center">
+          <FolderOpen className="mx-auto mb-3 h-12 w-12 text-content-2" />
+          <p className="mb-4 text-lg text-content-3">No projects yet</p>
           <Link
             href="/dashboard/projects/new"
             className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-indigo-500 shadow-lg shadow-indigo-600/25"
@@ -76,7 +76,7 @@ export default function ProjectsPage() {
           {projects.map((project) => (
             <div
               key={project._id}
-              className="overflow-hidden rounded-2xl border border-white/[0.06] bg-white/[0.02] transition hover:bg-white/[0.04]"
+              className="overflow-hidden rounded-2xl border border-edge bg-card transition hover:bg-card-hover"
             >
               {project.images?.[0] ? (
                 <img
@@ -85,20 +85,22 @@ export default function ProjectsPage() {
                   className="h-48 w-full object-cover"
                 />
               ) : (
-                <div className="flex h-48 items-center justify-center bg-white/[0.03]">
-                  <FolderOpen className="h-12 w-12 text-zinc-700" />
+                <div className="flex h-48 items-center justify-center bg-card">
+                  <FolderOpen className="h-12 w-12 text-content-4" />
                 </div>
               )}
               <div className="p-5">
                 <div className="mb-2 flex items-start justify-between">
-                  <h3 className="font-semibold text-white">{project.title}</h3>
+                  <h3 className="font-semibold text-content">
+                    {project.title}
+                  </h3>
                   {project.isFeatured && (
                     <span className="rounded-full bg-yellow-500/10 px-2 py-0.5 text-xs font-medium text-yellow-400 ring-1 ring-yellow-500/20">
                       Featured
                     </span>
                   )}
                 </div>
-                <p className="mb-3 text-sm text-zinc-500 line-clamp-2">
+                <p className="mb-3 text-sm text-content-3 line-clamp-2">
                   {project.description || "No description"}
                 </p>
                 {project.technologies.length > 0 && (
@@ -106,17 +108,17 @@ export default function ProjectsPage() {
                     {project.technologies.map((tech) => (
                       <span
                         key={tech}
-                        className="rounded-md bg-white/5 px-2 py-0.5 text-xs text-zinc-400 ring-1 ring-white/10"
+                        className="rounded-md bg-card px-2 py-0.5 text-xs text-content-2 ring-1 ring-edge"
                       >
                         {tech}
                       </span>
                     ))}
                   </div>
                 )}
-                <div className="flex items-center gap-2 border-t border-white/[0.06] pt-3">
+                <div className="flex items-center gap-2 border-t border-edge pt-3">
                   <Link
                     href={`/dashboard/projects/${project._id}/edit`}
-                    className="flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium text-zinc-400 transition hover:bg-white/[0.04] hover:text-white"
+                    className="flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium text-content-2 transition hover:bg-card-hover hover:text-content"
                   >
                     <Edit className="h-3.5 w-3.5" /> Edit
                   </Link>

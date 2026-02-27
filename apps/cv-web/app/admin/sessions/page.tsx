@@ -51,57 +51,57 @@ export default function AdminSessionsPage() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-white">Sessions ({total})</h1>
-        <p className="text-sm text-zinc-500">
+        <h1 className="text-2xl font-bold text-content">Sessions ({total})</h1>
+        <p className="text-sm text-content-3">
           Monitor and manage user sessions
         </p>
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-white/[0.06] bg-white/[0.02]">
+      <div className="overflow-hidden rounded-2xl border border-edge bg-card">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-white/[0.06] bg-white/[0.03]">
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase text-zinc-500">
+            <tr className="border-b border-edge bg-card">
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase text-content-3">
                 User
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase text-zinc-500">
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase text-content-3">
                 User Agent
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase text-zinc-500">
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase text-content-3">
                 IP Address
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase text-zinc-500">
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase text-content-3">
                 Status
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase text-zinc-500">
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase text-content-3">
                 Last Activity
               </th>
-              <th className="px-6 py-3 text-right text-xs font-medium uppercase text-zinc-500">
+              <th className="px-6 py-3 text-right text-xs font-medium uppercase text-content-3">
                 Actions
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-white/[0.06]">
+          <tbody className="divide-y divide-edge">
             {sessions.map((session) => (
-              <tr key={session._id} className="hover:bg-white/[0.02]">
+              <tr key={session._id} className="hover:bg-card-hover">
                 <td className="px-6 py-4">
-                  <p className="text-sm font-medium text-white">
+                  <p className="text-sm font-medium text-content">
                     {typeof session.userId === "object"
                       ? session.userId.name
                       : session.userId}
                   </p>
-                  <p className="text-xs text-zinc-500">
+                  <p className="text-xs text-content-3">
                     {typeof session.userId === "object"
                       ? session.userId.email
                       : ""}
                   </p>
                 </td>
                 <td className="px-6 py-4">
-                  <p className="max-w-[200px] truncate text-xs text-zinc-500">
+                  <p className="max-w-[200px] truncate text-xs text-content-3">
                     {session.userAgent || "N/A"}
                   </p>
                 </td>
-                <td className="px-6 py-4 text-sm text-zinc-400">
+                <td className="px-6 py-4 text-sm text-content-2">
                   {session.ipAddress || "N/A"}
                 </td>
                 <td className="px-6 py-4">
@@ -109,13 +109,13 @@ export default function AdminSessionsPage() {
                     className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${
                       session.isActive
                         ? "bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/20"
-                        : "bg-white/5 text-zinc-500 ring-1 ring-white/10"
+                        : "bg-card text-content-3 ring-1 ring-edge"
                     }`}
                   >
                     {session.isActive ? "Active" : "Expired"}
                   </span>
                 </td>
-                <td className="px-6 py-4 text-xs text-zinc-500">
+                <td className="px-6 py-4 text-xs text-content-3">
                   {session.lastActivityAt
                     ? new Date(session.lastActivityAt).toLocaleString()
                     : "N/A"}
@@ -124,7 +124,7 @@ export default function AdminSessionsPage() {
                   {session.isActive && (
                     <button
                       onClick={() => terminateSession(session._id)}
-                      className="rounded-lg p-2 text-zinc-500 transition hover:bg-red-500/10 hover:text-red-400"
+                      className="rounded-lg p-2 text-content-3 transition hover:bg-red-500/10 hover:text-red-400"
                       title="Terminate session"
                     >
                       <XCircle className="h-4 w-4" />
@@ -142,17 +142,17 @@ export default function AdminSessionsPage() {
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1}
-            className="rounded-lg border border-white/10 px-4 py-2 text-sm text-zinc-300 hover:bg-white/[0.04] disabled:opacity-50"
+            className="rounded-lg border border-edge px-4 py-2 text-sm text-content-2 hover:bg-card-hover disabled:opacity-50"
           >
             Previous
           </button>
-          <span className="text-sm text-zinc-500">
+          <span className="text-sm text-content-3">
             Page {page} of {Math.ceil(total / 20)}
           </span>
           <button
             onClick={() => setPage((p) => p + 1)}
             disabled={page * 20 >= total}
-            className="rounded-lg border border-white/10 px-4 py-2 text-sm text-zinc-300 hover:bg-white/[0.04] disabled:opacity-50"
+            className="rounded-lg border border-edge px-4 py-2 text-sm text-content-2 hover:bg-card-hover disabled:opacity-50"
           >
             Next
           </button>

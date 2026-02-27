@@ -46,7 +46,7 @@ export default function AdminAuditLogsPage() {
     const key = Object.keys(actionColors).find((k) =>
       action?.toUpperCase().includes(k),
     );
-    return key ? actionColors[key] : "text-zinc-400 bg-zinc-400/10";
+    return key ? actionColors[key] : "text-content-2 bg-zinc-400/10";
   };
 
   if (loading && logs.length === 0) {
@@ -60,8 +60,8 @@ export default function AdminAuditLogsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white">Audit Logs</h1>
-        <p className="text-sm text-zinc-500">Track all system activity</p>
+        <h1 className="text-2xl font-bold text-content">Audit Logs</h1>
+        <p className="text-sm text-content-3">Track all system activity</p>
       </div>
 
       <div className="flex items-center gap-3">
@@ -73,35 +73,35 @@ export default function AdminAuditLogsPage() {
             setPage(1);
           }}
           placeholder="Filter by action..."
-          className="rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-2 text-sm text-white placeholder-zinc-600 outline-none focus:border-indigo-500/50"
+          className="rounded-xl border border-edge bg-card px-4 py-2 text-sm text-content placeholder-content-3 outline-none focus:border-indigo-500/50"
         />
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-white/[0.06]">
+      <div className="overflow-hidden rounded-2xl border border-edge">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-white/[0.06] bg-white/[0.02]">
-              <th className="px-4 py-3 text-left text-xs font-medium text-zinc-500">
+            <tr className="border-b border-edge bg-card">
+              <th className="px-4 py-3 text-left text-xs font-medium text-content-3">
                 Time
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-zinc-500">
+              <th className="px-4 py-3 text-left text-xs font-medium text-content-3">
                 Action
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-zinc-500">
+              <th className="px-4 py-3 text-left text-xs font-medium text-content-3">
                 Resource
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-zinc-500">
+              <th className="px-4 py-3 text-left text-xs font-medium text-content-3">
                 User
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-zinc-500">
+              <th className="px-4 py-3 text-left text-xs font-medium text-content-3">
                 IP
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-white/[0.04]">
+          <tbody className="divide-y divide-edge">
             {logs.map((log: any, i: number) => (
-              <tr key={log._id || i} className="hover:bg-white/[0.02]">
-                <td className="whitespace-nowrap px-4 py-3 text-xs text-zinc-500">
+              <tr key={log._id || i} className="hover:bg-card-hover">
+                <td className="whitespace-nowrap px-4 py-3 text-xs text-content-3">
                   {new Date(log.createdAt).toLocaleString()}
                 </td>
                 <td className="px-4 py-3">
@@ -111,13 +111,13 @@ export default function AdminAuditLogsPage() {
                     {log.action}
                   </span>
                 </td>
-                <td className="px-4 py-3 text-xs text-zinc-400">
+                <td className="px-4 py-3 text-xs text-content-2">
                   {log.resource || "—"}
                 </td>
-                <td className="px-4 py-3 text-xs text-zinc-400">
+                <td className="px-4 py-3 text-xs text-content-2">
                   {log.userId || "System"}
                 </td>
-                <td className="px-4 py-3 text-xs text-zinc-600">
+                <td className="px-4 py-3 text-xs text-content-4">
                   {log.ip || "—"}
                 </td>
               </tr>
@@ -126,7 +126,7 @@ export default function AdminAuditLogsPage() {
               <tr>
                 <td
                   colSpan={5}
-                  className="px-4 py-10 text-center text-sm text-zinc-600"
+                  className="px-4 py-10 text-center text-sm text-content-4"
                 >
                   No audit logs found
                 </td>
@@ -138,22 +138,22 @@ export default function AdminAuditLogsPage() {
 
       {totalPages > 1 && (
         <div className="flex items-center justify-between">
-          <p className="text-xs text-zinc-600">{total} total entries</p>
+          <p className="text-xs text-content-4">{total} total entries</p>
           <div className="flex items-center gap-2">
             <button
               disabled={page <= 1}
               onClick={() => setPage(page - 1)}
-              className="rounded-lg border border-white/[0.06] p-1.5 text-zinc-500 hover:text-white disabled:opacity-30"
+              className="rounded-lg border border-edge p-1.5 text-content-3 hover:text-content disabled:opacity-30"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
-            <span className="text-xs text-zinc-500">
+            <span className="text-xs text-content-3">
               {page} / {totalPages}
             </span>
             <button
               disabled={page >= totalPages}
               onClick={() => setPage(page + 1)}
-              className="rounded-lg border border-white/[0.06] p-1.5 text-zinc-500 hover:text-white disabled:opacity-30"
+              className="rounded-lg border border-edge p-1.5 text-content-3 hover:text-content disabled:opacity-30"
             >
               <ChevronRight className="h-4 w-4" />
             </button>

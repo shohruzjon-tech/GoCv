@@ -65,26 +65,26 @@ export default function SettingsPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-white">
+        <h1 className="text-3xl font-bold tracking-tight text-content">
           <span className="text-gradient">Settings</span>
         </h1>
-        <p className="mt-1 text-sm text-zinc-400">
+        <p className="mt-1 text-sm text-content-2">
           Manage your account settings and profile
         </p>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 border-b border-white/[0.06] pb-1">
+      <div className="flex gap-2 border-b border-edge pb-1">
         <Link
           href="/dashboard/settings"
-          className="rounded-t-xl border-b-2 border-indigo-500 px-4 py-2 text-sm font-medium text-white"
+          className="rounded-t-xl border-b-2 border-indigo-500 px-4 py-2 text-sm font-medium text-content"
         >
           <User className="mb-0.5 mr-1.5 inline h-4 w-4" />
           Profile
         </Link>
         <Link
           href="/dashboard/settings/billing"
-          className="rounded-t-xl border-b-2 border-transparent px-4 py-2 text-sm font-medium text-zinc-400 hover:text-white"
+          className="rounded-t-xl border-b-2 border-transparent px-4 py-2 text-sm font-medium text-content-2 hover:text-content"
         >
           <CreditCard className="mb-0.5 mr-1.5 inline h-4 w-4" />
           Billing
@@ -92,15 +92,17 @@ export default function SettingsPage() {
       </div>
 
       {/* Avatar */}
-      <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6">
-        <h3 className="mb-4 text-sm font-semibold text-white">Profile Photo</h3>
+      <div className="rounded-2xl border border-edge bg-card p-6">
+        <h3 className="mb-4 text-sm font-semibold text-content">
+          Profile Photo
+        </h3>
         <div className="flex items-center gap-6">
           <div className="relative">
             {user?.avatar ? (
               <img
                 src={user.avatar}
                 alt=""
-                className="h-20 w-20 rounded-full object-cover ring-2 ring-white/10"
+                className="h-20 w-20 rounded-full object-cover ring-2 ring-edge"
               />
             ) : (
               <div className="flex h-20 w-20 items-center justify-center rounded-full bg-indigo-600/30 text-2xl font-bold text-indigo-300 ring-2 ring-indigo-500/30">
@@ -122,44 +124,44 @@ export default function SettingsPage() {
             </label>
           </div>
           <div>
-            <p className="text-sm font-medium text-white">{user?.name}</p>
-            <p className="text-xs text-zinc-500">{user?.email}</p>
+            <p className="text-sm font-medium text-content">{user?.name}</p>
+            <p className="text-xs text-content-3">{user?.email}</p>
           </div>
         </div>
       </div>
 
       {/* Profile Form */}
-      <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 space-y-5">
-        <h3 className="text-sm font-semibold text-white">
+      <div className="rounded-2xl border border-edge bg-card p-6 space-y-5">
+        <h3 className="text-sm font-semibold text-content">
           Profile Information
         </h3>
 
         <div className="grid gap-5 sm:grid-cols-2">
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-zinc-400">
+            <label className="mb-1.5 block text-xs font-medium text-content-2">
               Full Name
             </label>
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-2.5 text-sm text-white outline-none focus:border-indigo-500/50"
+              className="w-full rounded-xl border border-edge bg-card px-4 py-2.5 text-sm text-content outline-none focus:border-indigo-500/50"
             />
           </div>
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-zinc-400">
+            <label className="mb-1.5 block text-xs font-medium text-content-2">
               Headline
             </label>
             <input
               value={headline}
               onChange={(e) => setHeadline(e.target.value)}
               placeholder="e.g. Full Stack Developer"
-              className="w-full rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-2.5 text-sm text-white placeholder-zinc-600 outline-none focus:border-indigo-500/50"
+              className="w-full rounded-xl border border-edge bg-card px-4 py-2.5 text-sm text-content placeholder-content-3 outline-none focus:border-indigo-500/50"
             />
           </div>
         </div>
 
         <div>
-          <label className="mb-1.5 block text-xs font-medium text-zinc-400">
+          <label className="mb-1.5 block text-xs font-medium text-content-2">
             Bio
           </label>
           <textarea
@@ -167,56 +169,56 @@ export default function SettingsPage() {
             onChange={(e) => setBio(e.target.value)}
             rows={3}
             placeholder="Tell us about yourself..."
-            className="w-full rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-2.5 text-sm text-white placeholder-zinc-600 outline-none focus:border-indigo-500/50"
+            className="w-full rounded-xl border border-edge bg-card px-4 py-2.5 text-sm text-content placeholder-content-3 outline-none focus:border-indigo-500/50"
           />
         </div>
 
         <div className="grid gap-5 sm:grid-cols-2">
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-zinc-400">
+            <label className="mb-1.5 block text-xs font-medium text-content-2">
               Location
             </label>
             <input
               value={location}
               onChange={(e) => setLocation(e.target.value)}
               placeholder="City, Country"
-              className="w-full rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-2.5 text-sm text-white placeholder-zinc-600 outline-none focus:border-indigo-500/50"
+              className="w-full rounded-xl border border-edge bg-card px-4 py-2.5 text-sm text-content placeholder-content-3 outline-none focus:border-indigo-500/50"
             />
           </div>
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-zinc-400">
+            <label className="mb-1.5 block text-xs font-medium text-content-2">
               Website
             </label>
             <input
               value={website}
               onChange={(e) => setWebsite(e.target.value)}
               placeholder="https://..."
-              className="w-full rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-2.5 text-sm text-white placeholder-zinc-600 outline-none focus:border-indigo-500/50"
+              className="w-full rounded-xl border border-edge bg-card px-4 py-2.5 text-sm text-content placeholder-content-3 outline-none focus:border-indigo-500/50"
             />
           </div>
         </div>
 
         <div className="grid gap-5 sm:grid-cols-2">
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-zinc-400">
+            <label className="mb-1.5 block text-xs font-medium text-content-2">
               LinkedIn
             </label>
             <input
               value={linkedin}
               onChange={(e) => setLinkedin(e.target.value)}
               placeholder="https://linkedin.com/in/..."
-              className="w-full rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-2.5 text-sm text-white placeholder-zinc-600 outline-none focus:border-indigo-500/50"
+              className="w-full rounded-xl border border-edge bg-card px-4 py-2.5 text-sm text-content placeholder-content-3 outline-none focus:border-indigo-500/50"
             />
           </div>
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-zinc-400">
+            <label className="mb-1.5 block text-xs font-medium text-content-2">
               GitHub
             </label>
             <input
               value={github}
               onChange={(e) => setGithub(e.target.value)}
               placeholder="https://github.com/..."
-              className="w-full rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-2.5 text-sm text-white placeholder-zinc-600 outline-none focus:border-indigo-500/50"
+              className="w-full rounded-xl border border-edge bg-card px-4 py-2.5 text-sm text-content placeholder-content-3 outline-none focus:border-indigo-500/50"
             />
           </div>
         </div>

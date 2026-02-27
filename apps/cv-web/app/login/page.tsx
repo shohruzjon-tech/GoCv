@@ -16,7 +16,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center bg-[#08081a] px-4">
+    <div className="relative flex min-h-screen items-center justify-center bg-page px-4">
       {/* Background glow */}
       <div className="pointer-events-none absolute left-1/2 top-1/3 -translate-x-1/2 -translate-y-1/2">
         <div className="h-[400px] w-[400px] rounded-full bg-indigo-600/10 blur-[120px]" />
@@ -28,19 +28,19 @@ export default function LoginPage() {
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-600/20 ring-1 ring-indigo-500/30">
               <FileText className="h-5 w-5 text-indigo-400" />
             </div>
-            <span className="text-2xl font-bold tracking-tight text-white">
+            <span className="text-2xl font-bold tracking-tight text-content">
               Go<span className="text-gradient">CV</span>
             </span>
           </Link>
-          <p className="mt-3 text-zinc-400">
+          <p className="mt-3 text-content-2">
             Sign in to create your professional CV
           </p>
         </div>
 
-        <div className="rounded-3xl border border-white/[0.06] bg-white/[0.03] p-8 backdrop-blur-xl">
+        <div className="rounded-3xl border border-edge bg-card p-8 backdrop-blur-xl">
           <button
             onClick={handleGoogleLogin}
-            className="group flex w-full items-center justify-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-6 py-3.5 text-base font-medium text-white transition-all hover:border-white/20 hover:bg-white/10"
+            className="group flex w-full items-center justify-center gap-3 rounded-2xl border border-edge bg-card px-6 py-3.5 text-base font-medium text-content transition-all hover:border-edge hover:bg-card-hover"
           >
             <svg className="h-5 w-5" viewBox="0 0 24 24">
               <path
@@ -61,24 +61,24 @@ export default function LoginPage() {
               />
             </svg>
             Continue with Google
-            <ArrowRight className="h-4 w-4 text-zinc-500 transition-transform group-hover:translate-x-0.5 group-hover:text-white" />
+            <ArrowRight className="h-4 w-4 text-content-3 transition-transform group-hover:translate-x-0.5 group-hover:text-content" />
           </button>
 
           <div className="my-6 flex items-center gap-3">
-            <div className="h-px flex-1 bg-white/[0.06]" />
-            <span className="text-xs font-medium text-zinc-600">or</span>
-            <div className="h-px flex-1 bg-white/[0.06]" />
+            <div className="h-px flex-1 bg-card-hover" />
+            <span className="text-xs font-medium text-content-4">or</span>
+            <div className="h-px flex-1 bg-card-hover" />
           </div>
 
           <Link
             href="/admin/login"
-            className="flex w-full items-center justify-center gap-2 rounded-2xl border border-white/[0.06] bg-white/[0.02] px-6 py-3.5 text-sm font-medium text-zinc-400 transition-all hover:border-white/10 hover:bg-white/[0.04] hover:text-white"
+            className="flex w-full items-center justify-center gap-2 rounded-2xl border border-edge bg-card px-6 py-3.5 text-sm font-medium text-content-2 transition-all hover:border-edge hover:bg-card-hover hover:text-content"
           >
             Admin Login
           </Link>
         </div>
 
-        <p className="mt-8 text-center text-xs text-zinc-600">
+        <p className="mt-8 text-center text-xs text-content-4">
           By signing in, you agree to our{" "}
           <Link
             href="/terms-of-service"

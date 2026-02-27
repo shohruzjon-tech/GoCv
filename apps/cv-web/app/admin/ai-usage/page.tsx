@@ -30,46 +30,48 @@ export default function AdminAiUsagePage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white">AI Usage Analytics</h1>
-        <p className="text-sm text-zinc-500">Monitor AI tool usage and costs</p>
+        <h1 className="text-2xl font-bold text-content">AI Usage Analytics</h1>
+        <p className="text-sm text-content-3">
+          Monitor AI tool usage and costs
+        </p>
       </div>
 
       {/* Stats */}
       {stats && (
         <div className="grid gap-4 sm:grid-cols-4">
-          <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
+          <div className="rounded-xl border border-edge bg-card p-4">
             <div className="flex items-center gap-2">
               <Brain className="h-4 w-4 text-cyan-400" />
-              <p className="text-xs text-zinc-500">Total Requests</p>
+              <p className="text-xs text-content-3">Total Requests</p>
             </div>
-            <p className="mt-2 text-2xl font-bold text-white">
+            <p className="mt-2 text-2xl font-bold text-content">
               {stats.totalRequests?.toLocaleString()}
             </p>
           </div>
-          <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
+          <div className="rounded-xl border border-edge bg-card p-4">
             <div className="flex items-center gap-2">
               <Zap className="h-4 w-4 text-amber-400" />
-              <p className="text-xs text-zinc-500">Total Tokens</p>
+              <p className="text-xs text-content-3">Total Tokens</p>
             </div>
-            <p className="mt-2 text-2xl font-bold text-white">
+            <p className="mt-2 text-2xl font-bold text-content">
               {stats.totalTokens?.toLocaleString()}
             </p>
           </div>
-          <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
+          <div className="rounded-xl border border-edge bg-card p-4">
             <div className="flex items-center gap-2">
               <TrendingUp className="h-4 w-4 text-emerald-400" />
-              <p className="text-xs text-zinc-500">Total Cost</p>
+              <p className="text-xs text-content-3">Total Cost</p>
             </div>
-            <p className="mt-2 text-2xl font-bold text-white">
+            <p className="mt-2 text-2xl font-bold text-content">
               ${(stats.totalCostMills / 1000).toFixed(2)}
             </p>
           </div>
-          <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
+          <div className="rounded-xl border border-edge bg-card p-4">
             <div className="flex items-center gap-2">
               <Brain className="h-4 w-4 text-purple-400" />
-              <p className="text-xs text-zinc-500">Avg Cost/Request</p>
+              <p className="text-xs text-content-3">Avg Cost/Request</p>
             </div>
-            <p className="mt-2 text-2xl font-bold text-white">
+            <p className="mt-2 text-2xl font-bold text-content">
               $
               {stats.totalRequests
                 ? (stats.totalCostMills / 1000 / stats.totalRequests).toFixed(4)
@@ -81,8 +83,8 @@ export default function AdminAiUsagePage() {
 
       {/* By Tool */}
       {stats?.byTool && (
-        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6">
-          <h2 className="mb-4 text-sm font-semibold text-white">
+        <div className="rounded-2xl border border-edge bg-card p-6">
+          <h2 className="mb-4 text-sm font-semibold text-content">
             Usage by Tool
           </h2>
           <div className="space-y-3">
@@ -90,16 +92,16 @@ export default function AdminAiUsagePage() {
               ([tool, data]: [string, any]) => (
                 <div
                   key={tool}
-                  className="flex items-center justify-between rounded-xl bg-white/[0.02] px-4 py-3"
+                  className="flex items-center justify-between rounded-xl bg-card px-4 py-3"
                 >
-                  <span className="text-sm font-medium capitalize text-zinc-300">
+                  <span className="text-sm font-medium capitalize text-content-2">
                     {tool.replace(/_/g, " ")}
                   </span>
                   <div className="flex items-center gap-6">
-                    <span className="text-xs text-zinc-500">
+                    <span className="text-xs text-content-3">
                       {data.count} requests
                     </span>
-                    <span className="text-xs text-zinc-500">
+                    <span className="text-xs text-content-3">
                       {data.tokens?.toLocaleString()} tokens
                     </span>
                   </div>
@@ -111,29 +113,31 @@ export default function AdminAiUsagePage() {
       )}
 
       {/* Recent usage table */}
-      <div className="overflow-hidden rounded-2xl border border-white/[0.06]">
-        <div className="border-b border-white/[0.06] bg-white/[0.02] px-4 py-3">
-          <h2 className="text-sm font-semibold text-white">Recent AI Calls</h2>
+      <div className="overflow-hidden rounded-2xl border border-edge">
+        <div className="border-b border-edge bg-card px-4 py-3">
+          <h2 className="text-sm font-semibold text-content">
+            Recent AI Calls
+          </h2>
         </div>
         <table className="w-full">
           <thead>
-            <tr className="border-b border-white/[0.06]">
-              <th className="px-4 py-2 text-left text-xs font-medium text-zinc-500">
+            <tr className="border-b border-edge">
+              <th className="px-4 py-2 text-left text-xs font-medium text-content-3">
                 Tool
               </th>
-              <th className="px-4 py-2 text-left text-xs font-medium text-zinc-500">
+              <th className="px-4 py-2 text-left text-xs font-medium text-content-3">
                 Tokens
               </th>
-              <th className="px-4 py-2 text-left text-xs font-medium text-zinc-500">
+              <th className="px-4 py-2 text-left text-xs font-medium text-content-3">
                 Cost
               </th>
-              <th className="px-4 py-2 text-left text-xs font-medium text-zinc-500">
+              <th className="px-4 py-2 text-left text-xs font-medium text-content-3">
                 Latency
               </th>
-              <th className="px-4 py-2 text-left text-xs font-medium text-zinc-500">
+              <th className="px-4 py-2 text-left text-xs font-medium text-content-3">
                 Status
               </th>
-              <th className="px-4 py-2 text-left text-xs font-medium text-zinc-500">
+              <th className="px-4 py-2 text-left text-xs font-medium text-content-3">
                 Date
               </th>
             </tr>
@@ -142,18 +146,18 @@ export default function AdminAiUsagePage() {
             {(Array.isArray(usage) ? usage : []).slice(0, 30).map((u: any) => (
               <tr
                 key={u._id}
-                className="border-b border-white/[0.04] hover:bg-white/[0.02]"
+                className="border-b border-edge hover:bg-card-hover"
               >
-                <td className="px-4 py-2 text-sm capitalize text-zinc-300">
+                <td className="px-4 py-2 text-sm capitalize text-content-2">
                   {u.toolType?.replace(/_/g, " ")}
                 </td>
-                <td className="px-4 py-2 text-sm text-zinc-400">
+                <td className="px-4 py-2 text-sm text-content-2">
                   {u.totalTokens?.toLocaleString()}
                 </td>
-                <td className="px-4 py-2 text-sm text-zinc-400">
+                <td className="px-4 py-2 text-sm text-content-2">
                   ${((u.estimatedCostMills || 0) / 1000).toFixed(4)}
                 </td>
-                <td className="px-4 py-2 text-sm text-zinc-400">
+                <td className="px-4 py-2 text-sm text-content-2">
                   {u.latencyMs ? `${u.latencyMs}ms` : "—"}
                 </td>
                 <td className="px-4 py-2">
@@ -163,7 +167,7 @@ export default function AdminAiUsagePage() {
                     {u.success ? "✓" : "✗"}
                   </span>
                 </td>
-                <td className="px-4 py-2 text-xs text-zinc-600">
+                <td className="px-4 py-2 text-xs text-content-4">
                   {new Date(u.createdAt).toLocaleString()}
                 </td>
               </tr>

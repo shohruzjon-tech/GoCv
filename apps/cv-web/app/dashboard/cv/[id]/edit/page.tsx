@@ -137,7 +137,7 @@ export default function EditCvPage() {
         <div className="flex items-center gap-3">
           <button
             onClick={() => router.push("/dashboard")}
-            className="rounded-lg p-2 text-zinc-500 transition hover:bg-white/[0.04]"
+            className="rounded-lg p-2 text-content-3 transition hover:bg-card-hover"
           >
             <ArrowLeft className="h-5 w-5" />
           </button>
@@ -145,16 +145,16 @@ export default function EditCvPage() {
             <input
               value={cv.title}
               onChange={(e) => setCv({ ...cv, title: e.target.value })}
-              className="bg-transparent text-2xl font-bold text-white focus:outline-none"
+              className="bg-transparent text-2xl font-bold text-content focus:outline-none"
             />
-            <p className="text-sm text-zinc-500">Edit your CV details</p>
+            <p className="text-sm text-content-3">Edit your CV details</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={handleSave}
             disabled={saving}
-            className="flex items-center gap-2 rounded-lg border border-white/10 px-4 py-2 text-sm font-medium text-zinc-300 transition hover:bg-white/[0.04] disabled:opacity-50"
+            className="flex items-center gap-2 rounded-lg border border-edge px-4 py-2 text-sm font-medium text-content-2 transition hover:bg-card-hover disabled:opacity-50"
           >
             <Save className="h-4 w-4" />
             {saving ? "Saving..." : "Save"}
@@ -180,8 +180,8 @@ export default function EditCvPage() {
         {/* Editor Panel */}
         <div className="space-y-6">
           {/* Personal Info */}
-          <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6">
-            <h3 className="mb-4 text-lg font-semibold text-white">
+          <div className="rounded-2xl border border-edge bg-card p-6">
+            <h3 className="mb-4 text-lg font-semibold text-content">
               Personal Information
             </h3>
             <div className="grid gap-4 sm:grid-cols-2">
@@ -195,13 +195,13 @@ export default function EditCvPage() {
                 "github",
               ].map((field) => (
                 <div key={field}>
-                  <label className="mb-1 block text-xs font-medium uppercase text-zinc-500">
+                  <label className="mb-1 block text-xs font-medium uppercase text-content-3">
                     {field.replace(/([A-Z])/g, " $1").trim()}
                   </label>
                   <input
                     value={(cv.personalInfo as any)?.[field] || ""}
                     onChange={(e) => updatePersonalInfo(field, e.target.value)}
-                    className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:border-indigo-500 focus:outline-none"
+                    className="w-full rounded-lg border border-edge bg-card px-3 py-2 text-sm text-content focus:border-indigo-500 focus:outline-none"
                   />
                 </div>
               ))}
@@ -209,13 +209,13 @@ export default function EditCvPage() {
           </div>
 
           {/* Summary */}
-          <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6">
-            <h3 className="mb-4 text-lg font-semibold text-white">Summary</h3>
+          <div className="rounded-2xl border border-edge bg-card p-6">
+            <h3 className="mb-4 text-lg font-semibold text-content">Summary</h3>
             <textarea
               value={cv.summary || ""}
               onChange={(e) => setCv({ ...cv, summary: e.target.value })}
               rows={4}
-              className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:border-indigo-500 focus:outline-none"
+              className="w-full rounded-lg border border-edge bg-card px-3 py-2 text-sm text-content focus:border-indigo-500 focus:outline-none"
             />
           </div>
 
@@ -223,10 +223,10 @@ export default function EditCvPage() {
           {cv.sections?.map((section, idx) => (
             <div
               key={idx}
-              className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6"
+              className="rounded-2xl border border-edge bg-card p-6"
             >
               <div className="mb-4 flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-white">
+                <h3 className="text-lg font-semibold text-content">
                   {section.title}
                 </h3>
                 <div className="flex items-center gap-2">
@@ -234,7 +234,7 @@ export default function EditCvPage() {
                     onClick={() =>
                       updateSection(idx, { visible: !section.visible })
                     }
-                    className="rounded-lg p-1.5 text-zinc-500 hover:text-zinc-300"
+                    className="rounded-lg p-1.5 text-content-3 hover:text-content-2"
                     title={section.visible ? "Hide" : "Show"}
                   >
                     {section.visible ? (
@@ -251,7 +251,7 @@ export default function EditCvPage() {
                   </button>
                 </div>
               </div>
-              <pre className="max-h-40 overflow-auto rounded-lg bg-white/[0.03] p-3 text-xs text-zinc-400 ring-1 ring-white/10">
+              <pre className="max-h-40 overflow-auto rounded-lg bg-card p-3 text-xs text-content-2 ring-1 ring-edge">
                 {JSON.stringify(section.content, null, 2)}
               </pre>
             </div>
@@ -260,8 +260,8 @@ export default function EditCvPage() {
 
         {/* Preview Panel */}
         <div className="sticky top-24">
-          <h3 className="mb-3 text-lg font-semibold text-white">Preview</h3>
-          <div className="overflow-hidden rounded-2xl border border-white/[0.06] bg-white">
+          <h3 className="mb-3 text-lg font-semibold text-content">Preview</h3>
+          <div className="overflow-hidden rounded-2xl border border-edge bg-white">
             {cv.aiGeneratedHtml ? (
               <iframe
                 srcDoc={cv.aiGeneratedHtml}
@@ -269,7 +269,7 @@ export default function EditCvPage() {
                 title="CV Preview"
               />
             ) : (
-              <div className="flex h-96 items-center justify-center text-zinc-600">
+              <div className="flex h-96 items-center justify-center text-content-4">
                 No HTML preview available
               </div>
             )}

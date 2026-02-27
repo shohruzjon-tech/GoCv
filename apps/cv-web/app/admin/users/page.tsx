@@ -88,34 +88,34 @@ export default function AdminUsersPage() {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Users ({total})</h1>
-          <p className="text-sm text-zinc-500">
+          <h1 className="text-2xl font-bold text-content">Users ({total})</h1>
+          <p className="text-sm text-content-3">
             Manage user accounts and access
           </p>
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-white/[0.06] bg-white/[0.02]">
+      <div className="overflow-hidden rounded-2xl border border-edge bg-card">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-white/[0.06] bg-white/[0.03]">
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase text-zinc-500">
+            <tr className="border-b border-edge bg-card">
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase text-content-3">
                 User
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase text-zinc-500">
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase text-content-3">
                 Role
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase text-zinc-500">
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase text-content-3">
                 Status
               </th>
-              <th className="px-6 py-3 text-right text-xs font-medium uppercase text-zinc-500">
+              <th className="px-6 py-3 text-right text-xs font-medium uppercase text-content-3">
                 Actions
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-white/[0.06]">
+          <tbody className="divide-y divide-edge">
             {users.map((user) => (
-              <tr key={user._id} className="hover:bg-white/[0.02]">
+              <tr key={user._id} className="hover:bg-card-hover">
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-3">
                     {user.avatar ? (
@@ -130,8 +130,8 @@ export default function AdminUsersPage() {
                       </div>
                     )}
                     <div>
-                      <p className="font-medium text-white">{user.name}</p>
-                      <p className="text-xs text-zinc-500">{user.email}</p>
+                      <p className="font-medium text-content">{user.name}</p>
+                      <p className="text-xs text-content-3">{user.email}</p>
                     </div>
                   </div>
                 </td>
@@ -139,7 +139,7 @@ export default function AdminUsersPage() {
                   <select
                     value={user.role}
                     onChange={(e) => changeRole(user._id, e.target.value)}
-                    className="rounded-lg border border-white/10 bg-white/5 text-white px-2 py-1 text-xs font-medium"
+                    className="rounded-lg border border-edge bg-card text-content px-2 py-1 text-xs font-medium"
                   >
                     <option value="user">User</option>
                     <option value="admin">Admin</option>
@@ -162,7 +162,7 @@ export default function AdminUsersPage() {
                       onClick={() =>
                         toggleActive(user._id, (user as any).isActive !== false)
                       }
-                      className="rounded-lg p-2 text-zinc-500 transition hover:bg-white/[0.04] hover:text-zinc-300"
+                      className="rounded-lg p-2 text-content-3 transition hover:bg-card-hover hover:text-content-2"
                       title={
                         (user as any).isActive !== false
                           ? "Deactivate"
@@ -177,14 +177,14 @@ export default function AdminUsersPage() {
                     </button>
                     <button
                       onClick={() => terminateAllSessions(user._id)}
-                      className="rounded-lg p-2 text-zinc-500 transition hover:bg-orange-500/10 hover:text-orange-400"
+                      className="rounded-lg p-2 text-content-3 transition hover:bg-orange-500/10 hover:text-orange-400"
                       title="Terminate all sessions"
                     >
                       <Key className="h-4 w-4" />
                     </button>
                     <button
                       onClick={() => deleteUser(user._id)}
-                      className="rounded-lg p-2 text-zinc-500 transition hover:bg-red-500/10 hover:text-red-400"
+                      className="rounded-lg p-2 text-content-3 transition hover:bg-red-500/10 hover:text-red-400"
                       title="Delete user"
                     >
                       <Trash2 className="h-4 w-4" />
@@ -203,17 +203,17 @@ export default function AdminUsersPage() {
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1}
-            className="rounded-lg border border-white/10 text-zinc-300 hover:bg-white/[0.04] px-4 py-2 text-sm disabled:opacity-50"
+            className="rounded-lg border border-edge text-content-2 hover:bg-card-hover px-4 py-2 text-sm disabled:opacity-50"
           >
             Previous
           </button>
-          <span className="text-sm text-zinc-500">
+          <span className="text-sm text-content-3">
             Page {page} of {Math.ceil(total / 20)}
           </span>
           <button
             onClick={() => setPage((p) => p + 1)}
             disabled={page * 20 >= total}
-            className="rounded-lg border border-white/10 text-zinc-300 hover:bg-white/[0.04] px-4 py-2 text-sm disabled:opacity-50"
+            className="rounded-lg border border-edge text-content-2 hover:bg-card-hover px-4 py-2 text-sm disabled:opacity-50"
           >
             Next
           </button>

@@ -91,35 +91,35 @@ export default function NewProjectPage() {
       <div className="mb-6 flex items-center gap-3">
         <button
           onClick={() => router.back()}
-          className="rounded-lg p-2 text-zinc-500 transition hover:bg-white/[0.04]"
+          className="rounded-lg p-2 text-content-3 transition hover:bg-card-hover"
         >
           <ArrowLeft className="h-5 w-5" />
         </button>
         <div>
-          <h1 className="text-2xl font-bold text-white">New Project</h1>
-          <p className="text-sm text-zinc-500">
+          <h1 className="text-2xl font-bold text-content">New Project</h1>
+          <p className="text-sm text-content-3">
             Add a project to your portfolio
           </p>
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6">
-          <h3 className="mb-4 font-semibold text-white">Project Details</h3>
+        <div className="rounded-2xl border border-edge bg-card p-6">
+          <h3 className="mb-4 font-semibold text-content">Project Details</h3>
           <div className="space-y-4">
             <div>
-              <label className="mb-1 block text-sm font-medium text-zinc-400">
+              <label className="mb-1 block text-sm font-medium text-content-2">
                 Title *
               </label>
               <input
                 value={form.title}
                 onChange={(e) => setForm({ ...form, title: e.target.value })}
-                className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm text-white focus:border-indigo-500 focus:outline-none"
+                className="w-full rounded-lg border border-edge bg-card px-4 py-2 text-sm text-content focus:border-indigo-500 focus:outline-none"
                 required
               />
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-zinc-400">
+              <label className="mb-1 block text-sm font-medium text-content-2">
                 Short Description
               </label>
               <textarea
@@ -128,11 +128,11 @@ export default function NewProjectPage() {
                   setForm({ ...form, description: e.target.value })
                 }
                 rows={2}
-                className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm text-white focus:border-indigo-500 focus:outline-none"
+                className="w-full rounded-lg border border-edge bg-card px-4 py-2 text-sm text-content focus:border-indigo-500 focus:outline-none"
               />
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-zinc-400">
+              <label className="mb-1 block text-sm font-medium text-content-2">
                 Full Description
               </label>
               <textarea
@@ -141,12 +141,12 @@ export default function NewProjectPage() {
                   setForm({ ...form, longDescription: e.target.value })
                 }
                 rows={5}
-                className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm text-white focus:border-indigo-500 focus:outline-none"
+                className="w-full rounded-lg border border-edge bg-card px-4 py-2 text-sm text-content focus:border-indigo-500 focus:outline-none"
               />
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <label className="mb-1 block text-sm font-medium text-zinc-400">
+                <label className="mb-1 block text-sm font-medium text-content-2">
                   Live URL
                 </label>
                 <input
@@ -154,12 +154,12 @@ export default function NewProjectPage() {
                   onChange={(e) =>
                     setForm({ ...form, liveUrl: e.target.value })
                   }
-                  className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm text-white focus:border-indigo-500 focus:outline-none"
+                  className="w-full rounded-lg border border-edge bg-card px-4 py-2 text-sm text-content focus:border-indigo-500 focus:outline-none"
                   placeholder="https://"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm font-medium text-zinc-400">
+                <label className="mb-1 block text-sm font-medium text-content-2">
                   Source Code URL
                 </label>
                 <input
@@ -167,14 +167,14 @@ export default function NewProjectPage() {
                   onChange={(e) =>
                     setForm({ ...form, sourceUrl: e.target.value })
                   }
-                  className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm text-white focus:border-indigo-500 focus:outline-none"
+                  className="w-full rounded-lg border border-edge bg-card px-4 py-2 text-sm text-content focus:border-indigo-500 focus:outline-none"
                   placeholder="https://github.com/..."
                 />
               </div>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <label className="mb-1 block text-sm font-medium text-zinc-400">
+                <label className="mb-1 block text-sm font-medium text-content-2">
                   Start Date
                 </label>
                 <input
@@ -183,11 +183,11 @@ export default function NewProjectPage() {
                   onChange={(e) =>
                     setForm({ ...form, startDate: e.target.value })
                   }
-                  className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm text-white focus:border-indigo-500 focus:outline-none"
+                  className="w-full rounded-lg border border-edge bg-card px-4 py-2 text-sm text-content focus:border-indigo-500 focus:outline-none"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm font-medium text-zinc-400">
+                <label className="mb-1 block text-sm font-medium text-content-2">
                   End Date
                 </label>
                 <input
@@ -196,7 +196,7 @@ export default function NewProjectPage() {
                   onChange={(e) =>
                     setForm({ ...form, endDate: e.target.value })
                   }
-                  className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm text-white focus:border-indigo-500 focus:outline-none"
+                  className="w-full rounded-lg border border-edge bg-card px-4 py-2 text-sm text-content focus:border-indigo-500 focus:outline-none"
                 />
               </div>
             </div>
@@ -204,8 +204,8 @@ export default function NewProjectPage() {
         </div>
 
         {/* Technologies */}
-        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6">
-          <h3 className="mb-4 font-semibold text-white">Technologies</h3>
+        <div className="rounded-2xl border border-edge bg-card p-6">
+          <h3 className="mb-4 font-semibold text-content">Technologies</h3>
           <div className="mb-3 flex gap-2">
             <input
               value={techInput}
@@ -214,12 +214,12 @@ export default function NewProjectPage() {
                 e.key === "Enter" && (e.preventDefault(), addTech())
               }
               placeholder="Add technology..."
-              className="flex-1 rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm text-white focus:border-indigo-500 focus:outline-none"
+              className="flex-1 rounded-lg border border-edge bg-card px-4 py-2 text-sm text-content focus:border-indigo-500 focus:outline-none"
             />
             <button
               type="button"
               onClick={addTech}
-              className="rounded-lg bg-white/5 px-4 py-2 text-sm font-medium text-zinc-300 ring-1 ring-white/10 transition hover:bg-white/10"
+              className="rounded-lg bg-card px-4 py-2 text-sm font-medium text-content-2 ring-1 ring-edge transition hover:bg-card-hover"
             >
               Add
             </button>
@@ -240,8 +240,8 @@ export default function NewProjectPage() {
         </div>
 
         {/* Images */}
-        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6">
-          <h3 className="mb-4 font-semibold text-white">Images</h3>
+        <div className="rounded-2xl border border-edge bg-card p-6">
+          <h3 className="mb-4 font-semibold text-content">Images</h3>
           <div className="grid grid-cols-3 gap-3 mb-4">
             {previews.map((preview, idx) => (
               <div key={idx} className="relative group">
@@ -262,7 +262,7 @@ export default function NewProjectPage() {
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="flex h-32 items-center justify-center rounded-lg border-2 border-dashed border-white/10 text-zinc-600 transition hover:border-indigo-500/50 hover:text-indigo-400"
+              className="flex h-32 items-center justify-center rounded-lg border-2 border-dashed border-edge text-content-4 transition hover:border-indigo-500/50 hover:text-indigo-400"
             >
               <Upload className="h-8 w-8" />
             </button>
@@ -278,7 +278,7 @@ export default function NewProjectPage() {
         </div>
 
         <div className="flex items-center justify-between">
-          <label className="flex items-center gap-2 text-sm text-zinc-300">
+          <label className="flex items-center gap-2 text-sm text-content-2">
             <input
               type="checkbox"
               checked={form.isFeatured}

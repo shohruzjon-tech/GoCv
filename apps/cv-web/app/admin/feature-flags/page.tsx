@@ -65,8 +65,8 @@ export default function AdminFeatureFlagsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Feature Flags</h1>
-          <p className="text-sm text-zinc-500">Control feature availability</p>
+          <h1 className="text-2xl font-bold text-content">Feature Flags</h1>
+          <p className="text-sm text-content-3">Control feature availability</p>
         </div>
       </div>
 
@@ -74,30 +74,32 @@ export default function AdminFeatureFlagsPage() {
         {flags.map((flag: any) => (
           <div
             key={flag._id}
-            className="flex items-center justify-between rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5"
+            className="flex items-center justify-between rounded-2xl border border-edge bg-card p-5"
           >
             <div className="flex items-start gap-4">
               <button onClick={() => handleToggle(flag._id)} className="mt-0.5">
                 {flag.enabled ? (
                   <ToggleRight className="h-6 w-6 text-emerald-400" />
                 ) : (
-                  <ToggleLeft className="h-6 w-6 text-zinc-600" />
+                  <ToggleLeft className="h-6 w-6 text-content-4" />
                 )}
               </button>
               <div>
-                <p className="text-sm font-semibold text-white">{flag.name}</p>
-                <p className="mt-0.5 text-xs text-zinc-500">
+                <p className="text-sm font-semibold text-content">
+                  {flag.name}
+                </p>
+                <p className="mt-0.5 text-xs text-content-3">
                   {flag.description || flag.key}
                 </p>
                 <div className="mt-2 flex items-center gap-3">
-                  <span className="text-[10px] text-zinc-600">
+                  <span className="text-[10px] text-content-4">
                     Key: {flag.key}
                   </span>
-                  <span className="text-[10px] text-zinc-600">
+                  <span className="text-[10px] text-content-4">
                     Rollout: {flag.rolloutPercentage}%
                   </span>
                   {flag.allowedPlans?.length > 0 && (
-                    <span className="text-[10px] text-zinc-600">
+                    <span className="text-[10px] text-content-4">
                       Plans: {flag.allowedPlans.join(", ")}
                     </span>
                   )}
@@ -106,7 +108,7 @@ export default function AdminFeatureFlagsPage() {
             </div>
             <button
               onClick={() => handleDelete(flag._id)}
-              className="rounded-lg p-2 text-zinc-600 hover:bg-red-500/10 hover:text-red-400"
+              className="rounded-lg p-2 text-content-4 hover:bg-red-500/10 hover:text-red-400"
             >
               <Trash2 className="h-4 w-4" />
             </button>

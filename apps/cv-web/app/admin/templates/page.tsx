@@ -51,8 +51,8 @@ export default function AdminTemplatesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Templates</h1>
-          <p className="text-sm text-zinc-500">{total} total templates</p>
+          <h1 className="text-2xl font-bold text-content">Templates</h1>
+          <p className="text-sm text-content-3">{total} total templates</p>
         </div>
       </div>
 
@@ -61,26 +61,26 @@ export default function AdminTemplatesPage() {
           <Loader2 className="h-8 w-8 animate-spin text-orange-500" />
         </div>
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-white/[0.06]">
+        <div className="overflow-hidden rounded-2xl border border-edge">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-white/[0.06] bg-white/[0.02]">
-                <th className="px-4 py-3 text-left text-xs font-semibold text-zinc-400">
+              <tr className="border-b border-edge bg-card">
+                <th className="px-4 py-3 text-left text-xs font-semibold text-content-2">
                   Name
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-zinc-400">
+                <th className="px-4 py-3 text-left text-xs font-semibold text-content-2">
                   Category
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-zinc-400">
+                <th className="px-4 py-3 text-left text-xs font-semibold text-content-2">
                   Status
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-zinc-400">
+                <th className="px-4 py-3 text-left text-xs font-semibold text-content-2">
                   Tier
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-zinc-400">
+                <th className="px-4 py-3 text-left text-xs font-semibold text-content-2">
                   Uses
                 </th>
-                <th className="px-4 py-3 text-right text-xs font-semibold text-zinc-400">
+                <th className="px-4 py-3 text-right text-xs font-semibold text-content-2">
                   Actions
                 </th>
               </tr>
@@ -89,12 +89,12 @@ export default function AdminTemplatesPage() {
               {templates.map((t: any) => (
                 <tr
                   key={t._id}
-                  className="border-b border-white/[0.04] hover:bg-white/[0.02]"
+                  className="border-b border-edge hover:bg-card-hover"
                 >
-                  <td className="px-4 py-3 text-sm font-medium text-white">
+                  <td className="px-4 py-3 text-sm font-medium text-content">
                     {t.name}
                   </td>
-                  <td className="px-4 py-3 text-sm capitalize text-zinc-400">
+                  <td className="px-4 py-3 text-sm capitalize text-content-2">
                     {t.category}
                   </td>
                   <td className="px-4 py-3">
@@ -104,26 +104,26 @@ export default function AdminTemplatesPage() {
                           ? "bg-emerald-500/10 text-emerald-400"
                           : t.status === "draft"
                             ? "bg-amber-500/10 text-amber-400"
-                            : "bg-zinc-500/10 text-zinc-400"
+                            : "bg-zinc-500/10 text-content-2"
                       }`}
                     >
                       {t.status}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-sm text-zinc-400">
+                  <td className="px-4 py-3 text-sm text-content-2">
                     {t.isEnterprise
                       ? "Enterprise"
                       : t.isPremium
                         ? "Premium"
                         : "Free"}
                   </td>
-                  <td className="px-4 py-3 text-sm text-zinc-400">
+                  <td className="px-4 py-3 text-sm text-content-2">
                     {t.usageCount || 0}
                   </td>
                   <td className="px-4 py-3 text-right">
                     <button
                       onClick={() => handleDelete(t._id)}
-                      className="rounded-lg p-1.5 text-zinc-600 hover:bg-red-500/10 hover:text-red-400"
+                      className="rounded-lg p-1.5 text-content-4 hover:bg-red-500/10 hover:text-red-400"
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>

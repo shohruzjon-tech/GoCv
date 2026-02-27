@@ -60,40 +60,40 @@ export default function InterviewPage() {
       <div className="flex items-center gap-4">
         <button
           onClick={() => router.back()}
-          className="rounded-xl p-2 text-zinc-500 hover:bg-white/[0.04] hover:text-white"
+          className="rounded-xl p-2 text-content-3 hover:bg-card-hover hover:text-content"
         >
           <ArrowLeft className="h-5 w-5" />
         </button>
         <div>
-          <h1 className="text-2xl font-bold text-white">
+          <h1 className="text-2xl font-bold text-content">
             <span className="text-gradient">Interview Prep</span>
           </h1>
-          <p className="text-sm text-zinc-400">
+          <p className="text-sm text-content-2">
             AI-generated interview questions & preparation tips
           </p>
         </div>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6">
-          <label className="mb-2 block text-sm font-medium text-zinc-300">
+        <div className="rounded-2xl border border-edge bg-card p-6">
+          <label className="mb-2 block text-sm font-medium text-content-2">
             Select a CV
           </label>
           <select
             value={selectedCv}
             onChange={(e) => setSelectedCv(e.target.value)}
-            className="w-full rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-3 text-sm text-white outline-none focus:border-indigo-500/50"
+            className="w-full rounded-xl border border-edge bg-card px-4 py-3 text-sm text-content outline-none focus:border-indigo-500/50"
           >
             <option value="">Choose...</option>
             {cvs.map((cv) => (
-              <option key={cv._id} value={cv._id} className="bg-[#0f0f23]">
+              <option key={cv._id} value={cv._id} className="bg-elevated">
                 {cv.title}
               </option>
             ))}
           </select>
         </div>
-        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6">
-          <label className="mb-2 block text-sm font-medium text-zinc-300">
+        <div className="rounded-2xl border border-edge bg-card p-6">
+          <label className="mb-2 block text-sm font-medium text-content-2">
             Job Description
           </label>
           <textarea
@@ -101,7 +101,7 @@ export default function InterviewPage() {
             onChange={(e) => setJobDescription(e.target.value)}
             rows={4}
             placeholder="Paste the job description..."
-            className="w-full rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-3 text-sm text-white placeholder-zinc-500 outline-none focus:border-indigo-500/50"
+            className="w-full rounded-xl border border-edge bg-card px-4 py-3 text-sm text-content placeholder-content-3 outline-none focus:border-indigo-500/50"
           />
         </div>
       </div>
@@ -123,8 +123,8 @@ export default function InterviewPage() {
         <div className="space-y-6">
           {/* Focus Areas */}
           {result.focusAreas && result.focusAreas.length > 0 && (
-            <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
-              <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-white">
+            <div className="rounded-xl border border-edge bg-card p-4">
+              <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-content">
                 <Target className="h-4 w-4 text-cyan-400" /> Focus Areas
               </h3>
               <div className="flex flex-wrap gap-2">
@@ -142,40 +142,40 @@ export default function InterviewPage() {
 
           {/* Questions */}
           <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-white">
+            <h3 className="text-sm font-semibold text-content">
               Practice Questions
             </h3>
             {result.questions?.map((q, i) => (
               <div
                 key={i}
-                className="rounded-xl border border-white/[0.06] bg-white/[0.02] overflow-hidden"
+                className="rounded-xl border border-edge bg-card overflow-hidden"
               >
                 <button
                   onClick={() => setExpanded(expanded === i ? null : i)}
                   className="flex w-full items-center justify-between p-4 text-left"
                 >
-                  <span className="text-sm font-medium text-white">
+                  <span className="text-sm font-medium text-content">
                     {i + 1}. {q.question}
                   </span>
                   {expanded === i ? (
-                    <ChevronUp className="h-4 w-4 text-zinc-500" />
+                    <ChevronUp className="h-4 w-4 text-content-3" />
                   ) : (
-                    <ChevronDown className="h-4 w-4 text-zinc-500" />
+                    <ChevronDown className="h-4 w-4 text-content-3" />
                   )}
                 </button>
                 {expanded === i && (
-                  <div className="border-t border-white/[0.06] px-4 py-3 space-y-3">
+                  <div className="border-t border-edge px-4 py-3 space-y-3">
                     <div>
                       <p className="text-xs font-medium text-amber-400">
                         💡 Tip
                       </p>
-                      <p className="mt-1 text-sm text-zinc-400">{q.tip}</p>
+                      <p className="mt-1 text-sm text-content-2">{q.tip}</p>
                     </div>
                     <div>
                       <p className="text-xs font-medium text-emerald-400">
                         Sample Answer
                       </p>
-                      <p className="mt-1 text-sm text-zinc-300">
+                      <p className="mt-1 text-sm text-content-2">
                         {q.sampleAnswer}
                       </p>
                     </div>
@@ -187,13 +187,13 @@ export default function InterviewPage() {
 
           {/* Tips */}
           {result.preparationTips && result.preparationTips.length > 0 && (
-            <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
-              <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-white">
+            <div className="rounded-xl border border-edge bg-card p-4">
+              <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-content">
                 <Lightbulb className="h-4 w-4 text-amber-400" /> Preparation
                 Tips
               </h3>
               {result.preparationTips.map((tip, i) => (
-                <p key={i} className="mt-2 text-sm text-zinc-400">
+                <p key={i} className="mt-2 text-sm text-content-2">
                   • {tip}
                 </p>
               ))}

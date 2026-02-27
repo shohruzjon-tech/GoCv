@@ -51,7 +51,7 @@ export default function PublicCvPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#08081a]">
+      <div className="flex min-h-screen items-center justify-center bg-page">
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-500 border-t-transparent" />
       </div>
     );
@@ -59,10 +59,10 @@ export default function PublicCvPage() {
 
   if (notFound || !cv) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-[#08081a]">
-        <FileText className="mb-4 h-16 w-16 text-zinc-300" />
-        <h1 className="mb-2 text-2xl font-bold text-white">CV Not Found</h1>
-        <p className="text-zinc-500">
+      <div className="flex min-h-screen flex-col items-center justify-center bg-page">
+        <FileText className="mb-4 h-16 w-16 text-content-2" />
+        <h1 className="mb-2 text-2xl font-bold text-content">CV Not Found</h1>
+        <p className="text-content-3">
           This CV does not exist or is not publicly available.
         </p>
       </div>
@@ -78,8 +78,8 @@ export default function PublicCvPage() {
           dangerouslySetInnerHTML={{ __html: cv.aiGeneratedHtml }}
         />
         {projects.length > 0 && (
-          <div className="mx-auto max-w-4xl border-t border-white/[0.06] px-8 py-12">
-            <h2 className="mb-8 text-2xl font-bold text-white">Projects</h2>
+          <div className="mx-auto max-w-4xl border-t border-edge px-8 py-12">
+            <h2 className="mb-8 text-2xl font-bold text-content">Projects</h2>
             <div className="grid gap-6 md:grid-cols-2">
               {projects
                 .filter((p) => p.isVisible)
@@ -97,7 +97,7 @@ export default function PublicCvPage() {
   const primaryColor = cv.theme?.primaryColor || "#2563eb";
 
   return (
-    <div className="min-h-screen bg-[#08081a] py-12">
+    <div className="min-h-screen bg-page py-12">
       <div className="mx-auto max-w-3xl">
         {/* Header */}
         <div
@@ -164,7 +164,7 @@ export default function PublicCvPage() {
         </div>
 
         {/* Sections */}
-        <div className="rounded-b-2xl bg-white/[0.02] border border-white/[0.06] px-8 py-8">
+        <div className="rounded-b-2xl bg-card border border-edge px-8 py-8">
           {cv.sections
             .filter((s) => s.visible)
             .sort((a, b) => a.order - b.order)
@@ -187,7 +187,7 @@ export default function PublicCvPage() {
         {/* Projects */}
         {projects.length > 0 && (
           <div className="mt-8">
-            <h2 className="mb-6 text-2xl font-bold text-white">Projects</h2>
+            <h2 className="mb-6 text-2xl font-bold text-content">Projects</h2>
             <div className="grid gap-6 md:grid-cols-2">
               {projects
                 .filter((p) => p.isVisible)
@@ -212,22 +212,22 @@ function SectionContent({ section }: { section: any }) {
     return (
       <div className="space-y-4">
         {content.items.map((item: any, i: number) => (
-          <div key={i} className="border-l-2 border-white/10 pl-4">
-            <p className="font-semibold text-white">
+          <div key={i} className="border-l-2 border-edge pl-4">
+            <p className="font-semibold text-content">
               {item.title || item.degree || item.name}
             </p>
             {(item.company || item.institution) && (
-              <p className="text-sm text-zinc-400">
+              <p className="text-sm text-content-2">
                 {item.company || item.institution}
               </p>
             )}
             {(item.startDate || item.endDate) && (
-              <p className="text-xs text-zinc-400">
+              <p className="text-xs text-content-2">
                 {item.startDate} — {item.endDate || "Present"}
               </p>
             )}
             {item.description && (
-              <p className="mt-1 text-sm text-zinc-400">{item.description}</p>
+              <p className="mt-1 text-sm text-content-2">{item.description}</p>
             )}
           </div>
         ))}
@@ -242,7 +242,7 @@ function SectionContent({ section }: { section: any }) {
         {content.skills.map((skill: string, i: number) => (
           <span
             key={i}
-            className="rounded-full bg-white/5 px-3 py-1 text-sm text-zinc-300 ring-1 ring-white/10"
+            className="rounded-full bg-card px-3 py-1 text-sm text-content-2 ring-1 ring-edge"
           >
             {skill}
           </span>
@@ -254,13 +254,13 @@ function SectionContent({ section }: { section: any }) {
   // Plain text
   if (typeof content.text === "string") {
     return (
-      <p className="text-sm leading-relaxed text-zinc-400">{content.text}</p>
+      <p className="text-sm leading-relaxed text-content-2">{content.text}</p>
     );
   }
 
   // Fallback: render as JSON-like text
   return (
-    <pre className="text-xs text-zinc-500">
+    <pre className="text-xs text-content-3">
       {JSON.stringify(content, null, 2)}
     </pre>
   );
@@ -268,7 +268,7 @@ function SectionContent({ section }: { section: any }) {
 
 function ProjectCard({ project }: { project: Project }) {
   return (
-    <div className="overflow-hidden rounded-2xl border border-white/[0.06] bg-white/[0.02]">
+    <div className="overflow-hidden rounded-2xl border border-edge bg-card">
       {project.images?.[0] && (
         <img
           src={project.images[0].url}
@@ -277,9 +277,9 @@ function ProjectCard({ project }: { project: Project }) {
         />
       )}
       <div className="p-5">
-        <h3 className="font-bold text-white">{project.title}</h3>
+        <h3 className="font-bold text-content">{project.title}</h3>
         {project.description && (
-          <p className="mt-1 text-sm text-zinc-500">{project.description}</p>
+          <p className="mt-1 text-sm text-content-3">{project.description}</p>
         )}
         {project.technologies.length > 0 && (
           <div className="mt-3 flex flex-wrap gap-1.5">
@@ -310,7 +310,7 @@ function ProjectCard({ project }: { project: Project }) {
               href={project.sourceUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1 text-sm text-zinc-400 hover:underline"
+              className="flex items-center gap-1 text-sm text-content-2 hover:underline"
             >
               <Github className="h-3.5 w-3.5" />
               Source

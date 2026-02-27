@@ -44,7 +44,7 @@ export default function AdminLayout({
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#08081a]">
+      <div className="flex min-h-screen items-center justify-center bg-page">
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-orange-500 border-t-transparent" />
       </div>
     );
@@ -91,19 +91,19 @@ export default function AdminLayout({
   };
 
   return (
-    <div className="flex min-h-screen bg-[#08081a]">
+    <div className="flex min-h-screen bg-page">
       {/* Sidebar */}
-      <aside className="fixed left-0 top-0 z-40 flex h-screen w-64 flex-col border-r border-white/[0.06] bg-[#0a0a1e]">
-        <div className="flex h-16 items-center gap-2 border-b border-white/[0.06] px-6">
+      <aside className="fixed left-0 top-0 z-40 flex h-screen w-64 flex-col border-r border-edge bg-surface">
+        <div className="flex h-16 items-center gap-2 border-b border-edge px-6">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-500/10 ring-1 ring-orange-500/20">
             <Shield className="h-4 w-4 text-orange-400" />
           </div>
-          <span className="text-lg font-bold text-white">Admin Panel</span>
+          <span className="text-lg font-bold text-content">Admin Panel</span>
         </div>
         <nav className="flex-1 overflow-y-auto p-4 space-y-6">
           {sections.map((section) => (
             <div key={section.title}>
-              <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
+              <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-wider text-content-4">
                 {section.title}
               </p>
               <div className="space-y-1">
@@ -114,7 +114,7 @@ export default function AdminLayout({
                     className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
                       pathname === link.href
                         ? "bg-orange-500/10 text-orange-400 ring-1 ring-orange-500/20"
-                        : "text-zinc-400 hover:bg-white/[0.04] hover:text-white"
+                        : "text-content-2 hover:bg-card-hover hover:text-content"
                     }`}
                   >
                     <link.icon className="h-4 w-4" />
@@ -125,10 +125,10 @@ export default function AdminLayout({
             </div>
           ))}
         </nav>
-        <div className="border-t border-white/[0.06] p-4">
+        <div className="border-t border-edge p-4">
           <Link
             href="/dashboard"
-            className="mb-2 flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-zinc-500 transition hover:bg-white/[0.04] hover:text-zinc-300"
+            className="mb-2 flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-content-3 transition hover:bg-card-hover hover:text-content-2"
           >
             <ArrowLeft className="h-4 w-4" />
             Back to App

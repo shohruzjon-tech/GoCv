@@ -2,8 +2,15 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAuthStore } from "@/lib/store";
-import Header from "@/components/layout/header";
+import {
+  useAuthStore,
+  useNotificationsStore,
+  useSubscriptionStore,
+} from "@/lib/store";
+import { notificationsApi, subscriptionsApi } from "@/lib/api";
+import Sidebar from "@/components/layout/sidebar";
+import DashboardHeader from "@/components/layout/dashboard-header";
+import NotificationDrawer from "@/components/layout/notification-drawer";
 
 export default function DashboardLayout({
   children,
@@ -11,6 +18,8 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const { user, isLoading } = useAuthStore();
+  const { setNotifications, setUnreadCount } = useNotificationsStore();
+  const { setSubscription } = useSubscriptionStore();
   const router = useRouter();
 
   useEffect(() => {
@@ -19,9 +28,27 @@ export default function DashboardLayout({
     }
   }, [user, isLoading, router]);
 
+  // Load notifications & subscription
+  useEffect(() => {
+    if (user) {
+      notificationsApi
+        .getAll()
+        .then((r) => setNotifications(r.data))
+        .catch(() => {});
+      notificationsApi
+        .getUnreadCount()
+        .then((r) => setUnreadCount(r.data.count ?? r.data))
+        .catch(() => {});
+      subscriptionsApi
+        .getMy()
+        .then((r) => setSubscription(r.data))
+        .catch(() => {});
+    }
+  }, [user]);
+
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#08081a]">
+      <div className="flex min-h-screen items-center justify-center bg-page">
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-500 border-t-transparent" />
       </div>
     );
@@ -30,9 +57,13 @@ export default function DashboardLayout({
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-[#08081a]">
-      <Header />
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6">{children}</main>
+    <div className="min-h-screen bg-page">
+      <Sidebar />
+      <NotificationDrawer />
+      <div className="lg:pl-[260px]">
+        <DashboardHeader />
+        <main className="px-4 py-6 sm:px-6 lg:px-8">{children}</main>
+      </div>
     </div>
   );
 }

@@ -8,6 +8,7 @@ import { PlanConfig, PlanConfigSchema } from './schemas/plan-config.schema.js';
 import { SubscriptionsService } from './subscriptions.service.js';
 import { SubscriptionsController } from './subscriptions.controller.js';
 import { PlanConfigService } from './plan-config.service.js';
+import { NotificationsModule } from '../notifications/notifications.module.js';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { PlanConfigService } from './plan-config.service.js';
       { name: Subscription.name, schema: SubscriptionSchema },
       { name: PlanConfig.name, schema: PlanConfigSchema },
     ]),
+    NotificationsModule,
   ],
   controllers: [SubscriptionsController],
   providers: [SubscriptionsService, PlanConfigService],

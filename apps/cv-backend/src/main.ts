@@ -14,6 +14,10 @@ async function bootstrap() {
     allowedHeaders: ['Content-Type', 'Authorization'],
   });
 
+  // Enable WebSocket CORS (socket.io adapter picks up the same origin)
+  const ioAdapter = app.getHttpAdapter().getInstance();
+  // socket.io is auto-configured by @nestjs/platform-socket.io
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

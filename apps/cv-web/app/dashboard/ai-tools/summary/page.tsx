@@ -64,33 +64,33 @@ export default function SummaryPage() {
       <div className="flex items-center gap-4">
         <button
           onClick={() => router.back()}
-          className="rounded-xl p-2 text-zinc-500 hover:bg-white/[0.04] hover:text-white"
+          className="rounded-xl p-2 text-content-3 hover:bg-card-hover hover:text-content"
         >
           <ArrowLeft className="h-5 w-5" />
         </button>
         <div>
-          <h1 className="text-2xl font-bold text-white">
+          <h1 className="text-2xl font-bold text-content">
             <span className="text-gradient">Summary Generator</span>
           </h1>
-          <p className="text-sm text-zinc-400">
+          <p className="text-sm text-content-2">
             Generate compelling professional summaries
           </p>
         </div>
       </div>
 
-      <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 space-y-6">
+      <div className="rounded-2xl border border-edge bg-card p-6 space-y-6">
         <div>
-          <label className="mb-2 block text-sm font-medium text-zinc-300">
+          <label className="mb-2 block text-sm font-medium text-content-2">
             Select a CV
           </label>
           <select
             value={selectedCv}
             onChange={(e) => setSelectedCv(e.target.value)}
-            className="w-full rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-3 text-sm text-white outline-none focus:border-indigo-500/50"
+            className="w-full rounded-xl border border-edge bg-card px-4 py-3 text-sm text-content outline-none focus:border-indigo-500/50"
           >
             <option value="">Choose a CV...</option>
             {cvs.map((cv) => (
-              <option key={cv._id} value={cv._id} className="bg-[#0f0f23]">
+              <option key={cv._id} value={cv._id} className="bg-elevated">
                 {cv.title}
               </option>
             ))}
@@ -98,7 +98,7 @@ export default function SummaryPage() {
         </div>
 
         <div>
-          <label className="mb-2 block text-sm font-medium text-zinc-300">
+          <label className="mb-2 block text-sm font-medium text-content-2">
             Tone
           </label>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -109,15 +109,15 @@ export default function SummaryPage() {
                 className={`rounded-xl border p-3 text-left transition ${
                   tone === t.value
                     ? "border-amber-500/30 bg-amber-500/5"
-                    : "border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04]"
+                    : "border-edge bg-card hover:bg-card-hover"
                 }`}
               >
                 <p
-                  className={`text-sm font-medium ${tone === t.value ? "text-amber-300" : "text-white"}`}
+                  className={`text-sm font-medium ${tone === t.value ? "text-amber-300" : "text-content"}`}
                 >
                   {t.label}
                 </p>
-                <p className="text-xs text-zinc-500">{t.desc}</p>
+                <p className="text-xs text-content-3">{t.desc}</p>
               </button>
             ))}
           </div>
@@ -160,22 +160,19 @@ export default function SummaryPage() {
                 )}
               </button>
             </div>
-            <p className="mt-3 text-sm leading-relaxed text-zinc-200">
+            <p className="mt-3 text-sm leading-relaxed text-content">
               {result.summary}
             </p>
           </div>
           {result.alternatives?.map((alt, i) => (
-            <div
-              key={i}
-              className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5"
-            >
+            <div key={i} className="rounded-xl border border-edge bg-card p-5">
               <div className="flex items-start justify-between">
-                <p className="text-xs font-medium text-zinc-400">
+                <p className="text-xs font-medium text-content-2">
                   Alternative {i + 1}
                 </p>
                 <button
                   onClick={() => copyText(alt, i)}
-                  className="rounded-lg p-1.5 text-zinc-500 hover:bg-white/[0.04] hover:text-white"
+                  className="rounded-lg p-1.5 text-content-3 hover:bg-card-hover hover:text-content"
                 >
                   {copied === i ? (
                     <Check className="h-4 w-4" />
@@ -184,7 +181,7 @@ export default function SummaryPage() {
                   )}
                 </button>
               </div>
-              <p className="mt-2 text-sm leading-relaxed text-zinc-300">
+              <p className="mt-2 text-sm leading-relaxed text-content-2">
                 {alt}
               </p>
             </div>

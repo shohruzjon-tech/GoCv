@@ -58,47 +58,47 @@ export default function SkillGapPage() {
       <div className="flex items-center gap-4">
         <button
           onClick={() => router.back()}
-          className="rounded-xl p-2 text-zinc-500 hover:bg-white/[0.04] hover:text-white"
+          className="rounded-xl p-2 text-content-3 hover:bg-card-hover hover:text-content"
         >
           <ArrowLeft className="h-5 w-5" />
         </button>
         <div>
-          <h1 className="text-2xl font-bold text-white">
+          <h1 className="text-2xl font-bold text-content">
             <span className="text-gradient">Skill Gap Analysis</span>
           </h1>
-          <p className="text-sm text-zinc-400">
+          <p className="text-sm text-content-2">
             Identify missing skills for your target role
           </p>
         </div>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6">
-          <label className="mb-2 block text-sm font-medium text-zinc-300">
+        <div className="rounded-2xl border border-edge bg-card p-6">
+          <label className="mb-2 block text-sm font-medium text-content-2">
             Select a CV
           </label>
           <select
             value={selectedCv}
             onChange={(e) => setSelectedCv(e.target.value)}
-            className="w-full rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-3 text-sm text-white outline-none focus:border-indigo-500/50"
+            className="w-full rounded-xl border border-edge bg-card px-4 py-3 text-sm text-content outline-none focus:border-indigo-500/50"
           >
             <option value="">Choose...</option>
             {cvs.map((cv) => (
-              <option key={cv._id} value={cv._id} className="bg-[#0f0f23]">
+              <option key={cv._id} value={cv._id} className="bg-elevated">
                 {cv.title}
               </option>
             ))}
           </select>
         </div>
-        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6">
-          <label className="mb-2 block text-sm font-medium text-zinc-300">
+        <div className="rounded-2xl border border-edge bg-card p-6">
+          <label className="mb-2 block text-sm font-medium text-content-2">
             Target Role
           </label>
           <input
             value={targetRole}
             onChange={(e) => setTargetRole(e.target.value)}
             placeholder="e.g. Senior Product Manager"
-            className="w-full rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-3 text-sm text-white placeholder-zinc-500 outline-none focus:border-indigo-500/50"
+            className="w-full rounded-xl border border-edge bg-card px-4 py-3 text-sm text-content placeholder-content-3 outline-none focus:border-indigo-500/50"
           />
         </div>
       </div>
@@ -135,7 +135,7 @@ export default function SkillGapPage() {
           </div>
 
           <div className="grid gap-6 lg:grid-cols-2">
-            <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
+            <div className="rounded-xl border border-edge bg-card p-4">
               <h3 className="mb-3 text-sm font-semibold text-emerald-400">
                 ✓ Current Skills
               </h3>
@@ -150,7 +150,7 @@ export default function SkillGapPage() {
                 ))}
               </div>
             </div>
-            <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
+            <div className="rounded-xl border border-edge bg-card p-4">
               <h3 className="mb-3 text-sm font-semibold text-red-400">
                 ✗ Missing Skills
               </h3>
@@ -168,12 +168,12 @@ export default function SkillGapPage() {
           </div>
 
           {result.recommendations && result.recommendations.length > 0 && (
-            <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
-              <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-white">
+            <div className="rounded-xl border border-edge bg-card p-4">
+              <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-content">
                 <BookOpen className="h-4 w-4 text-indigo-400" /> Recommendations
               </h3>
               {result.recommendations.map((rec, i) => (
-                <p key={i} className="mt-2 text-sm text-zinc-400">
+                <p key={i} className="mt-2 text-sm text-content-2">
                   • {rec}
                 </p>
               ))}

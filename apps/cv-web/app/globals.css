@@ -1,21 +1,64 @@
 @import "tailwindcss";
 
+/* ── Light theme (default) ────────────────────────── */
 :root {
-  --background: #fafbff;
-  --foreground: #1a1a2e;
+  --t-page: #f8faff;
+  --t-surface: #f1f5f9;
+  --t-elevated: #ffffff;
+  --t-card: rgba(0, 0, 0, 0.025);
+  --t-card-hover: rgba(0, 0, 0, 0.05);
+  --t-content: #0f172a;
+  --t-content-2: #475569;
+  --t-content-3: #64748b;
+  --t-content-4: #94a3b8;
+  --t-edge: rgba(0, 0, 0, 0.1);
+  --t-edge-2: rgba(0, 0, 0, 0.05);
+  --t-field: rgba(0, 0, 0, 0.03);
+  --t-field-edge: rgba(0, 0, 0, 0.12);
+  --t-popover: rgba(255, 255, 255, 0.98);
+  --t-glass-bg: rgba(255, 255, 255, 0.75);
+  --t-glass-border: rgba(0, 0, 0, 0.08);
+  --t-three-opacity: 0.12;
 }
 
+/* ── Dark theme ───────────────────────────────────── */
+.dark {
+  --t-page: #08081a;
+  --t-surface: #0a0a1e;
+  --t-elevated: #0f0f23;
+  --t-card: rgba(255, 255, 255, 0.04);
+  --t-card-hover: rgba(255, 255, 255, 0.06);
+  --t-content: #ffffff;
+  --t-content-2: #a1a1aa;
+  --t-content-3: #71717a;
+  --t-content-4: #52525b;
+  --t-edge: rgba(255, 255, 255, 0.08);
+  --t-edge-2: rgba(255, 255, 255, 0.04);
+  --t-field: rgba(255, 255, 255, 0.05);
+  --t-field-edge: rgba(255, 255, 255, 0.1);
+  --t-popover: rgba(15, 15, 35, 0.95);
+  --t-glass-bg: rgba(255, 255, 255, 0.06);
+  --t-glass-border: rgba(255, 255, 255, 0.08);
+  --t-three-opacity: 1;
+}
+
+/* ── Tailwind theme tokens ────────────────────────── */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-page: var(--t-page);
+  --color-surface: var(--t-surface);
+  --color-elevated: var(--t-elevated);
+  --color-card: var(--t-card);
+  --color-card-hover: var(--t-card-hover);
+  --color-content: var(--t-content);
+  --color-content-2: var(--t-content-2);
+  --color-content-3: var(--t-content-3);
+  --color-content-4: var(--t-content-4);
+  --color-edge: var(--t-edge);
+  --color-edge-2: var(--t-edge-2);
+  --color-field: var(--t-field);
+  --color-field-edge: var(--t-field-edge);
+  --color-popover: var(--t-popover);
   --font-sans: var(--font-jakarta), var(--font-inter), system-ui, sans-serif;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #08081a;
-    --foreground: #eef0ff;
-  }
 }
 
 * {
@@ -23,8 +66,8 @@
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--t-page);
+  color: var(--t-content);
   font-family: var(--font-jakarta), var(--font-inter), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -32,17 +75,10 @@ body {
 
 /* Premium glassmorphism utility */
 .glass {
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--t-glass-bg);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.glass-light {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  border: 1px solid var(--t-glass-border);
 }
 
 /* Gradient text utility */

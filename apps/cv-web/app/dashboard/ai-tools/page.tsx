@@ -114,31 +114,31 @@ export default function AiToolsPage() {
     <div className="space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-white">
+        <h1 className="text-3xl font-bold tracking-tight text-content">
           <span className="text-gradient">AI</span> Tools
         </h1>
-        <p className="mt-1 text-sm text-zinc-400">
+        <p className="mt-1 text-sm text-content-2">
           Powerful AI-driven tools to perfect your CV and ace your job search
         </p>
       </div>
 
       {/* Usage Card */}
-      <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6">
+      <div className="rounded-2xl border border-edge bg-card p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h3 className="flex items-center gap-2 text-sm font-semibold text-white">
+            <h3 className="flex items-center gap-2 text-sm font-semibold text-content">
               <Zap className="h-4 w-4 text-amber-400" />
               AI Credits This Month
             </h3>
-            <p className="mt-1 text-xs text-zinc-500">
+            <p className="mt-1 text-xs text-content-3">
               {creditsUsed} / {creditsMax} credits used
             </p>
           </div>
           <div className="flex items-center gap-4">
             {usage && (
               <div className="text-right">
-                <p className="text-xs text-zinc-500">Total Requests</p>
-                <p className="text-lg font-bold text-white">
+                <p className="text-xs text-content-3">Total Requests</p>
+                <p className="text-lg font-bold text-content">
                   {usage.totalRequests}
                 </p>
               </div>
@@ -154,7 +154,7 @@ export default function AiToolsPage() {
             )}
           </div>
         </div>
-        <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/[0.06]">
+        <div className="mt-4 h-2 overflow-hidden rounded-full bg-card-hover">
           <div
             className={`h-full rounded-full transition-all duration-500 ${
               creditsPercent > 80
@@ -175,8 +175,8 @@ export default function AiToolsPage() {
               key={tool.id}
               className={`group relative overflow-hidden rounded-2xl border transition ${
                 locked
-                  ? "border-white/[0.04] bg-white/[0.01] opacity-75"
-                  : "border-white/[0.06] bg-white/[0.02] hover:border-white/[0.1] hover:bg-white/[0.03]"
+                  ? "border-edge bg-card opacity-75"
+                  : "border-edge bg-card hover:border-edge hover:bg-card-hover"
               }`}
             >
               <div className="p-6">
@@ -185,7 +185,7 @@ export default function AiToolsPage() {
                 >
                   <tool.icon className="h-6 w-6 text-white" />
                 </div>
-                <h3 className="flex items-center gap-2 text-lg font-semibold text-white">
+                <h3 className="flex items-center gap-2 text-lg font-semibold text-content">
                   {tool.name}
                   {tool.premium && (
                     <span className="flex items-center gap-0.5 rounded-full bg-amber-500/10 px-2 py-0.5 text-[10px] font-bold text-amber-400 ring-1 ring-amber-500/20">
@@ -193,7 +193,7 @@ export default function AiToolsPage() {
                     </span>
                   )}
                 </h3>
-                <p className="mt-2 text-sm leading-relaxed text-zinc-400">
+                <p className="mt-2 text-sm leading-relaxed text-content-2">
                   {tool.description}
                 </p>
                 <div className="mt-6">

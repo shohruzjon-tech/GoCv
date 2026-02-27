@@ -14,12 +14,14 @@ import {
 } from './dto/cv.dto.js';
 import { AiService } from '../ai/ai.service.js';
 import { CvStatus } from '../common/enums/cv-status.enum.js';
+import { NotificationsService } from '../notifications/notifications.service.js';
 
 @Injectable()
 export class CvService {
   constructor(
     @InjectModel(Cv.name) private cvModel: Model<CvDocument>,
     private aiService: AiService,
+    private notificationsService: NotificationsService,
   ) {}
 
   async create(userId: string, dto: CreateCvDto): Promise<CvDocument> {
@@ -119,7 +121,17 @@ export class CvService {
       existingCv.theme = aiResult.theme;
       existingCv.aiGeneratedHtml = aiResult.html;
       existingCv.lastAiPrompt = dto.prompt;
-      return existingCv.save();
+      const saved = await existingCv.save();
+
+      await this.notificationsService.create({
+        userId,
+        title: 'CV Generated! ✨',
+        message: 'Your AI-powered CV has been created and is ready for review.',
+        type: 'success',
+        actionUrl: '/dashboard',
+      });
+
+      return saved;
     }
 
     const cv = new this.cvModel({
@@ -134,7 +146,17 @@ export class CvService {
       slug: this.generateSlug('ai-cv-' + Date.now()),
     });
 
-    return cv.save();
+    const saved = await cv.save();
+
+    await this.notificationsService.create({
+      userId,
+      title: 'CV Generated! ✨',
+      message: 'Your AI-powered CV has been created and is ready for review.',
+      type: 'success',
+      actionUrl: '/dashboard',
+    });
+
+    return saved;
   }
 
   async editSectionWithAi(
@@ -214,7 +236,11 @@ export class CvService {
 
     cv.status = CvStatus.PUBLISHED;
     cv.isPublic = true;
-    return cv.save();
+    const saved = await cv.save();
+
+    await this.notificationsService.notifyCvPublished(userId, cv.slug!);
+
+    return saved;
   }
 
   async getPublicCv(slug: string): Promise<CvDocument> {

@@ -2,31 +2,39 @@
 
 import { useEffect } from "react";
 import { Toaster } from "react-hot-toast";
-import { useAuthStore, useThemeStore } from "@/lib/store";
+import { ThemeProvider } from "@/components/theme-provider";
+import { useAuthStore } from "@/lib/store";
+import { useNotificationSocket } from "@/hooks/use-socket";
+import NotificationToastContainer from "@/components/layout/notification-toast";
+
+function SocketConnector() {
+  useNotificationSocket();
+  return null;
+}
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   const loadFromStorage = useAuthStore((s) => s.loadFromStorage);
-  const loadTheme = useThemeStore((s) => s.loadTheme);
 
   useEffect(() => {
     loadFromStorage();
-    loadTheme();
-  }, [loadFromStorage, loadTheme]);
+  }, [loadFromStorage]);
 
   return (
-    <>
+    <ThemeProvider>
+      <SocketConnector />
       <Toaster
         position="top-right"
         toastOptions={{
           style: {
-            background: "rgba(15, 15, 35, 0.95)",
-            color: "#e4e4e7",
-            border: "1px solid rgba(255,255,255,0.06)",
+            background: "var(--t-elevated)",
+            color: "var(--t-content)",
+            border: "1px solid var(--t-edge)",
             backdropFilter: "blur(12px)",
           },
         }}
       />
+      <NotificationToastContainer />
       {children}
-    </>
+    </ThemeProvider>
   );
 }

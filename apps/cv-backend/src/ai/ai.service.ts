@@ -173,7 +173,6 @@ If context about existing CV data is provided, use it to enhance or modify the c
           { role: 'user', content: userPrompt },
         ],
         response_format: { type: 'json_object' },
-        temperature: 0.7,
         max_completion_tokens: 4000,
       });
 
@@ -236,7 +235,6 @@ If current content is provided, modify it. Otherwise, generate new content for t
           { role: 'user', content: userPrompt },
         ],
         response_format: { type: 'json_object' },
-        temperature: 0.7,
         max_completion_tokens: 2000,
       });
 
@@ -290,7 +288,6 @@ Return ONLY the HTML string, no JSON wrapping.`;
             content: `Generate a professional CV HTML page with this data: ${JSON.stringify(cvData)}`,
           },
         ],
-        temperature: 0.5,
         max_completion_tokens: 4000,
       });
 
@@ -340,7 +337,6 @@ Respond in a friendly, professional manner. When suggesting CV changes, be speci
       const completion = await this.openai.chat.completions.create({
         model: 'gpt-5',
         messages: [{ role: 'system', content: systemPrompt }, ...messages],
-        temperature: 0.7,
         max_completion_tokens: 1500,
       });
 
@@ -418,7 +414,6 @@ Focus on:
           },
         ],
         response_format: { type: 'json_object' },
-        temperature: 0.6,
         max_completion_tokens: 4000,
       });
 
@@ -490,7 +485,6 @@ Focus on:
           },
         ],
         response_format: { type: 'json_object' },
-        temperature: 0.6,
         max_completion_tokens: 4000,
       });
 
@@ -560,7 +554,6 @@ Rules:
           },
         ],
         response_format: { type: 'json_object' },
-        temperature: 0.7,
         max_completion_tokens: 2000,
       });
 
@@ -623,7 +616,6 @@ Focus on the candidate's strongest qualifications and achievements.`;
           },
         ],
         response_format: { type: 'json_object' },
-        temperature: 0.7,
         max_completion_tokens: 1500,
       });
 
@@ -695,7 +687,6 @@ Return a JSON object with:
           },
         ],
         response_format: { type: 'json_object' },
-        temperature: 0.6,
         max_completion_tokens: 3000,
       });
 
@@ -778,7 +769,6 @@ Check for:
           { role: 'user', content: userContent },
         ],
         response_format: { type: 'json_object' },
-        temperature: 0.5,
         max_completion_tokens: 3000,
       });
 
@@ -860,7 +850,6 @@ Generate 8-10 diverse questions covering different categories.`;
           },
         ],
         response_format: { type: 'json_object' },
-        temperature: 0.7,
         max_completion_tokens: 4000,
       });
 

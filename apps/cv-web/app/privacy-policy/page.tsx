@@ -9,21 +9,21 @@ export const metadata: Metadata = {
 
 export default function PrivacyPolicyPage() {
   return (
-    <div className="min-h-screen bg-[#08081a]">
+    <div className="min-h-screen bg-page">
       {/* Header */}
-      <header className="border-b border-white/[0.06] bg-[#08081a]/80 backdrop-blur-xl">
+      <header className="border-b border-edge bg-page/80 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
           <Link href="/" className="flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600/20 ring-1 ring-indigo-500/30">
               <FileText className="h-4 w-4 text-indigo-400" />
             </div>
-            <span className="text-lg font-bold tracking-tight text-white">
+            <span className="text-lg font-bold tracking-tight text-content">
               Go<span className="text-gradient">CV</span>
             </span>
           </Link>
           <Link
             href="/"
-            className="flex items-center gap-1.5 text-sm text-zinc-500 transition hover:text-white"
+            className="flex items-center gap-1.5 text-sm text-content-3 transition hover:text-content"
           >
             <ArrowLeft className="h-4 w-4" />
             Back to Home
@@ -32,12 +32,12 @@ export default function PrivacyPolicyPage() {
       </header>
 
       <main className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
-        <h1 className="mb-2 text-4xl font-bold text-white">Privacy Policy</h1>
-        <p className="mb-12 text-sm text-zinc-500">
+        <h1 className="mb-2 text-4xl font-bold text-content">Privacy Policy</h1>
+        <p className="mb-12 text-sm text-content-3">
           Last updated: February 26, 2026
         </p>
 
-        <div className="space-y-10 text-zinc-400 [&_h2]:mb-4 [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:text-white [&_h3]:mb-2 [&_h3]:mt-4 [&_h3]:text-base [&_h3]:font-semibold [&_h3]:text-zinc-200 [&_p]:mb-3 [&_p]:leading-relaxed [&_ul]:mb-3 [&_ul]:list-disc [&_ul]:space-y-1.5 [&_ul]:pl-6">
+        <div className="space-y-10 text-content-2 [&_h2]:mb-4 [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:text-content [&_h3]:mb-2 [&_h3]:mt-4 [&_h3]:text-base [&_h3]:font-semibold [&_h3]:text-content [&_p]:mb-3 [&_p]:leading-relaxed [&_ul]:mb-3 [&_ul]:list-disc [&_ul]:space-y-1.5 [&_ul]:pl-6">
           <section>
             <h2>1. Introduction</h2>
             <p>
@@ -297,14 +297,14 @@ export default function PrivacyPolicyPage() {
         </div>
       </main>
 
-      <footer className="border-t border-white/[0.06] py-8">
-        <div className="mx-auto flex max-w-7xl flex-col items-center gap-3 px-4 text-sm text-zinc-500 sm:flex-row sm:justify-between sm:px-6">
+      <footer className="border-t border-edge py-8">
+        <div className="mx-auto flex max-w-7xl flex-col items-center gap-3 px-4 text-sm text-content-3 sm:flex-row sm:justify-between sm:px-6">
           <span>© {new Date().getFullYear()} GoCV. All rights reserved.</span>
           <div className="flex gap-6">
-            <Link href="/privacy-policy" className="hover:text-white">
+            <Link href="/privacy-policy" className="hover:text-content">
               Privacy Policy
             </Link>
-            <Link href="/terms-of-service" className="hover:text-white">
+            <Link href="/terms-of-service" className="hover:text-content">
               Terms of Service
             </Link>
           </div>

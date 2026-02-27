@@ -78,18 +78,32 @@ export const useSubscriptionStore = create<SubscriptionState>((set) => ({
 interface NotificationsState {
   notifications: Notification[];
   unreadCount: number;
+  drawerOpen: boolean;
+  lastIncoming: Notification | null;
   setNotifications: (notifications: Notification[]) => void;
   setUnreadCount: (count: number) => void;
+  addNotification: (notification: Notification) => void;
   markAsRead: (id: string) => void;
   markAllAsRead: () => void;
   removeNotification: (id: string) => void;
+  openDrawer: () => void;
+  closeDrawer: () => void;
+  toggleDrawer: () => void;
 }
 
 export const useNotificationsStore = create<NotificationsState>((set) => ({
   notifications: [],
   unreadCount: 0,
+  drawerOpen: false,
+  lastIncoming: null,
   setNotifications: (notifications) => set({ notifications }),
   setUnreadCount: (unreadCount) => set({ unreadCount }),
+  addNotification: (notification) =>
+    set((state) => ({
+      notifications: [notification, ...state.notifications],
+      unreadCount: state.unreadCount + 1,
+      lastIncoming: notification,
+    })),
   markAsRead: (id) =>
     set((state) => ({
       notifications: state.notifications.map((n) =>
@@ -106,37 +120,23 @@ export const useNotificationsStore = create<NotificationsState>((set) => ({
     set((state) => ({
       notifications: state.notifications.filter((n) => n._id !== id),
     })),
+  openDrawer: () => set({ drawerOpen: true }),
+  closeDrawer: () => set({ drawerOpen: false }),
+  toggleDrawer: () => set((s) => ({ drawerOpen: !s.drawerOpen })),
 }));
 
-// ─── Theme Store ───
+// ─── Sidebar Store ───
 
-type Theme = "dark" | "light";
-
-interface ThemeState {
-  theme: Theme;
-  toggleTheme: () => void;
-  setTheme: (theme: Theme) => void;
-  loadTheme: () => void;
+interface SidebarState {
+  isOpen: boolean;
+  toggle: () => void;
+  open: () => void;
+  close: () => void;
 }
 
-export const useThemeStore = create<ThemeState>((set) => ({
-  theme: "dark",
-  toggleTheme: () =>
-    set((state) => {
-      const next = state.theme === "dark" ? "light" : "dark";
-      localStorage.setItem("theme", next);
-      document.documentElement.setAttribute("data-theme", next);
-      return { theme: next };
-    }),
-  setTheme: (theme) => {
-    localStorage.setItem("theme", theme);
-    document.documentElement.setAttribute("data-theme", theme);
-    set({ theme });
-  },
-  loadTheme: () => {
-    const saved = localStorage.getItem("theme") as Theme | null;
-    const theme = saved || "dark";
-    document.documentElement.setAttribute("data-theme", theme);
-    set({ theme });
-  },
+export const useSidebarStore = create<SidebarState>((set) => ({
+  isOpen: false,
+  toggle: () => set((s) => ({ isOpen: !s.isOpen })),
+  open: () => set({ isOpen: true }),
+  close: () => set({ isOpen: false }),
 }));

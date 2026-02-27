@@ -52,22 +52,22 @@ export default function BulletsPage() {
       <div className="flex items-center gap-4">
         <button
           onClick={() => router.back()}
-          className="rounded-xl p-2 text-zinc-500 hover:bg-white/[0.04] hover:text-white"
+          className="rounded-xl p-2 text-content-3 hover:bg-card-hover hover:text-content"
         >
           <ArrowLeft className="h-5 w-5" />
         </button>
         <div>
-          <h1 className="text-2xl font-bold text-white">
+          <h1 className="text-2xl font-bold text-content">
             <span className="text-gradient">Bullet Improver</span>
           </h1>
-          <p className="text-sm text-zinc-400">
+          <p className="text-sm text-content-2">
             Transform weak bullets into powerful achievement statements
           </p>
         </div>
       </div>
 
-      <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 space-y-4">
-        <label className="block text-sm font-medium text-zinc-300">
+      <div className="rounded-2xl border border-edge bg-card p-6 space-y-4">
+        <label className="block text-sm font-medium text-content-2">
           Your bullet points
         </label>
         {bullets.map((b, i) => (
@@ -76,12 +76,12 @@ export default function BulletsPage() {
               value={b}
               onChange={(e) => updateBullet(i, e.target.value)}
               placeholder={`Bullet point ${i + 1}...`}
-              className="flex-1 rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-2.5 text-sm text-white placeholder-zinc-500 outline-none focus:border-indigo-500/50"
+              className="flex-1 rounded-xl border border-edge bg-card px-4 py-2.5 text-sm text-content placeholder-content-3 outline-none focus:border-indigo-500/50"
             />
             {bullets.length > 1 && (
               <button
                 onClick={() => removeBullet(i)}
-                className="rounded-xl p-2 text-zinc-600 hover:text-red-400"
+                className="rounded-xl p-2 text-content-4 hover:text-red-400"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -95,14 +95,14 @@ export default function BulletsPage() {
           <Plus className="h-4 w-4" /> Add bullet
         </button>
 
-        <label className="block text-sm font-medium text-zinc-300">
+        <label className="block text-sm font-medium text-content-2">
           Context (optional)
         </label>
         <input
           value={context}
           onChange={(e) => setContext(e.target.value)}
           placeholder="e.g. Software Engineer at Google"
-          className="w-full rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-2.5 text-sm text-white placeholder-zinc-500 outline-none focus:border-indigo-500/50"
+          className="w-full rounded-xl border border-edge bg-card px-4 py-2.5 text-sm text-content placeholder-content-3 outline-none focus:border-indigo-500/50"
         />
 
         <button
@@ -121,13 +121,12 @@ export default function BulletsPage() {
 
       {result && (
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-white">Improved Bullets</h3>
+          <h3 className="text-lg font-semibold text-content">
+            Improved Bullets
+          </h3>
           {result.improved?.map((imp, i) => (
-            <div
-              key={i}
-              className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4"
-            >
-              <p className="text-xs text-zinc-600 line-through">
+            <div key={i} className="rounded-xl border border-edge bg-card p-4">
+              <p className="text-xs text-content-4 line-through">
                 {result.original?.[i]}
               </p>
               <div className="mt-2 flex items-start gap-2">
@@ -137,10 +136,10 @@ export default function BulletsPage() {
             </div>
           ))}
           {result.tips && result.tips.length > 0 && (
-            <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
-              <p className="mb-2 text-sm font-medium text-white">Tips</p>
+            <div className="rounded-xl border border-edge bg-card p-4">
+              <p className="mb-2 text-sm font-medium text-content">Tips</p>
               {result.tips.map((tip, i) => (
-                <p key={i} className="text-xs text-zinc-400">
+                <p key={i} className="text-xs text-content-2">
                   • {tip}
                 </p>
               ))}

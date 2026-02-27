@@ -106,11 +106,11 @@ export default function EditProjectPage() {
         <div className="flex items-center gap-3">
           <button
             onClick={() => router.push("/dashboard/projects")}
-            className="rounded-lg p-2 text-zinc-500 transition hover:bg-white/[0.04]"
+            className="rounded-lg p-2 text-content-3 transition hover:bg-card-hover"
           >
             <ArrowLeft className="h-5 w-5" />
           </button>
-          <h1 className="text-2xl font-bold text-white">Edit Project</h1>
+          <h1 className="text-2xl font-bold text-content">Edit Project</h1>
         </div>
         <button
           onClick={handleSave}
@@ -124,10 +124,10 @@ export default function EditProjectPage() {
 
       <div className="space-y-6">
         {/* Basic Info */}
-        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6">
+        <div className="rounded-2xl border border-edge bg-card p-6">
           <div className="space-y-4">
             <div>
-              <label className="mb-1 block text-sm font-medium text-zinc-400">
+              <label className="mb-1 block text-sm font-medium text-content-2">
                 Title
               </label>
               <input
@@ -135,11 +135,11 @@ export default function EditProjectPage() {
                 onChange={(e) =>
                   setProject({ ...project, title: e.target.value })
                 }
-                className="w-full rounded-lg border border-white/10 bg-white/5 text-white px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+                className="w-full rounded-lg border border-edge bg-card text-content px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none"
               />
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-zinc-400">
+              <label className="mb-1 block text-sm font-medium text-content-2">
                 Description
               </label>
               <textarea
@@ -148,11 +148,11 @@ export default function EditProjectPage() {
                   setProject({ ...project, description: e.target.value })
                 }
                 rows={3}
-                className="w-full rounded-lg border border-white/10 bg-white/5 text-white px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+                className="w-full rounded-lg border border-edge bg-card text-content px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none"
               />
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-zinc-400">
+              <label className="mb-1 block text-sm font-medium text-content-2">
                 Full Description
               </label>
               <textarea
@@ -161,12 +161,12 @@ export default function EditProjectPage() {
                   setProject({ ...project, longDescription: e.target.value })
                 }
                 rows={6}
-                className="w-full rounded-lg border border-white/10 bg-white/5 text-white px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+                className="w-full rounded-lg border border-edge bg-card text-content px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none"
               />
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <label className="mb-1 block text-sm font-medium text-zinc-400">
+                <label className="mb-1 block text-sm font-medium text-content-2">
                   Live URL
                 </label>
                 <input
@@ -174,11 +174,11 @@ export default function EditProjectPage() {
                   onChange={(e) =>
                     setProject({ ...project, liveUrl: e.target.value })
                   }
-                  className="w-full rounded-lg border border-white/10 bg-white/5 text-white px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+                  className="w-full rounded-lg border border-edge bg-card text-content px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm font-medium text-zinc-400">
+                <label className="mb-1 block text-sm font-medium text-content-2">
                   Source URL
                 </label>
                 <input
@@ -186,7 +186,7 @@ export default function EditProjectPage() {
                   onChange={(e) =>
                     setProject({ ...project, sourceUrl: e.target.value })
                   }
-                  className="w-full rounded-lg border border-zinc-300 px-4 py-2 text-sm focus:border-blue-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+                  className="w-full rounded-lg border border-edge bg-card text-content px-4 py-2 text-sm focus:border-blue-500 focus:outline-none"
                 />
               </div>
             </div>
@@ -194,8 +194,8 @@ export default function EditProjectPage() {
         </div>
 
         {/* Technologies */}
-        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6">
-          <h3 className="mb-4 font-semibold text-white">Technologies</h3>
+        <div className="rounded-2xl border border-edge bg-card p-6">
+          <h3 className="mb-4 font-semibold text-content">Technologies</h3>
           <div className="mb-3 flex gap-2">
             <input
               value={techInput}
@@ -204,12 +204,12 @@ export default function EditProjectPage() {
                 e.key === "Enter" && (e.preventDefault(), addTech())
               }
               placeholder="Add technology..."
-              className="flex-1 rounded-lg border border-white/10 bg-white/5 text-white px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+              className="flex-1 rounded-lg border border-edge bg-card text-content px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none"
             />
             <button
               type="button"
               onClick={addTech}
-              className="rounded-lg bg-white/5 text-zinc-300 ring-1 ring-white/10 hover:bg-white/10 px-4 py-2 text-sm font-medium"
+              className="rounded-lg bg-card text-content-2 ring-1 ring-edge hover:bg-card-hover px-4 py-2 text-sm font-medium"
             >
               Add
             </button>
@@ -239,8 +239,8 @@ export default function EditProjectPage() {
         </div>
 
         {/* Images */}
-        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6">
-          <h3 className="mb-4 font-semibold text-white">Images</h3>
+        <div className="rounded-2xl border border-edge bg-card p-6">
+          <h3 className="mb-4 font-semibold text-content">Images</h3>
           <div className="grid grid-cols-3 gap-3 mb-4">
             {project.images.map((img, idx) => (
               <div key={idx} className="group relative">
@@ -259,7 +259,7 @@ export default function EditProjectPage() {
             ))}
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="flex h-32 items-center justify-center rounded-lg border-2 border-dashed border-white/10 text-zinc-600 transition hover:border-indigo-500/50 hover:text-indigo-400"
+              className="flex h-32 items-center justify-center rounded-lg border-2 border-dashed border-edge text-content-4 transition hover:border-indigo-500/50 hover:text-indigo-400"
             >
               <Upload className="h-8 w-8" />
             </button>
@@ -276,7 +276,7 @@ export default function EditProjectPage() {
 
         {/* Settings */}
         <div className="flex items-center gap-6">
-          <label className="flex items-center gap-2 text-sm text-zinc-300">
+          <label className="flex items-center gap-2 text-sm text-content-2">
             <input
               type="checkbox"
               checked={project.isFeatured}
@@ -287,7 +287,7 @@ export default function EditProjectPage() {
             />
             Featured
           </label>
-          <label className="flex items-center gap-2 text-sm text-zinc-300">
+          <label className="flex items-center gap-2 text-sm text-content-2">
             <input
               type="checkbox"
               checked={project.isVisible}

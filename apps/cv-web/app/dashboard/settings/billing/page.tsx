@@ -130,26 +130,26 @@ export default function BillingPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-white">
+        <h1 className="text-3xl font-bold tracking-tight text-content">
           <span className="text-gradient">Billing</span> & Plan
         </h1>
-        <p className="mt-1 text-sm text-zinc-400">
+        <p className="mt-1 text-sm text-content-2">
           Manage your subscription and billing
         </p>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 border-b border-white/[0.06] pb-1">
+      <div className="flex gap-2 border-b border-edge pb-1">
         <Link
           href="/dashboard/settings"
-          className="rounded-t-xl border-b-2 border-transparent px-4 py-2 text-sm font-medium text-zinc-400 hover:text-white"
+          className="rounded-t-xl border-b-2 border-transparent px-4 py-2 text-sm font-medium text-content-2 hover:text-content"
         >
           <User className="mb-0.5 mr-1.5 inline h-4 w-4" />
           Profile
         </Link>
         <Link
           href="/dashboard/settings/billing"
-          className="rounded-t-xl border-b-2 border-indigo-500 px-4 py-2 text-sm font-medium text-white"
+          className="rounded-t-xl border-b-2 border-indigo-500 px-4 py-2 text-sm font-medium text-content"
         >
           <CreditCard className="mb-0.5 mr-1.5 inline h-4 w-4" />
           Billing
@@ -158,15 +158,17 @@ export default function BillingPage() {
 
       {/* Current Plan */}
       {subscription && (
-        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6">
+        <div className="rounded-2xl border border-edge bg-card p-6">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-sm font-semibold text-white">Current Plan</h3>
+              <h3 className="text-sm font-semibold text-content">
+                Current Plan
+              </h3>
               <p className="mt-1 flex items-center gap-2 text-lg font-bold capitalize text-indigo-400">
                 <Sparkles className="h-5 w-5" />
                 {subscription.plan}
               </p>
-              <p className="mt-0.5 text-xs text-zinc-500">
+              <p className="mt-0.5 text-xs text-content-3">
                 Status:{" "}
                 <span className="capitalize text-emerald-400">
                   {subscription.status}
@@ -182,7 +184,7 @@ export default function BillingPage() {
               {subscription.stripeCustomerId && (
                 <button
                   onClick={handleManageBilling}
-                  className="flex items-center gap-1.5 rounded-xl border border-white/[0.06] px-4 py-2 text-xs font-medium text-zinc-300 transition hover:bg-white/[0.04]"
+                  className="flex items-center gap-1.5 rounded-xl border border-edge px-4 py-2 text-xs font-medium text-content-2 transition hover:bg-card-hover"
                 >
                   <ExternalLink className="h-3.5 w-3.5" />
                   Manage Billing
@@ -226,13 +228,13 @@ export default function BillingPage() {
             ].map((item) => (
               <div
                 key={item.label}
-                className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-3"
+                className="rounded-xl border border-edge bg-card p-3"
               >
-                <p className="text-xs text-zinc-500">{item.label}</p>
-                <p className="mt-1 text-sm font-semibold text-white">
+                <p className="text-xs text-content-3">{item.label}</p>
+                <p className="mt-1 text-sm font-semibold text-content">
                   {item.used} / {item.max === -1 ? "∞" : item.max}
                 </p>
-                <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/[0.06]">
+                <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-card-hover">
                   <div
                     className="h-full rounded-full bg-indigo-500"
                     style={{
@@ -249,7 +251,7 @@ export default function BillingPage() {
       {/* Billing Cycle Toggle */}
       <div className="flex items-center justify-center gap-3">
         <span
-          className={`text-sm ${billingCycle === "monthly" ? "text-white" : "text-zinc-500"}`}
+          className={`text-sm ${billingCycle === "monthly" ? "text-content" : "text-content-3"}`}
         >
           Monthly
         </span>
@@ -264,7 +266,7 @@ export default function BillingPage() {
           />
         </button>
         <span
-          className={`text-sm ${billingCycle === "yearly" ? "text-white" : "text-zinc-500"}`}
+          className={`text-sm ${billingCycle === "yearly" ? "text-content" : "text-content-3"}`}
         >
           Yearly <span className="text-xs text-emerald-400">(Save 20%)</span>
         </span>
@@ -292,25 +294,25 @@ export default function BillingPage() {
                       ? "bg-purple-500/20 text-purple-400"
                       : plan.plan === "premium"
                         ? "bg-indigo-500/20 text-indigo-400"
-                        : "bg-zinc-700/50 text-zinc-400"
+                        : "bg-card-hover text-content-2"
                   }`}
                 >
                   <Icon className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold capitalize text-white">
+                  <h3 className="text-lg font-bold capitalize text-content">
                     {plan.name}
                   </h3>
                 </div>
               </div>
 
               <div className="mt-4">
-                <span className="text-3xl font-bold text-white">
+                <span className="text-3xl font-bold text-content">
                   ${price.toFixed(0)}
                 </span>
-                <span className="text-sm text-zinc-500">/mo</span>
+                <span className="text-sm text-content-3">/mo</span>
                 {billingCycle === "yearly" && plan.monthlyPrice > 0 && (
-                  <p className="mt-1 text-xs text-zinc-500">
+                  <p className="mt-1 text-xs text-content-3">
                     Billed ${plan.yearlyPrice}/year
                   </p>
                 )}
@@ -320,7 +322,7 @@ export default function BillingPage() {
                 {plan.features?.map((feat) => (
                   <li
                     key={feat}
-                    className="flex items-start gap-2 text-sm text-zinc-300"
+                    className="flex items-start gap-2 text-sm text-content-2"
                   >
                     <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" />
                     {feat}
@@ -330,7 +332,7 @@ export default function BillingPage() {
 
               <div className="mt-6">
                 {isCurrent ? (
-                  <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] py-2.5 text-center text-sm font-medium text-zinc-400">
+                  <div className="rounded-xl border border-edge bg-card py-2.5 text-center text-sm font-medium text-content-2">
                     Current Plan
                   </div>
                 ) : (
@@ -342,7 +344,7 @@ export default function BillingPage() {
                         ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/25"
                         : plan.plan === "enterprise"
                           ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/25"
-                          : "border border-white/[0.06] text-zinc-300 hover:bg-white/[0.04]"
+                          : "border border-edge text-content-2 hover:bg-card-hover"
                     }`}
                   >
                     {upgrading === plan.plan ? (
@@ -363,8 +365,8 @@ export default function BillingPage() {
 
       {/* Invoice History */}
       {invoices.length > 0 && (
-        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6">
-          <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold text-white">
+        <div className="rounded-2xl border border-edge bg-card p-6">
+          <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold text-content">
             <Receipt className="h-4 w-4 text-indigo-400" />
             Invoice History
           </h3>
@@ -372,15 +374,15 @@ export default function BillingPage() {
             {invoices.map((invoice) => (
               <div
                 key={invoice.id}
-                className="flex items-center justify-between rounded-xl border border-white/[0.04] bg-white/[0.01] px-4 py-3"
+                className="flex items-center justify-between rounded-xl border border-edge bg-card px-4 py-3"
               >
                 <div className="flex items-center gap-3">
-                  <FileText className="h-4 w-4 text-zinc-500" />
+                  <FileText className="h-4 w-4 text-content-3" />
                   <div>
-                    <p className="text-sm font-medium text-white">
+                    <p className="text-sm font-medium text-content">
                       {invoice.number || invoice.id.slice(0, 16)}
                     </p>
-                    <p className="text-xs text-zinc-500">
+                    <p className="text-xs text-content-3">
                       {invoice.date
                         ? new Date(invoice.date).toLocaleDateString()
                         : "—"}
@@ -388,9 +390,9 @@ export default function BillingPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
-                  <span className="text-sm font-semibold text-white">
+                  <span className="text-sm font-semibold text-content">
                     ${invoice.amount.toFixed(2)}{" "}
-                    <span className="text-xs uppercase text-zinc-500">
+                    <span className="text-xs uppercase text-content-3">
                       {invoice.currency}
                     </span>
                   </span>
@@ -400,7 +402,7 @@ export default function BillingPage() {
                         ? "bg-emerald-400/10 text-emerald-400"
                         : invoice.status === "open"
                           ? "bg-amber-400/10 text-amber-400"
-                          : "bg-zinc-400/10 text-zinc-400"
+                          : "bg-card text-content-2"
                     }`}
                   >
                     {invoice.status}
@@ -410,7 +412,7 @@ export default function BillingPage() {
                       href={invoice.pdfUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="rounded-lg p-1.5 text-zinc-500 transition hover:bg-white/[0.04] hover:text-white"
+                      className="rounded-lg p-1.5 text-content-3 transition hover:bg-card-hover hover:text-content"
                     >
                       <Download className="h-4 w-4" />
                     </a>

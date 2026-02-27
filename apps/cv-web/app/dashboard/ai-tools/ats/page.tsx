@@ -70,40 +70,40 @@ export default function AtsPage() {
       <div className="flex items-center gap-4">
         <button
           onClick={() => router.back()}
-          className="rounded-xl p-2 text-zinc-500 hover:bg-white/[0.04] hover:text-white"
+          className="rounded-xl p-2 text-content-3 hover:bg-card-hover hover:text-content"
         >
           <ArrowLeft className="h-5 w-5" />
         </button>
         <div>
-          <h1 className="text-2xl font-bold text-white">
+          <h1 className="text-2xl font-bold text-content">
             <span className="text-gradient">ATS Score Checker</span>
           </h1>
-          <p className="text-sm text-zinc-400">
+          <p className="text-sm text-content-2">
             Check your CV&apos;s ATS compatibility
           </p>
         </div>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6">
-          <label className="mb-2 block text-sm font-medium text-zinc-300">
+        <div className="rounded-2xl border border-edge bg-card p-6">
+          <label className="mb-2 block text-sm font-medium text-content-2">
             Select a CV
           </label>
           <select
             value={selectedCv}
             onChange={(e) => setSelectedCv(e.target.value)}
-            className="w-full rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-3 text-sm text-white outline-none focus:border-indigo-500/50"
+            className="w-full rounded-xl border border-edge bg-card px-4 py-3 text-sm text-content outline-none focus:border-indigo-500/50"
           >
             <option value="">Choose...</option>
             {cvs.map((cv) => (
-              <option key={cv._id} value={cv._id} className="bg-[#0f0f23]">
+              <option key={cv._id} value={cv._id} className="bg-elevated">
                 {cv.title}
               </option>
             ))}
           </select>
         </div>
-        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6">
-          <label className="mb-2 block text-sm font-medium text-zinc-300">
+        <div className="rounded-2xl border border-edge bg-card p-6">
+          <label className="mb-2 block text-sm font-medium text-content-2">
             Job Description (optional)
           </label>
           <textarea
@@ -111,7 +111,7 @@ export default function AtsPage() {
             onChange={(e) => setJobDescription(e.target.value)}
             rows={4}
             placeholder="Paste job description for keyword matching..."
-            className="w-full rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-3 text-sm text-white placeholder-zinc-500 outline-none focus:border-indigo-500/50"
+            className="w-full rounded-xl border border-edge bg-card px-4 py-3 text-sm text-content placeholder-content-3 outline-none focus:border-indigo-500/50"
           />
         </div>
       </div>
@@ -132,7 +132,7 @@ export default function AtsPage() {
       {result && (
         <div className="space-y-6">
           {/* Score */}
-          <div className="flex items-center gap-6 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6">
+          <div className="flex items-center gap-6 rounded-2xl border border-edge bg-card p-6">
             <div className="relative flex h-24 w-24 items-center justify-center">
               <svg className="h-24 w-24 -rotate-90">
                 <circle
@@ -169,9 +169,9 @@ export default function AtsPage() {
                     ? "Good"
                     : "Needs Work"}
               </p>
-              <p className="mt-1 text-sm text-zinc-400">{result.overall}</p>
+              <p className="mt-1 text-sm text-content-2">{result.overall}</p>
               {result.formatting && (
-                <p className="mt-1 text-xs text-zinc-500">
+                <p className="mt-1 text-xs text-content-3">
                   Formatting Score: {result.formatting.score}/100
                 </p>
               )}
@@ -180,12 +180,14 @@ export default function AtsPage() {
 
           {/* Issues */}
           {result.issues && result.issues.length > 0 && (
-            <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 space-y-3">
-              <h3 className="text-sm font-semibold text-white">Issues Found</h3>
+            <div className="rounded-xl border border-edge bg-card p-4 space-y-3">
+              <h3 className="text-sm font-semibold text-content">
+                Issues Found
+              </h3>
               {result.issues.map((issue, i) => (
                 <div
                   key={i}
-                  className="flex items-start gap-3 rounded-lg bg-white/[0.02] p-3"
+                  className="flex items-start gap-3 rounded-lg bg-card p-3"
                 >
                   <AlertTriangle
                     className={`mt-0.5 h-4 w-4 shrink-0 ${
@@ -197,8 +199,8 @@ export default function AtsPage() {
                     }`}
                   />
                   <div>
-                    <p className="text-sm text-zinc-300">{issue.message}</p>
-                    <p className="mt-1 text-xs text-zinc-500">
+                    <p className="text-sm text-content-2">{issue.message}</p>
+                    <p className="mt-1 text-xs text-content-3">
                       {issue.suggestion}
                     </p>
                   </div>
@@ -210,7 +212,7 @@ export default function AtsPage() {
           {/* Keywords */}
           {result.keywords && (
             <div className="grid gap-4 lg:grid-cols-2">
-              <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
+              <div className="rounded-xl border border-edge bg-card p-4">
                 <h3 className="mb-3 text-sm font-semibold text-emerald-400">
                   Keywords Found
                 </h3>
@@ -225,7 +227,7 @@ export default function AtsPage() {
                   ))}
                 </div>
               </div>
-              <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
+              <div className="rounded-xl border border-edge bg-card p-4">
                 <h3 className="mb-3 text-sm font-semibold text-red-400">
                   Keywords Missing
                 </h3>

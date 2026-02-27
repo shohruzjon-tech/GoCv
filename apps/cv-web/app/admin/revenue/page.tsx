@@ -84,8 +84,8 @@ export default function AdminRevenuePage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white">Revenue</h1>
-        <p className="text-sm text-zinc-500">
+        <h1 className="text-2xl font-bold text-content">Revenue</h1>
+        <p className="text-sm text-content-3">
           Financial overview and subscription metrics
         </p>
       </div>
@@ -94,23 +94,23 @@ export default function AdminRevenuePage() {
         {stats.map((s) => (
           <div
             key={s.label}
-            className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5"
+            className="rounded-2xl border border-edge bg-card p-5"
           >
             <div className="flex items-center gap-3">
               <div className={`rounded-xl p-2.5 ${s.color}`}>
                 <s.icon className="h-4 w-4" />
               </div>
               <div>
-                <p className="text-xs text-zinc-500">{s.label}</p>
-                <p className="text-lg font-bold text-white">{s.value}</p>
+                <p className="text-xs text-content-3">{s.label}</p>
+                <p className="text-lg font-bold text-content">{s.value}</p>
               </div>
             </div>
           </div>
         ))}
       </div>
 
-      <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6">
-        <h2 className="mb-4 text-sm font-semibold text-white">
+      <div className="rounded-2xl border border-edge bg-card p-6">
+        <h2 className="mb-4 text-sm font-semibold text-content">
           Plan Distribution
         </h2>
         <div className="space-y-4">
@@ -119,17 +119,17 @@ export default function AdminRevenuePage() {
             return (
               <div key={p.name}>
                 <div className="mb-1 flex items-center justify-between text-xs">
-                  <span className="text-zinc-400">
+                  <span className="text-content-2">
                     {p.name} — {p.count} users
                   </span>
-                  <span className="text-zinc-500">
+                  <span className="text-content-3">
                     ${p.price}/mo × {p.count} ={" "}
-                    <span className="text-white font-semibold">
+                    <span className="text-content font-semibold">
                       ${(p.price * p.count).toLocaleString()}/mo
                     </span>
                   </span>
                 </div>
-                <div className="h-2 overflow-hidden rounded-full bg-white/[0.04]">
+                <div className="h-2 overflow-hidden rounded-full bg-card-hover">
                   <div
                     className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-purple-500"
                     style={{ width: `${pct}%` }}
@@ -142,31 +142,31 @@ export default function AdminRevenuePage() {
       </div>
 
       {data?.aiCosts && (
-        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6">
-          <h2 className="mb-4 text-sm font-semibold text-white">
+        <div className="rounded-2xl border border-edge bg-card p-6">
+          <h2 className="mb-4 text-sm font-semibold text-content">
             AI Infrastructure Costs
           </h2>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
             <div>
-              <p className="text-xs text-zinc-500">Total Requests</p>
-              <p className="text-lg font-bold text-white">
+              <p className="text-xs text-content-3">Total Requests</p>
+              <p className="text-lg font-bold text-content">
                 {(data.aiCosts.totalRequests ?? 0).toLocaleString()}
               </p>
             </div>
             <div>
-              <p className="text-xs text-zinc-500">Total Tokens</p>
-              <p className="text-lg font-bold text-white">
+              <p className="text-xs text-content-3">Total Tokens</p>
+              <p className="text-lg font-bold text-content">
                 {(data.aiCosts.totalTokens ?? 0).toLocaleString()}
               </p>
             </div>
             <div>
-              <p className="text-xs text-zinc-500">Total Cost</p>
-              <p className="text-lg font-bold text-white">
+              <p className="text-xs text-content-3">Total Cost</p>
+              <p className="text-lg font-bold text-content">
                 ${((data.aiCosts.totalCost ?? 0) / 1000).toFixed(2)}
               </p>
             </div>
             <div>
-              <p className="text-xs text-zinc-500">Net Margin</p>
+              <p className="text-xs text-content-3">Net Margin</p>
               <p className="text-lg font-bold text-emerald-400">
                 {data.mrr > 0
                   ? `${(((data.mrr - (data.aiCosts.totalCost ?? 0) / 1000) / data.mrr) * 100).toFixed(0)}%`

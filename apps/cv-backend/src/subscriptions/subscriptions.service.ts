@@ -16,6 +16,7 @@ import {
 } from '../common/enums/subscription-plan.enum.js';
 import { StripeService } from '../stripe/stripe.service.js';
 import { PlanConfigService } from './plan-config.service.js';
+import { NotificationsService } from '../notifications/notifications.service.js';
 
 @Injectable()
 export class SubscriptionsService {
@@ -26,6 +27,7 @@ export class SubscriptionsService {
     private subscriptionModel: Model<SubscriptionDocument>,
     private readonly stripeService: StripeService,
     private readonly planConfigService: PlanConfigService,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   // Get or create subscription for user
@@ -168,7 +170,18 @@ export class SubscriptionsService {
       );
       sub.cancelAtPeriodEnd = true;
       sub.cancelledAt = new Date();
-      return sub.save();
+      const saved = await sub.save();
+
+      await this.notificationsService.create({
+        userId,
+        title: 'Subscription Cancelled',
+        message:
+          'Your subscription has been cancelled. You can still use free features.',
+        type: 'warning',
+        actionUrl: '/dashboard/settings/billing',
+      });
+
+      return saved;
     }
 
     // Direct cancel (free plan or dev mode)
@@ -178,7 +191,18 @@ export class SubscriptionsService {
     sub.cancelledAt = new Date();
     sub.pricePerMonth = 0;
     sub.pricePerYear = 0;
-    return sub.save();
+    const saved = await sub.save();
+
+    await this.notificationsService.create({
+      userId,
+      title: 'Subscription Cancelled',
+      message:
+        'Your subscription has been cancelled. You can still use free features.',
+      type: 'warning',
+      actionUrl: '/dashboard/settings/billing',
+    });
+
+    return saved;
   }
 
   // Usage tracking
@@ -196,6 +220,13 @@ export class SubscriptionsService {
         { $inc: { 'currentUsage.aiCreditsUsed': 1 } },
       )
       .exec();
+
+    // Notify when AI credits reach 80% usage
+    const newUsage = sub.currentUsage.aiCreditsUsed + 1;
+    if (limit !== -1 && newUsage === Math.ceil(limit * 0.8)) {
+      const remaining = limit - newUsage;
+      await this.notificationsService.notifyAiCreditsLow(userId, remaining);
+    }
 
     return true;
   }

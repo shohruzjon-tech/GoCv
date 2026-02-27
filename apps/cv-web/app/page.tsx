@@ -26,8 +26,10 @@ const ThreeBackground = dynamic(() => import("@/components/three-background"), {
 
 export default function Home() {
   return (
-    <div className="relative min-h-screen overflow-x-hidden bg-[#08081a] text-white">
-      <ThreeBackground />
+    <div className="relative min-h-screen overflow-x-hidden bg-page text-content">
+      <div style={{ opacity: "var(--t-three-opacity)" }}>
+        <ThreeBackground />
+      </div>
 
       {/* ──── Navbar ──── */}
       <header className="fixed top-0 z-50 w-full">
@@ -44,25 +46,25 @@ export default function Home() {
           <nav className="hidden items-center gap-8 md:flex">
             <a
               href="#features"
-              className="text-sm font-medium text-zinc-400 transition hover:text-white"
+              className="text-sm font-medium text-content-2 transition hover:text-content"
             >
               Features
             </a>
             <a
               href="#how-it-works"
-              className="text-sm font-medium text-zinc-400 transition hover:text-white"
+              className="text-sm font-medium text-content-2 transition hover:text-content"
             >
               How It Works
             </a>
             <a
               href="#testimonials"
-              className="text-sm font-medium text-zinc-400 transition hover:text-white"
+              className="text-sm font-medium text-content-2 transition hover:text-content"
             >
               Testimonials
             </a>
             <a
               href="#pricing"
-              className="text-sm font-medium text-zinc-400 transition hover:text-white"
+              className="text-sm font-medium text-content-2 transition hover:text-content"
             >
               Pricing
             </a>
@@ -71,7 +73,7 @@ export default function Home() {
           <div className="flex items-center gap-3">
             <Link
               href="/login"
-              className="hidden rounded-xl px-5 py-2.5 text-sm font-medium text-zinc-300 transition hover:text-white sm:inline-flex"
+              className="hidden rounded-xl px-5 py-2.5 text-sm font-medium text-content-2 transition hover:text-content sm:inline-flex"
             >
               Sign In
             </Link>
@@ -111,7 +113,7 @@ export default function Home() {
             </h1>
 
             {/* Subheading */}
-            <p className="animate-fade-up delay-200 mx-auto mb-12 max-w-2xl text-lg leading-relaxed text-zinc-400 sm:text-xl">
+            <p className="animate-fade-up delay-200 mx-auto mb-12 max-w-2xl text-lg leading-relaxed text-content-2 sm:text-xl">
               Create stunning, ATS-optimized resumes in minutes — not hours. Our
               AI understands your experience and crafts the perfect narrative to
               land your dream job.
@@ -129,7 +131,7 @@ export default function Home() {
               </Link>
               <a
                 href="#how-it-works"
-                className="inline-flex h-14 items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-8 text-base font-medium text-zinc-300 backdrop-blur transition-all hover:border-white/20 hover:bg-white/10 hover:text-white"
+                className="inline-flex h-14 items-center gap-2 rounded-2xl border border-edge bg-card px-8 text-base font-medium text-content-2 backdrop-blur transition-all hover:border-edge hover:bg-card-hover hover:text-content"
               >
                 See How It Works
               </a>
@@ -147,14 +149,14 @@ export default function Home() {
                 ].map((bg, i) => (
                   <div
                     key={i}
-                    className={`h-10 w-10 rounded-full ${bg} ring-2 ring-[#08081a] flex items-center justify-center text-xs font-bold`}
+                    className={`h-10 w-10 rounded-full ${bg} ring-2 ring-page flex items-center justify-center text-xs font-bold`}
                   >
                     {String.fromCharCode(65 + i)}
                   </div>
                 ))}
               </div>
-              <div className="text-sm text-zinc-400">
-                <span className="font-semibold text-white">2,500+</span>{" "}
+              <div className="text-sm text-content-2">
+                <span className="font-semibold text-content">2,500+</span>{" "}
                 professionals already building with GoCV
               </div>
               <div className="flex items-center gap-1">
@@ -164,16 +166,16 @@ export default function Home() {
                     className="h-4 w-4 fill-amber-400 text-amber-400"
                   />
                 ))}
-                <span className="ml-2 text-sm text-zinc-400">4.9/5</span>
+                <span className="ml-2 text-sm text-content-2">4.9/5</span>
               </div>
             </div>
           </div>
         </section>
 
         {/* ──── Logos / Trust Bar ──── */}
-        <section className="border-y border-white/5 bg-white/[0.02] py-12">
+        <section className="border-y border-edge bg-card py-12">
           <div className="mx-auto max-w-7xl px-6">
-            <p className="mb-8 text-center text-sm font-medium uppercase tracking-widest text-zinc-600">
+            <p className="mb-8 text-center text-sm font-medium uppercase tracking-widest text-content-4">
               Trusted by professionals at
             </p>
             <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-6 opacity-40">
@@ -187,7 +189,7 @@ export default function Home() {
               ].map((name) => (
                 <span
                   key={name}
-                  className="text-xl font-bold tracking-tight text-zinc-400"
+                  className="text-xl font-bold tracking-tight text-content-2"
                 >
                   {name}
                 </span>
@@ -208,7 +210,7 @@ export default function Home() {
                 Everything You Need to{" "}
                 <span className="text-gradient">Stand Out</span>
               </h2>
-              <p className="text-lg text-zinc-400">
+              <p className="text-lg text-content-2">
                 From AI-powered content generation to stunning designs,
                 we&apos;ve built every tool you need to create the perfect
                 resume.
@@ -288,10 +290,10 @@ export default function Home() {
                     >
                       <feat.icon className="h-5 w-5" />
                     </div>
-                    <h3 className="mb-2 text-lg font-semibold text-white">
+                    <h3 className="mb-2 text-lg font-semibold text-content">
                       {feat.title}
                     </h3>
-                    <p className="text-sm leading-relaxed text-zinc-400">
+                    <p className="text-sm leading-relaxed text-content-2">
                       {feat.desc}
                     </p>
                   </div>
@@ -314,7 +316,7 @@ export default function Home() {
                 From Zero to <span className="text-gradient">Dream CV</span> in
                 3 Steps
               </h2>
-              <p className="text-lg text-zinc-400">
+              <p className="text-lg text-content-2">
                 No more staring at blank pages. Let AI do the heavy lifting
                 while you focus on what matters.
               </p>
@@ -343,17 +345,17 @@ export default function Home() {
               ].map((item) => (
                 <div
                   key={item.step}
-                  className="group relative rounded-3xl border border-white/5 bg-white/[0.02] p-10 transition-all hover:border-white/10 hover:bg-white/[0.04]"
+                  className="group relative rounded-3xl border border-edge bg-card p-10 transition-all hover:border-edge hover:bg-card-hover"
                 >
                   <div
                     className={`mb-6 inline-flex bg-gradient-to-r ${item.gradient} bg-clip-text text-5xl font-black text-transparent`}
                   >
                     {item.step}
                   </div>
-                  <h3 className="mb-3 text-xl font-semibold text-white">
+                  <h3 className="mb-3 text-xl font-semibold text-content">
                     {item.title}
                   </h3>
-                  <p className="leading-relaxed text-zinc-400">{item.desc}</p>
+                  <p className="leading-relaxed text-content-2">{item.desc}</p>
                 </div>
               ))}
             </div>
@@ -361,7 +363,7 @@ export default function Home() {
         </section>
 
         {/* ──── Stats ──── */}
-        <section className="border-y border-white/5 bg-white/[0.02] py-20">
+        <section className="border-y border-edge bg-card py-20">
           <div className="mx-auto grid max-w-7xl grid-cols-2 gap-8 px-6 md:grid-cols-4">
             {[
               { value: "50K+", label: "CVs Created", icon: FileText },
@@ -376,7 +378,7 @@ export default function Home() {
                     {stat.value}
                   </span>
                 </div>
-                <p className="text-sm text-zinc-500">{stat.label}</p>
+                <p className="text-sm text-content-3">{stat.label}</p>
               </div>
             ))}
           </div>
@@ -393,7 +395,7 @@ export default function Home() {
               <h2 className="mb-5 text-4xl font-bold tracking-tight sm:text-5xl">
                 Loved by <span className="text-gradient">Professionals</span>
               </h2>
-              <p className="text-lg text-zinc-400">
+              <p className="text-lg text-content-2">
                 Don&apos;t take our word for it — hear from people who landed
                 their dream jobs with GoCV.
               </p>
@@ -419,7 +421,7 @@ export default function Home() {
               ].map((t) => (
                 <div
                   key={t.name}
-                  className="rounded-3xl border border-white/5 bg-white/[0.02] p-8 transition-all hover:border-white/10"
+                  className="rounded-3xl border border-edge bg-card p-8 transition-all hover:border-edge"
                 >
                   <div className="mb-4 flex gap-1">
                     {Array.from({ length: 5 }).map((_, i) => (
@@ -429,12 +431,12 @@ export default function Home() {
                       />
                     ))}
                   </div>
-                  <p className="mb-6 leading-relaxed text-zinc-300">
+                  <p className="mb-6 leading-relaxed text-content-2">
                     &ldquo;{t.text}&rdquo;
                   </p>
                   <div>
-                    <p className="font-semibold text-white">{t.name}</p>
-                    <p className="text-sm text-zinc-500">{t.role}</p>
+                    <p className="font-semibold text-content">{t.name}</p>
+                    <p className="text-sm text-content-3">{t.role}</p>
                   </div>
                 </div>
               ))}
@@ -455,21 +457,23 @@ export default function Home() {
                 Start <span className="text-gradient">Free</span>, Scale When
                 Ready
               </h2>
-              <p className="text-lg text-zinc-400">
+              <p className="text-lg text-content-2">
                 No credit card required. Upgrade only when you need more.
               </p>
             </div>
 
             <div className="mx-auto grid max-w-5xl gap-8 md:grid-cols-3">
               {/* Free */}
-              <div className="rounded-3xl border border-white/5 bg-white/[0.02] p-8 transition-all hover:border-white/10">
-                <h3 className="mb-2 text-lg font-semibold text-white">Free</h3>
-                <p className="mb-6 text-sm text-zinc-500">
+              <div className="rounded-3xl border border-edge bg-card p-8 transition-all hover:border-edge">
+                <h3 className="mb-2 text-lg font-semibold text-content">
+                  Free
+                </h3>
+                <p className="mb-6 text-sm text-content-3">
                   Perfect for getting started
                 </p>
                 <div className="mb-8">
-                  <span className="text-4xl font-bold text-white">$0</span>
-                  <span className="text-zinc-500">/month</span>
+                  <span className="text-4xl font-bold text-content">$0</span>
+                  <span className="text-content-3">/month</span>
                 </div>
                 <ul className="mb-8 space-y-3">
                   {[
@@ -480,7 +484,7 @@ export default function Home() {
                   ].map((f) => (
                     <li
                       key={f}
-                      className="flex items-center gap-3 text-sm text-zinc-300"
+                      className="flex items-center gap-3 text-sm text-content-2"
                     >
                       <Check className="h-4 w-4 flex-shrink-0 text-emerald-400" />
                       {f}
@@ -489,7 +493,7 @@ export default function Home() {
                 </ul>
                 <Link
                   href="/login"
-                  className="block w-full rounded-xl border border-white/10 bg-white/5 py-3 text-center text-sm font-semibold text-white transition hover:bg-white/10"
+                  className="block w-full rounded-xl border border-edge bg-card py-3 text-center text-sm font-semibold text-content transition hover:bg-card-hover"
                 >
                   Get Started
                 </Link>
@@ -500,13 +504,13 @@ export default function Home() {
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-indigo-600 px-4 py-1 text-xs font-bold uppercase tracking-wider text-white">
                   Popular
                 </div>
-                <h3 className="mb-2 text-lg font-semibold text-white">Pro</h3>
-                <p className="mb-6 text-sm text-zinc-500">
+                <h3 className="mb-2 text-lg font-semibold text-content">Pro</h3>
+                <p className="mb-6 text-sm text-content-3">
                   For serious job seekers
                 </p>
                 <div className="mb-8">
-                  <span className="text-4xl font-bold text-white">$9</span>
-                  <span className="text-zinc-500">/month</span>
+                  <span className="text-4xl font-bold text-content">$9</span>
+                  <span className="text-content-3">/month</span>
                 </div>
                 <ul className="mb-8 space-y-3">
                   {[
@@ -519,7 +523,7 @@ export default function Home() {
                   ].map((f) => (
                     <li
                       key={f}
-                      className="flex items-center gap-3 text-sm text-zinc-300"
+                      className="flex items-center gap-3 text-sm text-content-2"
                     >
                       <Check className="h-4 w-4 flex-shrink-0 text-indigo-400" />
                       {f}
@@ -535,15 +539,17 @@ export default function Home() {
               </div>
 
               {/* Enterprise */}
-              <div className="rounded-3xl border border-white/5 bg-white/[0.02] p-8 transition-all hover:border-white/10">
-                <h3 className="mb-2 text-lg font-semibold text-white">
+              <div className="rounded-3xl border border-edge bg-card p-8 transition-all hover:border-edge">
+                <h3 className="mb-2 text-lg font-semibold text-content">
                   Enterprise
                 </h3>
-                <p className="mb-6 text-sm text-zinc-500">
+                <p className="mb-6 text-sm text-content-3">
                   For teams & organizations
                 </p>
                 <div className="mb-8">
-                  <span className="text-4xl font-bold text-white">Custom</span>
+                  <span className="text-4xl font-bold text-content">
+                    Custom
+                  </span>
                 </div>
                 <ul className="mb-8 space-y-3">
                   {[
@@ -556,7 +562,7 @@ export default function Home() {
                   ].map((f) => (
                     <li
                       key={f}
-                      className="flex items-center gap-3 text-sm text-zinc-300"
+                      className="flex items-center gap-3 text-sm text-content-2"
                     >
                       <Check className="h-4 w-4 flex-shrink-0 text-purple-400" />
                       {f}
@@ -565,7 +571,7 @@ export default function Home() {
                 </ul>
                 <Link
                   href="/login"
-                  className="block w-full rounded-xl border border-white/10 bg-white/5 py-3 text-center text-sm font-semibold text-white transition hover:bg-white/10"
+                  className="block w-full rounded-xl border border-edge bg-card py-3 text-center text-sm font-semibold text-content transition hover:bg-card-hover"
                 >
                   Contact Sales
                 </Link>
@@ -582,7 +588,7 @@ export default function Home() {
                 Ready to Build Your{" "}
                 <span className="text-gradient">Perfect CV</span>?
               </h2>
-              <p className="mx-auto mb-10 max-w-xl text-lg text-zinc-400">
+              <p className="mx-auto mb-10 max-w-xl text-lg text-content-2">
                 Join thousands of professionals who&apos;ve already landed their
                 dream jobs. Start free — no credit card required.
               </p>
@@ -600,7 +606,7 @@ export default function Home() {
       </main>
 
       {/* ──── Footer ──── */}
-      <footer className="border-t border-white/5 bg-white/[0.02] py-16">
+      <footer className="border-t border-edge bg-card py-16">
         <div className="mx-auto max-w-7xl px-6">
           <div className="grid gap-12 md:grid-cols-4">
             {/* Brand */}
@@ -613,7 +619,7 @@ export default function Home() {
                   Go<span className="text-gradient">CV</span>
                 </span>
               </Link>
-              <p className="mt-4 text-sm leading-relaxed text-zinc-500">
+              <p className="mt-4 text-sm leading-relaxed text-content-3">
                 AI-powered resume builder that helps professionals stand out and
                 land their dream jobs.
               </p>
@@ -621,7 +627,7 @@ export default function Home() {
 
             {/* Product */}
             <div>
-              <h4 className="mb-4 text-sm font-semibold uppercase tracking-wider text-zinc-400">
+              <h4 className="mb-4 text-sm font-semibold uppercase tracking-wider text-content-2">
                 Product
               </h4>
               <ul className="space-y-3">
@@ -634,7 +640,7 @@ export default function Home() {
                   <li key={l.label}>
                     <a
                       href={l.href}
-                      className="text-sm text-zinc-500 transition hover:text-white"
+                      className="text-sm text-content-3 transition hover:text-content"
                     >
                       {l.label}
                     </a>
@@ -645,7 +651,7 @@ export default function Home() {
 
             {/* Company */}
             <div>
-              <h4 className="mb-4 text-sm font-semibold uppercase tracking-wider text-zinc-400">
+              <h4 className="mb-4 text-sm font-semibold uppercase tracking-wider text-content-2">
                 Company
               </h4>
               <ul className="space-y-3">
@@ -658,7 +664,7 @@ export default function Home() {
                   <li key={l.label}>
                     <a
                       href={l.href}
-                      className="text-sm text-zinc-500 transition hover:text-white"
+                      className="text-sm text-content-3 transition hover:text-content"
                     >
                       {l.label}
                     </a>
@@ -669,14 +675,14 @@ export default function Home() {
 
             {/* Legal */}
             <div>
-              <h4 className="mb-4 text-sm font-semibold uppercase tracking-wider text-zinc-400">
+              <h4 className="mb-4 text-sm font-semibold uppercase tracking-wider text-content-2">
                 Legal
               </h4>
               <ul className="space-y-3">
                 <li>
                   <Link
                     href="/privacy-policy"
-                    className="text-sm text-zinc-500 transition hover:text-white"
+                    className="text-sm text-content-3 transition hover:text-content"
                   >
                     Privacy Policy
                   </Link>
@@ -684,7 +690,7 @@ export default function Home() {
                 <li>
                   <Link
                     href="/terms-of-service"
-                    className="text-sm text-zinc-500 transition hover:text-white"
+                    className="text-sm text-content-3 transition hover:text-content"
                   >
                     Terms of Service
                   </Link>
@@ -693,7 +699,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/5 pt-8 text-sm text-zinc-600 sm:flex-row">
+          <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-edge pt-8 text-sm text-content-4 sm:flex-row">
             <span>© {new Date().getFullYear()} GoCV. All rights reserved.</span>
             <div className="flex items-center gap-2">
               <span className="inline-block h-2 w-2 rounded-full bg-emerald-500" />

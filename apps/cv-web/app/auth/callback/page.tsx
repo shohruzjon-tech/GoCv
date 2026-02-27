@@ -32,10 +32,10 @@ function AuthCallbackContent() {
   }, [searchParams, router, setAuth]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#08081a]">
+    <div className="flex min-h-screen items-center justify-center bg-page">
       <div className="text-center">
         <div className="mb-4 h-8 w-8 mx-auto animate-spin rounded-full border-4 border-indigo-500 border-t-transparent" />
-        <p className="text-zinc-400">Authenticating...</p>
+        <p className="text-content-2">Authenticating...</p>
       </div>
     </div>
   );
@@ -45,10 +45,10 @@ export default function AuthCallbackPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex min-h-screen items-center justify-center bg-[#08081a]">
+        <div className="flex min-h-screen items-center justify-center bg-page">
           <div className="text-center">
             <div className="mb-4 h-8 w-8 mx-auto animate-spin rounded-full border-4 border-indigo-500 border-t-transparent" />
-            <p className="text-zinc-400">Loading...</p>
+            <p className="text-content-2">Loading...</p>
           </div>
         </div>
       }

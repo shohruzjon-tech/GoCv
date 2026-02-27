@@ -5,12 +5,14 @@ import {
   Notification,
   NotificationDocument,
 } from './schemas/notification.schema.js';
+import { NotificationsGateway } from './notifications.gateway.js';
 
 @Injectable()
 export class NotificationsService {
   constructor(
     @InjectModel(Notification.name)
     private notifModel: Model<NotificationDocument>,
+    private gateway: NotificationsGateway,
   ) {}
 
   async create(data: {
@@ -26,7 +28,26 @@ export class NotificationsService {
       ...data,
       userId: new Types.ObjectId(data.userId),
     });
-    return notif.save();
+    const saved = await notif.save();
+
+    // Push real-time notification via WebSocket
+    this.gateway.sendToUser(data.userId, 'notification', {
+      _id: saved._id.toString(),
+      title: saved.title,
+      message: saved.message,
+      type: saved.type,
+      read: saved.read,
+      actionUrl: saved.actionUrl,
+      actionLabel: saved.actionLabel,
+      metadata: saved.metadata,
+      createdAt: saved.createdAt,
+    });
+
+    // Also send updated unread count
+    const count = await this.getUnreadCount(data.userId);
+    this.gateway.sendToUser(data.userId, 'unread-count', count);
+
+    return saved;
   }
 
   async findByUser(

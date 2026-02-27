@@ -75,7 +75,7 @@ export default function AdminPlansPage() {
     if (plan === "enterprise")
       return <Shield className="h-5 w-5 text-purple-400" />;
     if (plan === "premium") return <Crown className="h-5 w-5 text-amber-400" />;
-    return <Zap className="h-5 w-5 text-zinc-400" />;
+    return <Zap className="h-5 w-5 text-content-2" />;
   };
 
   const planGradient = (plan: string) => {
@@ -174,8 +174,8 @@ export default function AdminPlansPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Plan & Pricing</h1>
-          <p className="text-sm text-zinc-500">
+          <h1 className="text-2xl font-bold text-content">Plan & Pricing</h1>
+          <p className="text-sm text-content-3">
             Manage subscription plans, pricing, and features
           </p>
         </div>
@@ -210,25 +210,25 @@ export default function AdminPlansPage() {
 
             {/* Plan icon + name */}
             <div className="mb-4 flex items-center gap-3">
-              <div className="rounded-xl bg-white/[0.06] p-2.5">
+              <div className="rounded-xl bg-card-hover p-2.5">
                 {planIcon(plan.plan)}
               </div>
               <div>
-                <h3 className="text-lg font-bold text-white">{plan.name}</h3>
-                <p className="text-xs text-zinc-500">{plan.description}</p>
+                <h3 className="text-lg font-bold text-content">{plan.name}</h3>
+                <p className="text-xs text-content-3">{plan.description}</p>
               </div>
             </div>
 
             {/* Pricing */}
             <div className="mb-5">
               <div className="flex items-baseline gap-1">
-                <span className="text-3xl font-bold text-white">
+                <span className="text-3xl font-bold text-content">
                   ${(plan.monthlyPrice / 100).toFixed(0)}
                 </span>
-                <span className="text-sm text-zinc-500">/mo</span>
+                <span className="text-sm text-content-3">/mo</span>
               </div>
               {plan.yearlyPrice > 0 && (
-                <p className="mt-0.5 text-xs text-zinc-600">
+                <p className="mt-0.5 text-xs text-content-4">
                   ${(plan.yearlyPrice / 100).toFixed(0)}/yr ($
                   {(plan.yearlyPrice / 100 / 12).toFixed(0)}/mo billed annually)
                 </p>
@@ -237,31 +237,31 @@ export default function AdminPlansPage() {
 
             {/* Limits Summary */}
             <div className="mb-4 grid grid-cols-2 gap-2">
-              <div className="rounded-lg bg-white/[0.03] p-2">
-                <p className="text-[10px] text-zinc-600">CVs</p>
-                <p className="text-sm font-semibold text-white">
+              <div className="rounded-lg bg-card p-2">
+                <p className="text-[10px] text-content-4">CVs</p>
+                <p className="text-sm font-semibold text-content">
                   {plan.limits.maxCvs === -1 ? "Unlimited" : plan.limits.maxCvs}
                 </p>
               </div>
-              <div className="rounded-lg bg-white/[0.03] p-2">
-                <p className="text-[10px] text-zinc-600">Projects</p>
-                <p className="text-sm font-semibold text-white">
+              <div className="rounded-lg bg-card p-2">
+                <p className="text-[10px] text-content-4">Projects</p>
+                <p className="text-sm font-semibold text-content">
                   {plan.limits.maxProjects === -1
                     ? "Unlimited"
                     : plan.limits.maxProjects}
                 </p>
               </div>
-              <div className="rounded-lg bg-white/[0.03] p-2">
-                <p className="text-[10px] text-zinc-600">AI Credits/mo</p>
-                <p className="text-sm font-semibold text-white">
+              <div className="rounded-lg bg-card p-2">
+                <p className="text-[10px] text-content-4">AI Credits/mo</p>
+                <p className="text-sm font-semibold text-content">
                   {plan.limits.maxAiCreditsPerMonth === -1
                     ? "Unlimited"
                     : plan.limits.maxAiCreditsPerMonth}
                 </p>
               </div>
-              <div className="rounded-lg bg-white/[0.03] p-2">
-                <p className="text-[10px] text-zinc-600">PDF Exports/mo</p>
-                <p className="text-sm font-semibold text-white">
+              <div className="rounded-lg bg-card p-2">
+                <p className="text-[10px] text-content-4">PDF Exports/mo</p>
+                <p className="text-sm font-semibold text-content">
                   {plan.limits.maxPdfExportsPerMonth === -1
                     ? "Unlimited"
                     : plan.limits.maxPdfExportsPerMonth}
@@ -274,7 +274,7 @@ export default function AdminPlansPage() {
               {plan.features.map((f, i) => (
                 <div
                   key={i}
-                  className="flex items-center gap-2 text-xs text-zinc-400"
+                  className="flex items-center gap-2 text-xs text-content-2"
                 >
                   <Check className="h-3 w-3 text-emerald-400" />
                   {f}
@@ -315,7 +315,7 @@ export default function AdminPlansPage() {
             <div className="flex gap-2">
               <button
                 onClick={() => openEdit(plan)}
-                className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-white/[0.06] bg-white/[0.02] py-2 text-sm font-medium text-zinc-300 transition hover:bg-white/[0.06] hover:text-white"
+                className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-edge bg-card py-2 text-sm font-medium text-content-2 transition hover:bg-card-hover hover:text-content"
               >
                 <Pencil className="h-3.5 w-3.5" /> Edit
               </button>
@@ -330,7 +330,7 @@ export default function AdminPlansPage() {
             </div>
 
             {/* Order indicator */}
-            <div className="mt-3 flex items-center gap-1 text-[10px] text-zinc-700">
+            <div className="mt-3 flex items-center gap-1 text-[10px] text-content-4">
               <GripVertical className="h-3 w-3" />
               Order: {plan.displayOrder}
             </div>
@@ -341,22 +341,22 @@ export default function AdminPlansPage() {
       {/* Edit Modal */}
       {editingPlan && (
         <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/60 backdrop-blur-sm p-4">
-          <div className="w-full max-w-2xl rounded-2xl border border-white/[0.08] bg-[#0c0c20] p-6 shadow-2xl my-8">
+          <div className="w-full max-w-2xl rounded-2xl border border-edge bg-elevated p-6 shadow-2xl my-8">
             <div className="mb-6 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 {planIcon(editingPlan.plan)}
                 <div>
-                  <h2 className="text-lg font-bold text-white">
+                  <h2 className="text-lg font-bold text-content">
                     Edit {editingPlan.name} Plan
                   </h2>
-                  <p className="text-xs text-zinc-500 capitalize">
+                  <p className="text-xs text-content-3 capitalize">
                     {editingPlan.plan} plan configuration
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setEditingPlan(null)}
-                className="rounded-lg p-1.5 text-zinc-500 transition hover:bg-white/[0.06] hover:text-white"
+                className="rounded-lg p-1.5 text-content-3 transition hover:bg-card-hover hover:text-content"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -365,23 +365,23 @@ export default function AdminPlansPage() {
             <div className="max-h-[calc(100vh-200px)] overflow-y-auto space-y-6 pr-1">
               {/* Basic Info */}
               <div>
-                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-zinc-600">
+                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-content-4">
                   Basic Information
                 </h3>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div>
-                    <label className="mb-1 block text-xs text-zinc-500">
+                    <label className="mb-1 block text-xs text-content-3">
                       Name
                     </label>
                     <input
                       type="text"
                       value={formName}
                       onChange={(e) => setFormName(e.target.value)}
-                      className="w-full rounded-xl border border-white/[0.06] bg-white/[0.02] px-3 py-2.5 text-sm text-white outline-none focus:border-orange-500/30"
+                      className="w-full rounded-xl border border-edge bg-card px-3 py-2.5 text-sm text-content outline-none focus:border-orange-500/30"
                     />
                   </div>
                   <div>
-                    <label className="mb-1 block text-xs text-zinc-500">
+                    <label className="mb-1 block text-xs text-content-3">
                       Display Order
                     </label>
                     <input
@@ -390,18 +390,18 @@ export default function AdminPlansPage() {
                       onChange={(e) =>
                         setFormDisplayOrder(Number(e.target.value))
                       }
-                      className="w-full rounded-xl border border-white/[0.06] bg-white/[0.02] px-3 py-2.5 text-sm text-white outline-none focus:border-orange-500/30"
+                      className="w-full rounded-xl border border-edge bg-card px-3 py-2.5 text-sm text-content outline-none focus:border-orange-500/30"
                     />
                   </div>
                   <div className="sm:col-span-2">
-                    <label className="mb-1 block text-xs text-zinc-500">
+                    <label className="mb-1 block text-xs text-content-3">
                       Description
                     </label>
                     <input
                       type="text"
                       value={formDescription}
                       onChange={(e) => setFormDescription(e.target.value)}
-                      className="w-full rounded-xl border border-white/[0.06] bg-white/[0.02] px-3 py-2.5 text-sm text-white outline-none focus:border-orange-500/30"
+                      className="w-full rounded-xl border border-edge bg-card px-3 py-2.5 text-sm text-content outline-none focus:border-orange-500/30"
                     />
                   </div>
                 </div>
@@ -411,7 +411,7 @@ export default function AdminPlansPage() {
                     className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-xs transition ${
                       formPopular
                         ? "border-amber-500/30 bg-amber-500/10 text-amber-400"
-                        : "border-white/[0.06] text-zinc-500 hover:text-zinc-300"
+                        : "border-edge text-content-3 hover:text-content-2"
                     }`}
                   >
                     {formPopular ? (
@@ -441,16 +441,16 @@ export default function AdminPlansPage() {
 
               {/* Pricing */}
               <div>
-                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-zinc-600">
+                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-content-4">
                   Pricing
                 </h3>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div>
-                    <label className="mb-1 block text-xs text-zinc-500">
+                    <label className="mb-1 block text-xs text-content-3">
                       Monthly Price ($)
                     </label>
                     <div className="relative">
-                      <DollarSign className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-600" />
+                      <DollarSign className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-content-4" />
                       <input
                         type="number"
                         step="0.01"
@@ -459,16 +459,16 @@ export default function AdminPlansPage() {
                         onChange={(e) =>
                           setFormMonthlyPrice(Number(e.target.value))
                         }
-                        className="w-full rounded-xl border border-white/[0.06] bg-white/[0.02] pl-9 pr-3 py-2.5 text-sm text-white outline-none focus:border-orange-500/30"
+                        className="w-full rounded-xl border border-edge bg-card pl-9 pr-3 py-2.5 text-sm text-content outline-none focus:border-orange-500/30"
                       />
                     </div>
                   </div>
                   <div>
-                    <label className="mb-1 block text-xs text-zinc-500">
+                    <label className="mb-1 block text-xs text-content-3">
                       Yearly Price ($)
                     </label>
                     <div className="relative">
-                      <DollarSign className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-600" />
+                      <DollarSign className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-content-4" />
                       <input
                         type="number"
                         step="0.01"
@@ -477,11 +477,11 @@ export default function AdminPlansPage() {
                         onChange={(e) =>
                           setFormYearlyPrice(Number(e.target.value))
                         }
-                        className="w-full rounded-xl border border-white/[0.06] bg-white/[0.02] pl-9 pr-3 py-2.5 text-sm text-white outline-none focus:border-orange-500/30"
+                        className="w-full rounded-xl border border-edge bg-card pl-9 pr-3 py-2.5 text-sm text-content outline-none focus:border-orange-500/30"
                       />
                     </div>
                     {formMonthlyPrice > 0 && formYearlyPrice > 0 && (
-                      <p className="mt-1 text-[10px] text-zinc-600">
+                      <p className="mt-1 text-[10px] text-content-4">
                         ${(formYearlyPrice / 12).toFixed(2)}/mo — saves{" "}
                         {Math.round(
                           ((formMonthlyPrice * 12 - formYearlyPrice) /
@@ -497,15 +497,15 @@ export default function AdminPlansPage() {
 
               {/* Limits */}
               <div>
-                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-zinc-600">
+                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-content-4">
                   Limits
                 </h3>
-                <p className="mb-2 text-[10px] text-zinc-700">
+                <p className="mb-2 text-[10px] text-content-4">
                   Use -1 for unlimited
                 </p>
                 <div className="grid gap-3 sm:grid-cols-2">
                   <div>
-                    <label className="mb-1 block text-xs text-zinc-500">
+                    <label className="mb-1 block text-xs text-content-3">
                       Max CVs
                     </label>
                     <input
@@ -515,11 +515,11 @@ export default function AdminPlansPage() {
                       onChange={(e) =>
                         updateLimit("maxCvs", Number(e.target.value))
                       }
-                      className="w-full rounded-xl border border-white/[0.06] bg-white/[0.02] px-3 py-2.5 text-sm text-white outline-none focus:border-orange-500/30"
+                      className="w-full rounded-xl border border-edge bg-card px-3 py-2.5 text-sm text-content outline-none focus:border-orange-500/30"
                     />
                   </div>
                   <div>
-                    <label className="mb-1 block text-xs text-zinc-500">
+                    <label className="mb-1 block text-xs text-content-3">
                       Max Projects
                     </label>
                     <input
@@ -529,11 +529,11 @@ export default function AdminPlansPage() {
                       onChange={(e) =>
                         updateLimit("maxProjects", Number(e.target.value))
                       }
-                      className="w-full rounded-xl border border-white/[0.06] bg-white/[0.02] px-3 py-2.5 text-sm text-white outline-none focus:border-orange-500/30"
+                      className="w-full rounded-xl border border-edge bg-card px-3 py-2.5 text-sm text-content outline-none focus:border-orange-500/30"
                     />
                   </div>
                   <div>
-                    <label className="mb-1 block text-xs text-zinc-500">
+                    <label className="mb-1 block text-xs text-content-3">
                       AI Credits / Month
                     </label>
                     <input
@@ -546,11 +546,11 @@ export default function AdminPlansPage() {
                           Number(e.target.value),
                         )
                       }
-                      className="w-full rounded-xl border border-white/[0.06] bg-white/[0.02] px-3 py-2.5 text-sm text-white outline-none focus:border-orange-500/30"
+                      className="w-full rounded-xl border border-edge bg-card px-3 py-2.5 text-sm text-content outline-none focus:border-orange-500/30"
                     />
                   </div>
                   <div>
-                    <label className="mb-1 block text-xs text-zinc-500">
+                    <label className="mb-1 block text-xs text-content-3">
                       PDF Exports / Month
                     </label>
                     <input
@@ -563,7 +563,7 @@ export default function AdminPlansPage() {
                           Number(e.target.value),
                         )
                       }
-                      className="w-full rounded-xl border border-white/[0.06] bg-white/[0.02] px-3 py-2.5 text-sm text-white outline-none focus:border-orange-500/30"
+                      className="w-full rounded-xl border border-edge bg-card px-3 py-2.5 text-sm text-content outline-none focus:border-orange-500/30"
                     />
                   </div>
                 </div>
@@ -585,7 +585,7 @@ export default function AdminPlansPage() {
                       className={`flex items-center justify-between rounded-xl border px-3 py-2.5 text-xs transition ${
                         (formLimits as any)[key]
                           ? "border-emerald-500/20 bg-emerald-500/5 text-emerald-400"
-                          : "border-white/[0.06] bg-white/[0.02] text-zinc-500"
+                          : "border-edge bg-card text-content-3"
                       }`}
                     >
                       <span>{label}</span>
@@ -601,20 +601,20 @@ export default function AdminPlansPage() {
 
               {/* Features List */}
               <div>
-                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-zinc-600">
+                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-content-4">
                   Features (Pricing Display)
                 </h3>
                 <div className="space-y-1.5">
                   {formFeatures.map((f, i) => (
                     <div
                       key={i}
-                      className="flex items-center gap-2 rounded-lg border border-white/[0.04] bg-white/[0.01] px-3 py-2"
+                      className="flex items-center gap-2 rounded-lg border border-edge bg-card px-3 py-2"
                     >
                       <Check className="h-3 w-3 shrink-0 text-emerald-400" />
-                      <span className="flex-1 text-xs text-zinc-300">{f}</span>
+                      <span className="flex-1 text-xs text-content-2">{f}</span>
                       <button
                         onClick={() => removeFeature(i)}
-                        className="shrink-0 text-zinc-600 hover:text-red-400"
+                        className="shrink-0 text-content-4 hover:text-red-400"
                       >
                         <X className="h-3 w-3" />
                       </button>
@@ -628,11 +628,11 @@ export default function AdminPlansPage() {
                     onChange={(e) => setNewFeature(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && addFeature()}
                     placeholder="Add feature…"
-                    className="flex-1 rounded-xl border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-xs text-white outline-none focus:border-orange-500/30"
+                    className="flex-1 rounded-xl border border-edge bg-card px-3 py-2 text-xs text-content outline-none focus:border-orange-500/30"
                   />
                   <button
                     onClick={addFeature}
-                    className="rounded-xl border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-xs text-zinc-400 hover:text-white"
+                    className="rounded-xl border border-edge bg-card px-3 py-2 text-xs text-content-2 hover:text-content"
                   >
                     <Plus className="h-3.5 w-3.5" />
                   </button>
@@ -641,12 +641,12 @@ export default function AdminPlansPage() {
 
               {/* Stripe Config */}
               <div>
-                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-zinc-600">
+                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-content-4">
                   Stripe Configuration (optional)
                 </h3>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div>
-                    <label className="mb-1 block text-xs text-zinc-500">
+                    <label className="mb-1 block text-xs text-content-3">
                       Monthly Price ID
                     </label>
                     <input
@@ -656,11 +656,11 @@ export default function AdminPlansPage() {
                         setFormStripePriceIdMonthly(e.target.value)
                       }
                       placeholder="price_xxx"
-                      className="w-full rounded-xl border border-white/[0.06] bg-white/[0.02] px-3 py-2.5 text-xs font-mono text-zinc-400 outline-none focus:border-orange-500/30"
+                      className="w-full rounded-xl border border-edge bg-card px-3 py-2.5 text-xs font-mono text-content-2 outline-none focus:border-orange-500/30"
                     />
                   </div>
                   <div>
-                    <label className="mb-1 block text-xs text-zinc-500">
+                    <label className="mb-1 block text-xs text-content-3">
                       Yearly Price ID
                     </label>
                     <input
@@ -670,7 +670,7 @@ export default function AdminPlansPage() {
                         setFormStripePriceIdYearly(e.target.value)
                       }
                       placeholder="price_xxx"
-                      className="w-full rounded-xl border border-white/[0.06] bg-white/[0.02] px-3 py-2.5 text-xs font-mono text-zinc-400 outline-none focus:border-orange-500/30"
+                      className="w-full rounded-xl border border-edge bg-card px-3 py-2.5 text-xs font-mono text-content-2 outline-none focus:border-orange-500/30"
                     />
                   </div>
                 </div>
@@ -678,10 +678,10 @@ export default function AdminPlansPage() {
             </div>
 
             {/* Actions */}
-            <div className="mt-6 flex items-center justify-end gap-3 border-t border-white/[0.04] pt-4">
+            <div className="mt-6 flex items-center justify-end gap-3 border-t border-edge pt-4">
               <button
                 onClick={() => setEditingPlan(null)}
-                className="rounded-xl border border-white/[0.06] px-4 py-2 text-sm text-zinc-400 transition hover:bg-white/[0.04]"
+                className="rounded-xl border border-edge px-4 py-2 text-sm text-content-2 transition hover:bg-card-hover"
               >
                 Cancel
               </button>
