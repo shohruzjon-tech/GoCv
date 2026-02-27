@@ -1,146 +1,310 @@
 "use client";
 
-import { useRef, useMemo, useEffect } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { useRef, useMemo, useEffect, useState } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 
-/* ─────────────────────────────────────────────
-   1. Neural Network / AI Constellation
-   ───────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════
+   GoCV — Neuro-Link Background
+   ───────────────────────────────────────────────
+   Single futuristic neural-network animation.
+   • Tiny circular particles (canvas-generated texture)
+   • Distance-fading synaptic connections
+   • Nodes gravitate toward the mouse cursor
+   • Smooth global rotation + depth fog
+   ═══════════════════════════════════════════════ */
 
-function NeuralNetwork() {
-  const pointsRef = useRef<THREE.Points>(null);
-  const linesRef = useRef<THREE.LineSegments>(null);
-  const nodeCount = 50;
-  const maxDist = 3.5;
+/* ── Circular particle sprite (no square edges) ── */
+function createCircleTexture(): THREE.Texture {
+  const size = 64;
+  const canvas = document.createElement("canvas");
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext("2d")!;
 
-  const { nodes, velocities } = useMemo(() => {
-    const n: THREE.Vector3[] = [];
-    const v: THREE.Vector3[] = [];
-    for (let i = 0; i < nodeCount; i++) {
-      n.push(
-        new THREE.Vector3(
-          (Math.random() - 0.5) * 14,
-          (Math.random() - 0.5) * 10,
-          (Math.random() - 0.5) * 6,
-        ),
-      );
-      v.push(
-        new THREE.Vector3(
-          (Math.random() - 0.5) * 0.01,
-          (Math.random() - 0.5) * 0.01,
-          (Math.random() - 0.5) * 0.005,
-        ),
-      );
-    }
-    return { nodes: n, velocities: v };
+  // Radial gradient: bright center → transparent edge
+  const grad = ctx.createRadialGradient(
+    size / 2,
+    size / 2,
+    0,
+    size / 2,
+    size / 2,
+    size / 2,
+  );
+  grad.addColorStop(0, "rgba(255,255,255,1)");
+  grad.addColorStop(0.3, "rgba(255,255,255,0.8)");
+  grad.addColorStop(0.7, "rgba(255,255,255,0.15)");
+  grad.addColorStop(1, "rgba(255,255,255,0)");
+
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, size, size);
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.needsUpdate = true;
+  return tex;
+}
+
+/* ── Random point inside a sphere ── */
+function randomInSphere(radius: number): THREE.Vector3 {
+  const u = Math.random();
+  const v = Math.random();
+  const theta = 2 * Math.PI * u;
+  const phi = Math.acos(2 * v - 1);
+  const r = radius * Math.cbrt(Math.random());
+  return new THREE.Vector3(
+    r * Math.sin(phi) * Math.cos(theta),
+    r * Math.sin(phi) * Math.sin(theta),
+    r * Math.cos(phi),
+  );
+}
+
+/* ── Shared mouse state (projected into 3D world) ── */
+const mouseWorld = new THREE.Vector3(0, 0, 0);
+const mouseNDC = new THREE.Vector2(9999, 9999); // off-screen initially
+let mouseActive = false; // true when cursor is inside viewport
+
+function MouseTracker() {
+  const { camera } = useThree();
+  const raycaster = useMemo(() => new THREE.Raycaster(), []);
+  const plane = useMemo(
+    () => new THREE.Plane(new THREE.Vector3(0, 0, 1), 0),
+    [],
+  );
+
+  useEffect(() => {
+    const onMove = (e: MouseEvent) => {
+      mouseNDC.x = (e.clientX / window.innerWidth) * 2 - 1;
+      mouseNDC.y = -(e.clientY / window.innerHeight) * 2 + 1;
+      mouseActive = true;
+    };
+    const onLeave = () => {
+      mouseNDC.set(9999, 9999);
+      mouseActive = false;
+    };
+    window.addEventListener("mousemove", onMove, { passive: true });
+    window.addEventListener("mouseleave", onLeave);
+    return () => {
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseleave", onLeave);
+    };
   }, []);
 
+  useFrame(() => {
+    raycaster.setFromCamera(mouseNDC, camera);
+    const target = new THREE.Vector3();
+    raycaster.ray.intersectPlane(plane, target);
+    if (target) {
+      mouseWorld.lerp(target, 0.08);
+    }
+  });
+
+  return null;
+}
+
+/* ─────────────────────────────────────────────
+   NeuroLink — The main animation
+   ───────────────────────────────────────────── */
+
+function NeuroLink({ reduced }: { reduced: boolean }) {
+  const groupRef = useRef<THREE.Group>(null);
+  const linesRef = useRef<THREE.LineSegments>(null);
+  const pointsRef = useRef<THREE.Points>(null);
+
+  const count = reduced ? 50 : 100;
+  const radius = 8;
+  const maxDist = 3.0;
+  const mouseInfluence = reduced ? 0 : 0.015; // attraction strength
+  const mouseRadius = 5; // how far the attraction reaches
+
+  const circleTexture = useMemo(() => createCircleTexture(), []);
+
+  /* ── init particles ── */
+  const { nodes, velocities, orbitAxes, orbitSpeeds } = useMemo(() => {
+    const n: THREE.Vector3[] = [];
+    const v: THREE.Vector3[] = [];
+    const axes: THREE.Vector3[] = [];
+    const speeds: number[] = [];
+    for (let i = 0; i < count; i++) {
+      n.push(randomInSphere(radius));
+      v.push(
+        new THREE.Vector3(
+          (Math.random() - 0.5) * 0.0003,
+          (Math.random() - 0.5) * 0.0003,
+          (Math.random() - 0.5) * 0.00018,
+        ),
+      );
+      axes.push(
+        new THREE.Vector3(
+          Math.random() - 0.5,
+          Math.random() - 0.5,
+          Math.random() - 0.5,
+        ).normalize(),
+      );
+      speeds.push(0.00008 + Math.random() * 0.00018);
+    }
+    return { nodes: n, velocities: v, orbitAxes: axes, orbitSpeeds: speeds };
+  }, [count, radius]);
+
+  /* ── point geometry ── */
   const pointGeo = useMemo(() => {
-    const geo = new THREE.BufferGeometry();
-    const pos = new Float32Array(nodeCount * 3);
-    for (let i = 0; i < nodeCount; i++) {
+    const g = new THREE.BufferGeometry();
+    const pos = new Float32Array(count * 3);
+    for (let i = 0; i < count; i++) {
       pos[i * 3] = nodes[i].x;
       pos[i * 3 + 1] = nodes[i].y;
       pos[i * 3 + 2] = nodes[i].z;
     }
-    geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
-    return geo;
-  }, [nodes, nodeCount]);
+    g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+    return g;
+  }, [nodes, count]);
 
+  /* ── line geometry with vertex colours ── */
   const lineGeo = useMemo(() => {
-    const geo = new THREE.BufferGeometry();
-    const maxLines = (nodeCount * (nodeCount - 1)) / 2;
-    const pos = new Float32Array(maxLines * 6);
-    const col = new Float32Array(maxLines * 6);
-    geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
-    geo.setAttribute("color", new THREE.BufferAttribute(col, 3));
-    geo.setDrawRange(0, 0);
-    return geo;
-  }, [nodeCount]);
+    const maxLines = (count * (count - 1)) / 2;
+    const g = new THREE.BufferGeometry();
+    g.setAttribute(
+      "position",
+      new THREE.BufferAttribute(new Float32Array(maxLines * 6), 3),
+    );
+    g.setAttribute(
+      "color",
+      new THREE.BufferAttribute(new Float32Array(maxLines * 6), 3),
+    );
+    g.setDrawRange(0, 0);
+    return g;
+  }, [count]);
 
-  useFrame(() => {
-    // Update node positions
-    for (let i = 0; i < nodeCount; i++) {
-      nodes[i].add(velocities[i]);
-      if (Math.abs(nodes[i].x) > 7) velocities[i].x *= -1;
-      if (Math.abs(nodes[i].y) > 5) velocities[i].y *= -1;
-      if (Math.abs(nodes[i].z) > 3) velocities[i].z *= -1;
-    }
+  const _quat = useMemo(() => new THREE.Quaternion(), []);
+  const _dir = useMemo(() => new THREE.Vector3(), []);
+  const _vel = useMemo(() => new THREE.Vector3(), []);
+  const speedMul = useRef(1); // smoothed speed multiplier
 
-    // Update point positions
-    if (pointsRef.current) {
-      const pAttr = pointsRef.current.geometry.getAttribute(
-        "position",
-      ) as THREE.BufferAttribute;
-      const pArr = pAttr.array as Float32Array;
-      for (let i = 0; i < nodeCount; i++) {
-        pArr[i * 3] = nodes[i].x;
-        pArr[i * 3 + 1] = nodes[i].y;
-        pArr[i * 3 + 2] = nodes[i].z;
+  useFrame((state) => {
+    const t = state.clock.elapsedTime;
+
+    // Smoothly ramp speed: 1× idle → 5× on hover
+    const target = mouseActive && !reduced ? 5 : 1;
+    speedMul.current += (target - speedMul.current) * 0.035;
+    const sm = speedMul.current;
+
+    /* ── move particles ── */
+    for (let i = 0; i < count; i++) {
+      // Drift + orbit, scaled by speed multiplier
+      if (!reduced) {
+        _vel.copy(velocities[i]).multiplyScalar(sm);
+        nodes[i].add(_vel);
+        _quat.setFromAxisAngle(orbitAxes[i], orbitSpeeds[i] * sm);
+        nodes[i].applyQuaternion(_quat);
+      } else {
+        nodes[i].add(velocities[i].clone().multiplyScalar(0.25));
       }
-      pAttr.needsUpdate = true;
+
+      // Mouse attraction — nodes gently gravitate toward cursor
+      if (mouseInfluence > 0 && mouseNDC.x < 100) {
+        _dir.copy(mouseWorld).sub(nodes[i]);
+        const dist = _dir.length();
+        if (dist < mouseRadius && dist > 0.1) {
+          const force = mouseInfluence * (1 - dist / mouseRadius);
+          _dir.normalize().multiplyScalar(force);
+          nodes[i].add(_dir);
+        }
+      }
+
+      // Spherical boundary
+      const d = nodes[i].length();
+      if (d > radius) {
+        nodes[i].multiplyScalar(radius / d);
+        velocities[i].negate();
+      }
     }
 
-    // Update connecting lines
-    if (linesRef.current) {
-      const lPos = linesRef.current.geometry.getAttribute(
+    /* ── update point positions ── */
+    if (pointsRef.current) {
+      const attr = pointsRef.current.geometry.getAttribute(
         "position",
       ) as THREE.BufferAttribute;
-      const lCol = linesRef.current.geometry.getAttribute(
+      const a = attr.array as Float32Array;
+      for (let i = 0; i < count; i++) {
+        a[i * 3] = nodes[i].x;
+        a[i * 3 + 1] = nodes[i].y;
+        a[i * 3 + 2] = nodes[i].z;
+      }
+      attr.needsUpdate = true;
+    }
+
+    /* ── update connection lines ── */
+    if (linesRef.current) {
+      const posAttr = linesRef.current.geometry.getAttribute(
+        "position",
+      ) as THREE.BufferAttribute;
+      const colAttr = linesRef.current.geometry.getAttribute(
         "color",
       ) as THREE.BufferAttribute;
-      const posArr = lPos.array as Float32Array;
-      const colArr = lCol.array as Float32Array;
+      const pa = posAttr.array as Float32Array;
+      const ca = colAttr.array as Float32Array;
+
+      // Indigo-500 in linear RGB
+      const cr = 0.388,
+        cg = 0.4,
+        cb = 0.945;
+
       let idx = 0;
-      for (let i = 0; i < nodeCount; i++) {
-        for (let j = i + 1; j < nodeCount; j++) {
-          const d = nodes[i].distanceTo(nodes[j]);
-          if (d < maxDist) {
-            const alpha = 1 - d / maxDist;
-            posArr[idx * 6] = nodes[i].x;
-            posArr[idx * 6 + 1] = nodes[i].y;
-            posArr[idx * 6 + 2] = nodes[i].z;
-            posArr[idx * 6 + 3] = nodes[j].x;
-            posArr[idx * 6 + 4] = nodes[j].y;
-            posArr[idx * 6 + 5] = nodes[j].z;
-            const r = 0.4 + alpha * 0.15;
-            const g = 0.38 + alpha * 0.12;
-            const b = 0.98;
-            colArr[idx * 6] = r;
-            colArr[idx * 6 + 1] = g;
-            colArr[idx * 6 + 2] = b;
-            colArr[idx * 6 + 3] = r;
-            colArr[idx * 6 + 4] = g;
-            colArr[idx * 6 + 5] = b;
+      for (let i = 0; i < count; i++) {
+        for (let j = i + 1; j < count; j++) {
+          const dist = nodes[i].distanceTo(nodes[j]);
+          if (dist < maxDist) {
+            const fade = 1 - dist / maxDist;
+            const o = idx * 6;
+            pa[o] = nodes[i].x;
+            pa[o + 1] = nodes[i].y;
+            pa[o + 2] = nodes[i].z;
+            pa[o + 3] = nodes[j].x;
+            pa[o + 4] = nodes[j].y;
+            pa[o + 5] = nodes[j].z;
+            ca[o] = cr * fade;
+            ca[o + 1] = cg * fade;
+            ca[o + 2] = cb * fade;
+            ca[o + 3] = cr * fade;
+            ca[o + 4] = cg * fade;
+            ca[o + 5] = cb * fade;
             idx++;
           }
         }
       }
-      lPos.needsUpdate = true;
-      lCol.needsUpdate = true;
+      posAttr.needsUpdate = true;
+      colAttr.needsUpdate = true;
       linesRef.current.geometry.setDrawRange(0, idx * 2);
+    }
+
+    /* ── slow global rotation (scales with hover speed) ── */
+    if (groupRef.current) {
+      groupRef.current.rotation.y = t * 0.003 * sm;
+      groupRef.current.rotation.x = Math.sin(t * 0.0015 * sm) * 0.025;
     }
   });
 
   return (
-    <group>
+    <group ref={groupRef}>
       <points ref={pointsRef} geometry={pointGeo}>
         <pointsMaterial
-          size={3}
-          color="#818cf8"
+          map={circleTexture}
+          size={1.4}
+          color="#a5b4fc"
           transparent
-          opacity={0.85}
+          opacity={0.6}
           sizeAttenuation
           depthWrite={false}
+          blending={THREE.AdditiveBlending}
+          alphaTest={0.01}
         />
       </points>
       <lineSegments ref={linesRef} geometry={lineGeo}>
         <lineBasicMaterial
           vertexColors
           transparent
-          opacity={0.35}
+          opacity={0.16}
           depthWrite={false}
+          blending={THREE.AdditiveBlending}
         />
       </lineSegments>
     </group>
@@ -148,461 +312,61 @@ function NeuralNetwork() {
 }
 
 /* ─────────────────────────────────────────────
-   2. Floating Document Pages — CV / Resume shapes
+   Scene
    ───────────────────────────────────────────── */
 
-function FloatingDocument({
-  position,
-  rotation,
-  speed,
-  color,
-  scale,
-}: {
-  position: [number, number, number];
-  rotation: [number, number, number];
-  speed: number;
-  color: string;
-  scale: number;
-}) {
-  const meshRef = useRef<THREE.Group>(null);
-  const initialY = position[1];
-  const phaseOffset = useMemo(() => Math.random() * Math.PI * 2, []);
-
-  useFrame((state) => {
-    if (!meshRef.current) return;
-    const t = state.clock.elapsedTime;
-    meshRef.current.position.y =
-      initialY + Math.sin(t * speed + phaseOffset) * 0.6;
-    meshRef.current.rotation.y += 0.003 * speed;
-    meshRef.current.rotation.x =
-      rotation[0] + Math.sin(t * speed * 0.5 + phaseOffset) * 0.08;
-    meshRef.current.rotation.z = rotation[2] + Math.cos(t * speed * 0.3) * 0.05;
-  });
-
-  const { docShape, borderGeo, textLineShapes } = useMemo(() => {
-    const w = 0.8 * scale;
-    const h = 1.04 * scale;
-    const r = 0.05 * scale;
-
-    // Document outline shape
-    const s = new THREE.Shape();
-    s.moveTo(-w / 2 + r, -h / 2);
-    s.lineTo(w / 2 - r, -h / 2);
-    s.quadraticCurveTo(w / 2, -h / 2, w / 2, -h / 2 + r);
-    s.lineTo(w / 2, h / 2 - r);
-    s.quadraticCurveTo(w / 2, h / 2, w / 2 - r, h / 2);
-    s.lineTo(-w / 2 + r, h / 2);
-    s.quadraticCurveTo(-w / 2, h / 2, -w / 2, h / 2 - r);
-    s.lineTo(-w / 2, -h / 2 + r);
-    s.quadraticCurveTo(-w / 2, -h / 2, -w / 2 + r, -h / 2);
-
-    // Border geometry (line loop)
-    const pts = s.getPoints(48);
-    const bGeo = new THREE.BufferGeometry();
-    const bArr = new Float32Array(pts.length * 3);
-    pts.forEach((p, i) => {
-      bArr[i * 3] = p.x;
-      bArr[i * 3 + 1] = p.y;
-      bArr[i * 3 + 2] = 0;
-    });
-    bGeo.setAttribute("position", new THREE.BufferAttribute(bArr, 3));
-
-    // Text line shapes inside document
-    const lines: THREE.Shape[] = [];
-    const lineCount = 6;
-    const margin = 0.12 * scale;
-    const lineH = 0.018 * scale;
-    const spacing = (h - 2 * margin) / (lineCount + 1);
-    for (let i = 0; i < lineCount; i++) {
-      const y = h / 2 - margin - (i + 1) * spacing;
-      const lineW =
-        i === 0
-          ? w - 2 * margin
-          : (w - 2 * margin) * (0.45 + Math.random() * 0.45);
-      const ls = new THREE.Shape();
-      ls.moveTo(-w / 2 + margin, y + lineH);
-      ls.lineTo(-w / 2 + margin + lineW, y + lineH);
-      ls.lineTo(-w / 2 + margin + lineW, y);
-      ls.lineTo(-w / 2 + margin, y);
-      ls.closePath();
-      lines.push(ls);
-    }
-
-    return { docShape: s, borderGeo: bGeo, textLineShapes: lines };
-  }, [scale]);
-
-  return (
-    <group ref={meshRef} position={position} rotation={rotation}>
-      {/* Document fill */}
-      <mesh>
-        <shapeGeometry args={[docShape]} />
-        <meshBasicMaterial
-          color={color}
-          transparent
-          opacity={0.12}
-          side={THREE.DoubleSide}
-          depthWrite={false}
-        />
-      </mesh>
-      {/* Document border */}
-      <lineLoop geometry={borderGeo}>
-        <lineBasicMaterial
-          color={color}
-          transparent
-          opacity={0.45}
-          depthWrite={false}
-        />
-      </lineLoop>
-      {/* Text lines */}
-      {textLineShapes.map((ls, i) => (
-        <mesh key={i}>
-          <shapeGeometry args={[ls]} />
-          <meshBasicMaterial
-            color={color}
-            transparent
-            opacity={0.2}
-            side={THREE.DoubleSide}
-            depthWrite={false}
-          />
-        </mesh>
-      ))}
-    </group>
-  );
-}
-
-/* ─────────────────────────────────────────────
-   3. Data Stream Particles — flowing upward
-   ───────────────────────────────────────────── */
-
-function DataStream({
-  xOffset,
-  color,
-  count,
-  speed,
-}: {
-  xOffset: number;
-  color: string;
-  count: number;
-  speed: number;
-}) {
-  const pointsRef = useRef<THREE.Points>(null);
-
-  const geo = useMemo(() => {
-    const g = new THREE.BufferGeometry();
-    const arr = new Float32Array(count * 3);
-    for (let i = 0; i < count; i++) {
-      arr[i * 3] = xOffset + (Math.random() - 0.5) * 0.6;
-      arr[i * 3 + 1] = (Math.random() - 0.5) * 14;
-      arr[i * 3 + 2] = (Math.random() - 0.5) * 3;
-    }
-    g.setAttribute("position", new THREE.BufferAttribute(arr, 3));
-    return g;
-  }, [count, xOffset]);
-
-  useFrame(() => {
-    if (!pointsRef.current) return;
-    const attr = pointsRef.current.geometry.getAttribute(
-      "position",
-    ) as THREE.BufferAttribute;
-    const arr = attr.array as Float32Array;
-    for (let i = 0; i < count; i++) {
-      arr[i * 3 + 1] += speed * 0.025;
-      if (arr[i * 3 + 1] > 7) {
-        arr[i * 3 + 1] = -7;
-        arr[i * 3] = xOffset + (Math.random() - 0.5) * 0.6;
-      }
-    }
-    attr.needsUpdate = true;
-  });
-
-  return (
-    <points ref={pointsRef} geometry={geo}>
-      <pointsMaterial
-        size={2.5}
-        color={color}
-        transparent
-        opacity={0.7}
-        sizeAttenuation
-        depthWrite={false}
-      />
-    </points>
-  );
-}
-
-/* ─────────────────────────────────────────────
-   4. Holographic Grid Floor
-   ───────────────────────────────────────────── */
-
-function HolographicGrid() {
-  const meshRef = useRef<THREE.LineSegments>(null);
-
-  const geo = useMemo(() => {
-    const gridSize = 24;
-    const divisions = 24;
-    const step = gridSize / divisions;
-    const half = gridSize / 2;
-    const pos: number[] = [];
-    const col: number[] = [];
-
-    for (let i = 0; i <= divisions; i++) {
-      const t = i * step - half;
-      pos.push(-half, 0, t, half, 0, t);
-      pos.push(t, 0, -half, t, 0, half);
-      const fade = 1 - Math.abs(t / half) * 0.7;
-      const r = 0.39 * fade;
-      const g = 0.4 * fade;
-      const b = 0.97 * fade;
-      col.push(r, g, b, r * 0.3, g * 0.3, b * 0.3);
-      col.push(r, g, b, r * 0.3, g * 0.3, b * 0.3);
-    }
-
-    const g = new THREE.BufferGeometry();
-    g.setAttribute(
-      "position",
-      new THREE.BufferAttribute(new Float32Array(pos), 3),
-    );
-    g.setAttribute(
-      "color",
-      new THREE.BufferAttribute(new Float32Array(col), 3),
-    );
-    return g;
-  }, []);
-
-  useFrame((state) => {
-    if (!meshRef.current) return;
-    meshRef.current.position.y =
-      -4.5 + Math.sin(state.clock.elapsedTime * 0.2) * 0.15;
-    meshRef.current.position.z = -2;
-    meshRef.current.rotation.x = -Math.PI * 0.32;
-  });
-
-  return (
-    <lineSegments ref={meshRef} geometry={geo}>
-      <lineBasicMaterial
-        vertexColors
-        transparent
-        opacity={0.18}
-        depthWrite={false}
-      />
-    </lineSegments>
-  );
-}
-
-/* ─────────────────────────────────────────────
-   5. Orbiting Skill Nodes
-   ───────────────────────────────────────────── */
-
-function OrbitingNodes() {
-  const groupRef = useRef<THREE.Group>(null);
-  const nodeCount = 14;
-
-  const nodeData = useMemo(() => {
-    const palette = ["#818cf8", "#a78bfa", "#c084fc", "#6366f1", "#e879f9"];
-    return Array.from({ length: nodeCount }, (_, i) => ({
-      radius: 3 + Math.random() * 3.5,
-      speed: 0.1 + Math.random() * 0.15,
-      offset: (i / nodeCount) * Math.PI * 2,
-      yOffset: (Math.random() - 0.5) * 5,
-      size: 0.08 + Math.random() * 0.1,
-      color: palette[Math.floor(Math.random() * palette.length)],
-    }));
-  }, []);
-
-  useFrame((state) => {
-    if (!groupRef.current) return;
-    const t = state.clock.elapsedTime;
-    groupRef.current.children.forEach((child, i) => {
-      if (i >= nodeData.length) return;
-      const d = nodeData[i];
-      child.position.x = Math.cos(t * d.speed + d.offset) * d.radius;
-      child.position.y =
-        d.yOffset + Math.sin(t * d.speed * 1.5 + d.offset) * 1.2;
-      child.position.z = Math.sin(t * d.speed * 0.5 + d.offset) * 1.5;
-    });
-  });
-
-  return (
-    <group ref={groupRef}>
-      {nodeData.map((d, i) => (
-        <mesh key={i} scale={d.size}>
-          <sphereGeometry args={[1, 16, 16]} />
-          <meshBasicMaterial
-            color={d.color}
-            transparent
-            opacity={0.75}
-            depthWrite={false}
-          />
-        </mesh>
-      ))}
-    </group>
-  );
-}
-
-/* ─────────────────────────────────────────────
-   6. Pulsing Rings — AI processing broadcast
-   ───────────────────────────────────────────── */
-
-function PulsingRings() {
-  const ringsRef = useRef<THREE.Group>(null);
-  const ringCount = 4;
-
-  const rings = useMemo(
-    () =>
-      Array.from({ length: ringCount }, (_, i) => ({
-        delay: i * 1.5,
-        maxScale: 5 + i * 1.5,
-      })),
-    [],
-  );
-
-  useFrame((state) => {
-    if (!ringsRef.current) return;
-    const t = state.clock.elapsedTime;
-    ringsRef.current.children.forEach((child, i) => {
-      if (i >= rings.length) return;
-      const ring = rings[i];
-      const phase = ((t + ring.delay) % 6) / 6;
-      const scale = 0.1 + phase * ring.maxScale;
-      const opacity = (1 - phase) * 0.25;
-      child.scale.set(scale, scale, scale);
-      const mat = (child as THREE.Mesh).material as THREE.MeshBasicMaterial;
-      if (mat) mat.opacity = Math.max(0, opacity);
-    });
-  });
-
-  return (
-    <group ref={ringsRef} position={[0, 0, -3]}>
-      {rings.map((_, i) => (
-        <mesh key={i} rotation={[Math.PI / 2, 0, 0]}>
-          <ringGeometry args={[0.95, 1, 80]} />
-          <meshBasicMaterial
-            color="#6366f1"
-            transparent
-            opacity={0}
-            side={THREE.DoubleSide}
-            depthWrite={false}
-          />
-        </mesh>
-      ))}
-    </group>
-  );
-}
-
-/* ─────────────────────────────────────────────
-   7. Ambient Dust
-   ───────────────────────────────────────────── */
-
-function AmbientDust() {
-  const ref = useRef<THREE.Points>(null);
-  const count = 500;
-
-  const geo = useMemo(() => {
-    const g = new THREE.BufferGeometry();
-    const arr = new Float32Array(count * 3);
-    for (let i = 0; i < count; i++) {
-      arr[i * 3] = (Math.random() - 0.5) * 20;
-      arr[i * 3 + 1] = (Math.random() - 0.5) * 14;
-      arr[i * 3 + 2] = (Math.random() - 0.5) * 10;
-    }
-    g.setAttribute("position", new THREE.BufferAttribute(arr, 3));
-    return g;
-  }, []);
-
-  useFrame((state) => {
-    if (!ref.current) return;
-    ref.current.rotation.y = state.clock.elapsedTime * 0.01;
-    ref.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.005) * 0.05;
-  });
-
-  return (
-    <points ref={ref} geometry={geo}>
-      <pointsMaterial
-        size={1.8}
-        color="#a78bfa"
-        transparent
-        opacity={0.45}
-        sizeAttenuation
-        depthWrite={false}
-      />
-    </points>
-  );
-}
-
-/* ─────────────────────────────────────────────
-   Scene Composition
-   ───────────────────────────────────────────── */
-
-function Scene() {
+function Scene({ reduced }: { reduced: boolean }) {
   return (
     <>
-      <NeuralNetwork />
-
-      <FloatingDocument
-        position={[-5, 2, -2]}
-        rotation={[0.15, 0.3, 0.05]}
-        speed={0.3}
-        color="#818cf8"
-        scale={1.8}
-      />
-      <FloatingDocument
-        position={[5, -1.5, -1]}
-        rotation={[-0.1, -0.4, 0.1]}
-        speed={0.25}
-        color="#a78bfa"
-        scale={1.5}
-      />
-      <FloatingDocument
-        position={[-2.5, -3, -1.5]}
-        rotation={[0.2, 0.6, -0.1]}
-        speed={0.35}
-        color="#c084fc"
-        scale={1.2}
-      />
-      <FloatingDocument
-        position={[6, 3, -3]}
-        rotation={[-0.05, -0.2, 0.08]}
-        speed={0.2}
-        color="#6366f1"
-        scale={2}
-      />
-      <FloatingDocument
-        position={[-6.5, 0.5, -2.5]}
-        rotation={[0.1, 0.5, -0.05]}
-        speed={0.28}
-        color="#818cf8"
-        scale={1.3}
-      />
-
-      <DataStream xOffset={-5} color="#818cf8" count={35} speed={0.8} />
-      <DataStream xOffset={-1.5} color="#a78bfa" count={30} speed={1.2} />
-      <DataStream xOffset={2.5} color="#6366f1" count={32} speed={1.0} />
-      <DataStream xOffset={6} color="#c084fc" count={28} speed={0.9} />
-
-      <HolographicGrid />
-      <OrbitingNodes />
-      <PulsingRings />
-      <AmbientDust />
+      <fog attach="fog" args={["#08081a", 10, 30]} />
+      <MouseTracker />
+      <NeuroLink reduced={reduced} />
     </>
   );
 }
 
 /* ─────────────────────────────────────────────
-   Export
+   Export — ThreeBackground
    ───────────────────────────────────────────── */
 
 export default function ThreeBackground() {
+  const [reduced, setReduced] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const mql = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReduced(mql.matches);
+    const onChange = (e: MediaQueryListEvent) => setReduced(e.matches);
+    mql.addEventListener("change", onChange);
+
+    setIsMobile(window.innerWidth < 768);
+    const onResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", onResize, { passive: true });
+
+    return () => {
+      mql.removeEventListener("change", onChange);
+      window.removeEventListener("resize", onResize);
+    };
+  }, []);
+
+  const effectiveReduced = reduced || isMobile;
+
   return (
     <div
       className="fixed inset-0 z-0 pointer-events-none w-screen h-screen"
       style={{ opacity: "var(--t-three-opacity, 1)" }}
     >
       <Canvas
-        camera={{ position: [0, 0, 8], fov: 60 }}
-        dpr={[1, 1.5]}
-        gl={{ antialias: true, alpha: true }}
+        camera={{ position: [0, 0, 12], fov: 50 }}
+        dpr={isMobile ? [1, 1] : [1, 1.5]}
+        gl={{
+          antialias: !isMobile,
+          alpha: true,
+          powerPreference: "high-performance",
+        }}
         style={{ background: "transparent", width: "100%", height: "100%" }}
       >
-        <Scene />
+        <Scene reduced={effectiveReduced} />
       </Canvas>
     </div>
   );

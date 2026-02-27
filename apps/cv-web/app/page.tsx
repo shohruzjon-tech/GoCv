@@ -34,6 +34,7 @@ const ThreeBackground = dynamic(() => import("@/components/three-background"), {
 export default function Home() {
   const [showLogin, setShowLogin] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
   const [wizardMode, setWizardMode] = useState<"generate" | "polish">(
     "generate",
   );
@@ -102,10 +103,35 @@ export default function Home() {
   };
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
+    let ticking = false;
+    const onScroll = () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          const y = window.scrollY;
+          setScrolled(y > 20);
+          setScrollY(y);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  // Section reveal on scroll
+  useEffect(() => {
+    const els = document.querySelectorAll(".section-reveal");
+    const obs = new IntersectionObserver(
+      (entries) =>
+        entries.forEach((e) => {
+          if (e.isIntersecting) e.target.classList.add("visible");
+        }),
+      { threshold: 0.08, rootMargin: "0px 0px -40px 0px" },
+    );
+    els.forEach((el) => obs.observe(el));
+    return () => obs.disconnect();
+  }, [creatorInfo]);
 
   // Close on Escape
   useEffect(() => {
@@ -117,7 +143,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="relative min-h-screen overflow-x-hidden text-content">
+    <div className="relative z-10 min-h-screen overflow-x-hidden text-content">
       <ThreeBackground />
 
       {/* ──── Login Modal ──── */}
@@ -266,22 +292,40 @@ export default function Home() {
 
       <main>
         {/* ──── Hero ──── */}
-        <section className="relative flex min-h-screen items-center justify-center px-6 pt-20">
+        <section className="relative flex min-h-screen items-center justify-center px-6 pt-20 overflow-hidden">
+          {/* Radial overlay for text readability */}
+          <div className="hero-overlay pointer-events-none absolute inset-0 z-[1]" />
+
           {/* Radial glow behind hero */}
-          <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+          <div
+            className="pointer-events-none absolute left-1/2 top-1/2"
+            style={{
+              transform: `translate(-50%, calc(-50% + ${scrollY * 0.4}px))`,
+              willChange: "transform",
+            }}
+          >
             <div className="h-[600px] w-[600px] rounded-full bg-indigo-600/8 blur-[120px]" />
           </div>
 
-          <div className="relative mx-auto max-w-5xl text-center">
+          <div
+            className="relative z-[2] mx-auto max-w-5xl text-center"
+            style={{
+              transform: `translateY(${scrollY * 0.12}px)`,
+              willChange: "transform",
+            }}
+          >
             {/* Badge */}
-            <div className="animate-fade-up mb-8 inline-flex items-center gap-2 rounded-full border border-indigo-500/20 bg-indigo-500/10 px-5 py-2 text-sm font-medium text-indigo-300">
-              <Sparkles className="h-4 w-4" />
-              Powered by GPT-5 Artificial Intelligence
+            <div className="animate-fade-up mb-6 inline-flex items-center gap-2 rounded-full border border-indigo-500/25 bg-indigo-500/15 px-4 py-2 text-xs font-semibold text-indigo-300 sm:mb-8 sm:px-5 sm:text-sm">
+              <Sparkles className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">
+                Powered by GPT-5 Artificial Intelligence
+              </span>
+              <span className="sm:hidden">Powered by AI</span>
               <ChevronRight className="h-3.5 w-3.5" />
             </div>
 
             {/* Headline */}
-            <h1 className="animate-fade-up delay-100 mb-8 text-3xl font-extrabold leading-[1.1] tracking-tight sm:text-4xl lg:text-5xl">
+            <h1 className="animate-fade-up delay-100 mb-6 text-4xl font-extrabold leading-[1.08] tracking-tight text-content sm:text-5xl lg:text-6xl">
               Your Career,{" "}
               <span className="text-gradient">Beautifully Crafted</span>
               <br />
@@ -289,50 +333,54 @@ export default function Home() {
             </h1>
 
             {/* Subheading */}
-            <p className="animate-fade-up delay-200 mx-auto mb-10 max-w-2xl text-sm leading-relaxed text-content-2 sm:text-base">
-              Describe yourself, paste your LinkedIn profile, or upload an
-              existing CV — our AI crafts a stunning, ATS-optimized resume in
-              minutes.
+            <p className="animate-fade-up delay-200 mx-auto mb-12 max-w-2xl text-lg leading-relaxed text-content sm:text-xl">
+              Describe yourself or upload an existing CV — our AI crafts a
+              stunning, ATS-optimized resume in minutes.
             </p>
 
             {/* Smart Input */}
             <div className="animate-fade-up delay-300 mx-auto max-w-2xl text-left">
-              <div className="glass rounded-3xl p-2">
+              <div className="relative rounded-[28px] border border-edge bg-elevated/90 p-3 shadow-2xl shadow-black/10 backdrop-blur-2xl sm:p-4 ring-1 ring-white/5">
+                {/* Subtle glow behind the card */}
+                <div className="pointer-events-none absolute -inset-px rounded-[28px] bg-gradient-to-b from-indigo-500/10 via-transparent to-transparent" />
+
                 {/* Top-Level Mode Router */}
-                <div className="mb-2 flex gap-1 rounded-2xl bg-card/80 p-1">
+                <div className="relative mb-3 flex gap-1.5 rounded-2xl bg-card p-1 sm:gap-2 sm:p-1.5">
                   <button
                     onClick={() => setWizardMode("generate")}
-                    className={`flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-3.5 text-sm font-semibold transition-all ${
+                    className={`flex flex-1 items-center justify-center gap-2 rounded-xl px-3 py-3 text-sm font-semibold transition-all sm:px-5 sm:py-3.5 sm:text-base ${
                       wizardMode === "generate"
-                        ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-600/25"
+                        ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-600/30"
                         : "text-content-3 hover:text-content hover:bg-card-hover"
                     }`}
                   >
-                    <Sparkles className="h-4 w-4" />
-                    Generate with AI
+                    <Sparkles className="h-4 w-4 sm:h-5 sm:w-5" />
+                    <span className="hidden sm:inline">Generate with AI</span>
+                    <span className="sm:hidden">AI Generate</span>
                   </button>
                   <button
                     onClick={() => setWizardMode("polish")}
-                    className={`flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-3.5 text-sm font-semibold transition-all ${
+                    className={`flex flex-1 items-center justify-center gap-2 rounded-xl px-3 py-3 text-sm font-semibold transition-all sm:px-5 sm:py-3.5 sm:text-base ${
                       wizardMode === "polish"
-                        ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg shadow-emerald-600/25"
+                        ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg shadow-emerald-600/30"
                         : "text-content-3 hover:text-content hover:bg-card-hover"
                     }`}
                   >
-                    <FileText className="h-4 w-4" />
-                    Polish my CV
+                    <FileText className="h-4 w-4 sm:h-5 sm:w-5" />
+                    <span className="hidden sm:inline">Polish my CV</span>
+                    <span className="sm:hidden">Polish CV</span>
                   </button>
                 </div>
 
                 {/* Input Area */}
-                <div className="p-2">
+                <div className="relative px-1 pb-1 sm:px-2 sm:pb-2">
                   {wizardMode === "generate" && (
                     <textarea
                       value={inputText}
                       onChange={(e) => setInputText(e.target.value)}
                       placeholder="I'm a senior software engineer with 5 years of experience in React, Node.js, and cloud technologies. I've led teams of 8+ engineers and shipped products used by millions..."
                       rows={4}
-                      className="w-full resize-none rounded-2xl border border-edge bg-field p-4 text-base text-content placeholder:text-content-4 focus:border-indigo-500/50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition"
+                      className="w-full resize-none rounded-2xl border border-edge bg-field/80 p-4 text-[15px] leading-relaxed text-content placeholder:text-content-4 focus:border-indigo-500/50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition sm:text-base"
                     />
                   )}
 
@@ -345,12 +393,12 @@ export default function Home() {
                       onDragLeave={() => setIsDragOver(false)}
                       onDrop={handleFileDrop}
                       onClick={() => fileInputRef.current?.click()}
-                      className={`flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed py-10 transition-all ${
+                      className={`flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed py-8 transition-all sm:py-10 ${
                         isDragOver
                           ? "border-indigo-500 bg-indigo-500/10"
                           : uploadedFile
                             ? "border-emerald-500/50 bg-emerald-500/5"
-                            : "border-edge bg-field hover:border-indigo-500/30 hover:bg-indigo-500/5"
+                            : "border-edge bg-field/80 hover:border-indigo-500/30 hover:bg-indigo-500/5"
                       }`}
                     >
                       <input
@@ -392,10 +440,10 @@ export default function Home() {
                         ? !uploadedFile
                         : !inputText.trim()
                     }
-                    className={`mt-3 group flex w-full items-center justify-center gap-3 rounded-2xl py-4 text-base font-semibold text-white shadow-xl transition-all hover:scale-[1.01] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100 ${
+                    className={`mt-3 group flex w-full items-center justify-center gap-3 rounded-2xl py-4 text-[15px] font-bold text-white shadow-xl transition-all hover:scale-[1.01] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100 sm:py-4.5 sm:text-base ${
                       wizardMode === "polish"
-                        ? "bg-gradient-to-r from-emerald-600 to-teal-600 shadow-emerald-600/25 hover:shadow-emerald-500/30"
-                        : "bg-indigo-600 shadow-indigo-600/25 hover:bg-indigo-500 hover:shadow-indigo-500/30"
+                        ? "bg-gradient-to-r from-emerald-600 to-teal-600 shadow-emerald-600/25 hover:shadow-emerald-500/35"
+                        : "bg-gradient-to-r from-indigo-600 to-indigo-500 shadow-indigo-600/30 hover:from-indigo-500 hover:to-indigo-400 hover:shadow-indigo-500/35"
                     }`}
                   >
                     {wizardMode === "polish" ? (
@@ -416,7 +464,7 @@ export default function Home() {
             </div>
 
             {/* Social proof */}
-            <div className="animate-fade-up delay-500 mt-16 flex flex-col items-center gap-4 sm:flex-row sm:justify-center sm:gap-8">
+            <div className="animate-fade-up delay-500 mt-12 flex flex-col items-center gap-5 sm:mt-16 sm:flex-row sm:justify-center sm:gap-8">
               <div className="flex -space-x-3">
                 {[
                   "bg-indigo-500",
@@ -427,14 +475,14 @@ export default function Home() {
                 ].map((bg, i) => (
                   <div
                     key={i}
-                    className={`h-10 w-10 rounded-full ${bg} ring-2 ring-page flex items-center justify-center text-xs font-bold`}
+                    className={`h-9 w-9 rounded-full ${bg} ring-2 ring-page flex items-center justify-center text-xs font-bold text-white sm:h-10 sm:w-10`}
                   >
                     {String.fromCharCode(65 + i)}
                   </div>
                 ))}
               </div>
-              <div className="text-sm text-content-2">
-                <span className="font-semibold text-content">2,500+</span>{" "}
+              <div className="text-sm text-content-2 sm:text-base">
+                <span className="font-bold text-content">2,500+</span>{" "}
                 professionals already building with GoCV
               </div>
               <div className="flex items-center gap-1">
@@ -444,14 +492,16 @@ export default function Home() {
                     className="h-4 w-4 fill-amber-400 text-amber-400"
                   />
                 ))}
-                <span className="ml-2 text-sm text-content-2">4.9/5</span>
+                <span className="ml-2 text-sm font-semibold text-content-2">
+                  4.9/5
+                </span>
               </div>
             </div>
           </div>
         </section>
 
         {/* ──── Logos / Trust Bar ──── */}
-        <section className="border-y border-edge bg-card py-12">
+        <section className="section-reveal border-y border-edge bg-surface/80 backdrop-blur-md py-12">
           <div className="mx-auto max-w-7xl px-6">
             <p className="mb-8 text-center text-sm font-medium uppercase tracking-widest text-content-4">
               Trusted by professionals at
@@ -477,7 +527,10 @@ export default function Home() {
         </section>
 
         {/* ──── Features Grid ──── */}
-        <section id="features" className="py-32">
+        <section
+          id="features"
+          className="section-reveal py-32 bg-page/80 backdrop-blur-sm"
+        >
           <div className="mx-auto max-w-7xl px-6">
             <div className="mx-auto mb-20 max-w-2xl text-center">
               <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-indigo-500/20 bg-indigo-500/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-indigo-400">
@@ -582,7 +635,10 @@ export default function Home() {
         </section>
 
         {/* ──── How It Works ──── */}
-        <section id="how-it-works" className="relative py-32">
+        <section
+          id="how-it-works"
+          className="section-reveal relative py-32 bg-page/70 backdrop-blur-sm"
+        >
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-indigo-600/[0.03] to-transparent" />
           <div className="relative mx-auto max-w-7xl px-6">
             <div className="mx-auto mb-20 max-w-2xl text-center">
@@ -641,7 +697,7 @@ export default function Home() {
         </section>
 
         {/* ──── Stats ──── */}
-        <section className="border-y border-edge bg-card py-20">
+        <section className="section-reveal border-y border-edge bg-surface/80 backdrop-blur-md py-20">
           <div className="mx-auto grid max-w-7xl grid-cols-2 gap-8 px-6 md:grid-cols-4">
             {[
               { value: "50K+", label: "CVs Created", icon: FileText },
@@ -663,7 +719,10 @@ export default function Home() {
         </section>
 
         {/* ──── Testimonials ──── */}
-        <section id="testimonials" className="py-32">
+        <section
+          id="testimonials"
+          className="section-reveal py-32 bg-page/80 backdrop-blur-sm"
+        >
           <div className="mx-auto max-w-7xl px-6">
             <div className="mx-auto mb-20 max-w-2xl text-center">
               <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-amber-500/20 bg-amber-500/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-amber-400">
@@ -723,7 +782,10 @@ export default function Home() {
         </section>
 
         {/* ──── Pricing ──── */}
-        <section id="pricing" className="relative py-32">
+        <section
+          id="pricing"
+          className="section-reveal relative py-32 bg-page/70 backdrop-blur-sm"
+        >
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-purple-600/[0.03] to-transparent" />
           <div className="relative mx-auto max-w-7xl px-6">
             <div className="mx-auto mb-20 max-w-2xl text-center">
@@ -860,7 +922,10 @@ export default function Home() {
 
         {/* ──── About Creator ──── */}
         {creatorInfo && (
-          <section id="creator" className="py-32">
+          <section
+            id="creator"
+            className="section-reveal py-32 bg-page/80 backdrop-blur-sm"
+          >
             <div className="mx-auto max-w-4xl px-6">
               <div className="mx-auto mb-16 max-w-2xl text-center">
                 <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-pink-500/20 bg-pink-500/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-pink-400">
@@ -979,7 +1044,7 @@ export default function Home() {
         )}
 
         {/* ──── Final CTA ──── */}
-        <section className="py-32">
+        <section className="section-reveal py-32 bg-page/70 backdrop-blur-sm">
           <div className="mx-auto max-w-4xl px-6 text-center">
             <div className="rounded-[2rem] border border-indigo-500/20 bg-gradient-to-b from-indigo-600/10 to-purple-600/5 px-8 py-20 sm:px-16">
               <h2 className="mb-6 text-4xl font-bold tracking-tight sm:text-5xl">
@@ -1004,7 +1069,7 @@ export default function Home() {
       </main>
 
       {/* ──── Footer ──── */}
-      <footer className="border-t border-edge bg-card py-16">
+      <footer className="border-t border-edge bg-surface/80 backdrop-blur-md py-16">
         <div className="mx-auto max-w-7xl px-6">
           <div className="grid gap-12 md:grid-cols-4">
             {/* Brand */}

@@ -39,7 +39,7 @@
   --t-popover: rgba(15, 15, 35, 0.95);
   --t-glass-bg: rgba(255, 255, 255, 0.06);
   --t-glass-border: rgba(255, 255, 255, 0.08);
-  --t-three-opacity: 1;
+  --t-three-opacity: 0.55;
 }
 
 /* ── Tailwind theme tokens ────────────────────────── */
@@ -222,4 +222,46 @@ body {
 }
 .delay-800 {
   animation-delay: 800ms;
+}
+
+/* ── Section reveal on scroll ───────────────── */
+.section-reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition:
+    opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.section-reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.section-reveal:nth-child(even) {
+  transition-delay: 0.05s;
+}
+
+/* ── Hero overlay gradient for text readability ── */
+.hero-overlay {
+  background: radial-gradient(
+    ellipse 80% 70% at 50% 45%,
+    var(--t-page) 0%,
+    color-mix(in srgb, var(--t-page) 85%, transparent) 40%,
+    color-mix(in srgb, var(--t-page) 40%, transparent) 70%,
+    transparent 100%
+  );
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .section-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .animate-fade-up,
+  .animate-fade-in,
+  .animate-float {
+    animation: none;
+    opacity: 1;
+  }
 }
