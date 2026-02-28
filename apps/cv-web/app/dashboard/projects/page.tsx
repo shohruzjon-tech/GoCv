@@ -4,12 +4,23 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { projectsApi } from "@/lib/api";
 import { Project } from "@/types";
-import { Plus, Edit, Trash2, ExternalLink, FolderOpen } from "lucide-react";
+import {
+  Plus,
+  Edit,
+  Trash2,
+  ExternalLink,
+  FolderOpen,
+  Eye,
+  EyeOff,
+  Star,
+  Loader2,
+} from "lucide-react";
 import toast from "react-hot-toast";
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
+  const [togglingId, setTogglingId] = useState<string | null>(null);
 
   useEffect(() => {
     loadProjects();
@@ -37,6 +48,29 @@ export default function ProjectsPage() {
     }
   };
 
+  const toggleVisibility = async (project: Project) => {
+    setTogglingId(project._id);
+    try {
+      const res = await projectsApi.update(project._id, {
+        isVisible: !project.isVisible,
+      });
+      setProjects((prev) =>
+        prev.map((p) => (p._id === project._id ? res.data : p)),
+      );
+      toast.success(
+        res.data.isVisible
+          ? "Project is now visible on your live CV"
+          : "Project hidden from your live CV",
+      );
+    } catch {
+      toast.error("Failed to update visibility");
+    } finally {
+      setTogglingId(null);
+    }
+  };
+
+  const visibleCount = projects.filter((p) => p.isVisible).length;
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -50,7 +84,11 @@ export default function ProjectsPage() {
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-content">My Projects</h1>
-          <p className="text-sm text-content-3">Showcase your work</p>
+          <p className="text-sm text-content-3">
+            Showcase your work ·{" "}
+            <span className="text-green-400">{visibleCount}</span> of{" "}
+            {projects.length} visible on live CV
+          </p>
         </div>
         <Link
           href="/dashboard/projects/new"
@@ -76,8 +114,46 @@ export default function ProjectsPage() {
           {projects.map((project) => (
             <div
               key={project._id}
-              className="overflow-hidden rounded-2xl border border-edge bg-card transition hover:bg-card-hover"
+              className={`group relative overflow-hidden rounded-2xl border bg-card transition hover:bg-card-hover ${
+                project.isVisible
+                  ? "border-edge"
+                  : "border-dashed border-edge/50 opacity-75"
+              }`}
             >
+              {/* Visibility badge */}
+              <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5">
+                {project.isFeatured && (
+                  <span className="flex items-center gap-1 rounded-full bg-yellow-500/20 px-2 py-0.5 text-xs font-medium text-yellow-400 ring-1 ring-yellow-500/30 backdrop-blur-sm">
+                    <Star className="h-3 w-3" /> Featured
+                  </span>
+                )}
+              </div>
+
+              {/* Visibility toggle */}
+              <button
+                onClick={() => toggleVisibility(project)}
+                disabled={togglingId === project._id}
+                className={`absolute top-3 right-3 z-10 flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium backdrop-blur-sm transition ${
+                  project.isVisible
+                    ? "bg-green-500/20 text-green-400 ring-1 ring-green-500/30 hover:bg-green-500/30"
+                    : "bg-content-4/20 text-content-4 ring-1 ring-content-4/20 hover:bg-content-4/30"
+                }`}
+                title={
+                  project.isVisible
+                    ? "Click to hide from live CV"
+                    : "Click to show on live CV"
+                }
+              >
+                {togglingId === project._id ? (
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                ) : project.isVisible ? (
+                  <Eye className="h-3 w-3" />
+                ) : (
+                  <EyeOff className="h-3 w-3" />
+                )}
+                {project.isVisible ? "Live" : "Hidden"}
+              </button>
+
               {project.images?.[0] ? (
                 <img
                   src={project.images[0].url}
@@ -90,22 +166,15 @@ export default function ProjectsPage() {
                 </div>
               )}
               <div className="p-5">
-                <div className="mb-2 flex items-start justify-between">
-                  <h3 className="font-semibold text-content">
-                    {project.title}
-                  </h3>
-                  {project.isFeatured && (
-                    <span className="rounded-full bg-yellow-500/10 px-2 py-0.5 text-xs font-medium text-yellow-400 ring-1 ring-yellow-500/20">
-                      Featured
-                    </span>
-                  )}
-                </div>
+                <h3 className="mb-1 font-semibold text-content">
+                  {project.title}
+                </h3>
                 <p className="mb-3 text-sm text-content-3 line-clamp-2">
                   {project.description || "No description"}
                 </p>
                 {project.technologies.length > 0 && (
                   <div className="mb-4 flex flex-wrap gap-1">
-                    {project.technologies.map((tech) => (
+                    {project.technologies.slice(0, 4).map((tech) => (
                       <span
                         key={tech}
                         className="rounded-md bg-card px-2 py-0.5 text-xs text-content-2 ring-1 ring-edge"
@@ -113,6 +182,11 @@ export default function ProjectsPage() {
                         {tech}
                       </span>
                     ))}
+                    {project.technologies.length > 4 && (
+                      <span className="rounded-md bg-card px-2 py-0.5 text-xs text-content-3 ring-1 ring-edge">
+                        +{project.technologies.length - 4}
+                      </span>
+                    )}
                   </div>
                 )}
                 <div className="flex items-center gap-2 border-t border-edge pt-3">

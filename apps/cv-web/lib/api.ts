@@ -172,6 +172,21 @@ export const aiApi = {
 
   extractProfile: (text: string, sourceType: "prompt" | "linkedin" | "file") =>
     api.post("/api/ai/extract-profile", { text, sourceType }),
+
+  improveProjectDescription: (
+    projectTitle: string,
+    currentText: string,
+    field: "short" | "long",
+    technologies: string[],
+    action: "improve" | "professional" | "technical" | "concise",
+  ) =>
+    api.post("/api/ai/improve-project-description", {
+      projectTitle,
+      currentText,
+      field,
+      technologies,
+      action,
+    }),
 };
 
 // ========== PDF API ==========

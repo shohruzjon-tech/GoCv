@@ -11,4 +11,5 @@ export enum AiToolType {
   ATS_OPTIMIZE = 'ats_optimize',
   INTERVIEW_PREP = 'interview_prep',
   PROFILE_EXTRACT = 'profile_extract',
+  PROJECT_IMPROVE = 'project_improve',
 }

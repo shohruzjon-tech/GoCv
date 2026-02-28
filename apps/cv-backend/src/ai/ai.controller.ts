@@ -103,6 +103,28 @@ export class AiController {
     return this.aiService.extractProfile(text, sourceType, userId);
   }
 
+  // ─── Project Description Improvement ───
+
+  @Post('improve-project-description')
+  async improveProjectDescription(
+    @CurrentUser('_id') userId: string,
+    @Body('projectTitle') projectTitle: string,
+    @Body('currentText') currentText: string,
+    @Body('field') field: 'short' | 'long',
+    @Body('technologies') technologies: string[],
+    @Body('action')
+    action: 'improve' | 'professional' | 'technical' | 'concise',
+  ) {
+    return this.aiService.improveProjectDescription(
+      projectTitle,
+      currentText,
+      field,
+      technologies || [],
+      action || 'improve',
+      userId,
+    );
+  }
+
   // ─── Usage Stats ───
   @Get('usage')
   async getMyUsage(@CurrentUser('_id') userId: string) {

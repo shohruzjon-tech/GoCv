@@ -504,6 +504,95 @@ Rules:
   }
 
   // ═══════════════════════════════════════════
+  // PROJECT DESCRIPTION IMPROVEMENT
+  // ═══════════════════════════════════════════
+
+  async improveProjectDescription(
+    projectTitle: string,
+    currentText: string,
+    field: 'short' | 'long',
+    technologies: string[],
+    action: 'improve' | 'professional' | 'technical' | 'concise',
+    userId: string,
+  ): Promise<{ improved: string }> {
+    await this.checkAndTrackUsage(userId);
+    const startTime = Date.now();
+
+    const lengthGuide =
+      field === 'short'
+        ? 'Keep it between 1-3 sentences (max 200 characters). This is a brief tagline/overview.'
+        : 'Write 2-4 detailed paragraphs. This is the full project description for a portfolio.';
+
+    const toneGuide: Record<string, string> = {
+      improve:
+        'Improve clarity, grammar, and impact while keeping the original meaning.',
+      professional:
+        'Rewrite in a polished, business-professional tone suitable for recruiters.',
+      technical:
+        'Rewrite with a technical focus, highlighting architecture, patterns, and engineering decisions.',
+      concise:
+        'Make it as concise and punchy as possible — remove filler words.',
+    };
+
+    const systemPrompt = `You are an expert portfolio copywriter for software developers.
+Improve the given project description text.
+
+Project title: "${projectTitle}"
+Technologies used: ${technologies.length > 0 ? technologies.join(', ') : 'Not specified'}
+Field type: ${field === 'short' ? 'Short description' : 'Full description'}
+
+Instructions:
+- ${toneGuide[action]}
+- ${lengthGuide}
+- Mention relevant technologies naturally if they fit
+- Use active voice and strong action verbs
+- Make it compelling for potential employers or clients
+
+Return ONLY a JSON object: { "improved": "your improved text here" }`;
+
+    try {
+      const completion = await this.openai.chat.completions.create({
+        model: 'gpt-5',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          {
+            role: 'user',
+            content:
+              currentText ||
+              `Write a ${field} description for a project called "${projectTitle}" using ${technologies.join(', ') || 'various technologies'}.`,
+          },
+        ],
+        response_format: { type: 'json_object' },
+        max_completion_tokens: field === 'short' ? 300 : 1500,
+      });
+
+      const content = completion.choices[0]?.message?.content;
+      await this.trackCall(
+        userId,
+        AiToolType.PROJECT_IMPROVE,
+        completion,
+        startTime,
+        true,
+        currentText?.substring(0, 300),
+      );
+      return content ? JSON.parse(content) : { improved: '' };
+    } catch (error: any) {
+      await this.trackCall(
+        userId,
+        AiToolType.PROJECT_IMPROVE,
+        null,
+        startTime,
+        false,
+        currentText?.substring(0, 300),
+        undefined,
+        error.message,
+      );
+      this.logger.error('Project description improvement failed', error);
+      throw error;
+    }
+  }
+
+  // ═══════════════════════════════════════════
   // NEW ADVANCED AI TOOLS
   // ═══════════════════════════════════════════
 

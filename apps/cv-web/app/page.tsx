@@ -21,6 +21,14 @@ import {
   TrendingUp,
   X,
   Upload,
+  FolderOpen,
+  Code2,
+  ExternalLink,
+  Eye,
+  Link2,
+  Wand2,
+  Image,
+  Cpu,
 } from "lucide-react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
@@ -721,6 +729,286 @@ export default function Home() {
                   <p className="leading-relaxed text-content-2">{item.desc}</p>
                 </div>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ──── Live CV & Projects Showcase ──── */}
+        <section
+          id="live-cv"
+          className="section-reveal relative py-32 bg-page/80 backdrop-blur-sm overflow-hidden"
+        >
+          {/* Decorative glow */}
+          <div className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 h-[500px] w-[800px] rounded-full bg-purple-600/[0.06] blur-[120px]" />
+
+          <div className="relative mx-auto max-w-7xl px-6">
+            <div className="mx-auto mb-20 max-w-2xl text-center">
+              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-cyan-500/20 bg-cyan-500/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-cyan-400">
+                <Globe className="h-3.5 w-3.5" />
+                Your Online Presence
+              </div>
+              <h2 className="mb-5 text-4xl font-bold tracking-tight sm:text-5xl">
+                A Live CV Webpage &{" "}
+                <span className="text-gradient">Project Portfolio</span>
+              </h2>
+              <p className="text-lg text-content-2">
+                Get your own professional URL and showcase your best projects —
+                all in one beautiful, shareable page.
+              </p>
+            </div>
+
+            {/* Two-column feature cards */}
+            <div className="grid gap-8 lg:grid-cols-2">
+              {/* Live CV Webpage Card */}
+              <div className="group relative rounded-3xl border border-edge bg-card p-1 transition-all hover:border-indigo-500/30">
+                {/* Mock browser chrome */}
+                <div className="rounded-t-[20px] border-b border-edge bg-surface/60 px-4 py-3">
+                  <div className="flex items-center gap-2">
+                    <div className="flex gap-1.5">
+                      <div className="h-2.5 w-2.5 rounded-full bg-red-500/60" />
+                      <div className="h-2.5 w-2.5 rounded-full bg-amber-500/60" />
+                      <div className="h-2.5 w-2.5 rounded-full bg-emerald-500/60" />
+                    </div>
+                    <div className="mx-auto flex items-center gap-2 rounded-lg bg-card/80 px-4 py-1.5 text-xs text-content-3 ring-1 ring-edge">
+                      <Globe className="h-3 w-3 text-emerald-400" />
+                      <span>
+                        gocv.live/
+                        <span className="font-semibold text-indigo-400">
+                          your-name
+                        </span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                {/* Mock page content */}
+                <div className="p-6 sm:p-8">
+                  <div className="mb-6 flex items-start gap-4">
+                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-600 to-purple-600 text-lg font-bold text-white shadow-lg shadow-indigo-600/30">
+                      JD
+                    </div>
+                    <div>
+                      <div className="h-4 w-32 rounded bg-content/20 mb-2" />
+                      <div className="h-3 w-48 rounded bg-content/10" />
+                    </div>
+                  </div>
+                  <div className="space-y-2 mb-5">
+                    <div className="h-2.5 w-full rounded bg-content/8" />
+                    <div className="h-2.5 w-5/6 rounded bg-content/8" />
+                    <div className="h-2.5 w-4/6 rounded bg-content/8" />
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {["React", "Node.js", "TypeScript", "AWS"].map((t) => (
+                      <span
+                        key={t}
+                        className="rounded-full bg-indigo-500/10 px-3 py-1 text-xs font-medium text-indigo-400 ring-1 ring-indigo-500/20"
+                      >
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Overlay info */}
+                <div className="px-6 pb-8 sm:px-8">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-500/10 ring-1 ring-indigo-500/20">
+                      <Link2 className="h-5 w-5 text-indigo-400" />
+                    </div>
+                    <h3 className="text-xl font-bold text-content">
+                      Your Own Live URL
+                    </h3>
+                  </div>
+                  <p className="mb-4 text-sm leading-relaxed text-content-2">
+                    Every CV gets a personal{" "}
+                    <span className="font-semibold text-indigo-400">
+                      gocv.live/your-name
+                    </span>{" "}
+                    page with a stunning neon-themed design, interactive 3D
+                    background, and mobile-responsive layout. Share it in your
+                    email signature, LinkedIn, or anywhere.
+                  </p>
+                  <div className="flex flex-wrap gap-4 text-xs text-content-3">
+                    <span className="flex items-center gap-1.5">
+                      <Eye className="h-3.5 w-3.5 text-emerald-400" />
+                      Public & shareable
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <Download className="h-3.5 w-3.5 text-purple-400" />
+                      PDF download included
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <Shield className="h-3.5 w-3.5 text-sky-400" />
+                      ATS-optimized
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Projects Portfolio Card */}
+              <div className="group relative rounded-3xl border border-edge bg-card p-1 transition-all hover:border-purple-500/30">
+                {/* Header */}
+                <div className="rounded-t-[20px] border-b border-edge bg-surface/60 px-6 py-4 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <FolderOpen className="h-4 w-4 text-purple-400" />
+                    <span className="text-sm font-semibold text-content">
+                      Project Portfolio
+                    </span>
+                  </div>
+                  <span className="rounded-full bg-purple-500/10 px-3 py-1 text-xs font-medium text-purple-400 ring-1 ring-purple-500/20">
+                    4 Projects
+                  </span>
+                </div>
+                {/* Mock project cards */}
+                <div className="p-5 sm:p-6 grid gap-4 grid-cols-2">
+                  {[
+                    {
+                      name: "E-Commerce App",
+                      tech: "Next.js · Stripe",
+                      color: "indigo",
+                      featured: true,
+                    },
+                    {
+                      name: "AI Chat Bot",
+                      tech: "Python · GPT-5",
+                      color: "purple",
+                      featured: false,
+                    },
+                    {
+                      name: "Analytics Dash",
+                      tech: "React · D3.js",
+                      color: "emerald",
+                      featured: false,
+                    },
+                    {
+                      name: "Mobile Fitness",
+                      tech: "React Native",
+                      color: "pink",
+                      featured: true,
+                    },
+                  ].map((proj) => {
+                    const cardColors: Record<string, string> = {
+                      indigo:
+                        "from-indigo-500/20 to-indigo-600/5 border-indigo-500/15",
+                      purple:
+                        "from-purple-500/20 to-purple-600/5 border-purple-500/15",
+                      emerald:
+                        "from-emerald-500/20 to-emerald-600/5 border-emerald-500/15",
+                      pink: "from-pink-500/20 to-pink-600/5 border-pink-500/15",
+                    };
+                    return (
+                      <div
+                        key={proj.name}
+                        className={`rounded-2xl border bg-gradient-to-b p-4 transition-all group-hover:scale-[1.01] ${cardColors[proj.color]}`}
+                      >
+                        <div className="mb-3 flex h-16 items-center justify-center rounded-xl bg-card/50">
+                          <Code2 className="h-6 w-6 text-content-4" />
+                        </div>
+                        <div className="flex items-center justify-between mb-1">
+                          <p className="text-sm font-semibold text-content truncate">
+                            {proj.name}
+                          </p>
+                          {proj.featured && (
+                            <Star className="h-3 w-3 fill-amber-400 text-amber-400 shrink-0" />
+                          )}
+                        </div>
+                        <p className="text-xs text-content-3">{proj.tech}</p>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Overlay info */}
+                <div className="px-6 pb-8 sm:px-8">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-500/10 ring-1 ring-purple-500/20">
+                      <FolderOpen className="h-5 w-5 text-purple-400" />
+                    </div>
+                    <h3 className="text-xl font-bold text-content">
+                      Showcase Your Projects
+                    </h3>
+                  </div>
+                  <p className="mb-4 text-sm leading-relaxed text-content-2">
+                    Add unlimited projects with images, tech stacks, live demos
+                    & source links. Toggle which projects appear on your public
+                    CV page —{" "}
+                    <span className="font-semibold text-purple-400">
+                      you control what employers see
+                    </span>
+                    .
+                  </p>
+                  <div className="flex flex-wrap gap-4 text-xs text-content-3">
+                    <span className="flex items-center gap-1.5">
+                      <Wand2 className="h-3.5 w-3.5 text-purple-400" />
+                      AI-written descriptions
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <Image className="h-3.5 w-3.5 text-pink-400" />
+                      Image galleries
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <ExternalLink className="h-3.5 w-3.5 text-indigo-400" />
+                      Live demo links
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom feature pills */}
+            <div className="mt-14 flex flex-wrap items-center justify-center gap-3">
+              {[
+                {
+                  icon: Globe,
+                  text: "Custom gocv.live URL",
+                  color: "text-cyan-400 bg-cyan-500/10 ring-cyan-500/20",
+                },
+                {
+                  icon: FolderOpen,
+                  text: "Unlimited projects",
+                  color: "text-purple-400 bg-purple-500/10 ring-purple-500/20",
+                },
+                {
+                  icon: Eye,
+                  text: "Visibility controls",
+                  color:
+                    "text-emerald-400 bg-emerald-500/10 ring-emerald-500/20",
+                },
+                {
+                  icon: Wand2,
+                  text: "AI descriptions",
+                  color: "text-pink-400 bg-pink-500/10 ring-pink-500/20",
+                },
+                {
+                  icon: Cpu,
+                  text: "3D interactive page",
+                  color: "text-amber-400 bg-amber-500/10 ring-amber-500/20",
+                },
+                {
+                  icon: Download,
+                  text: "PDF export",
+                  color: "text-sky-400 bg-sky-500/10 ring-sky-500/20",
+                },
+              ].map((pill) => (
+                <div
+                  key={pill.text}
+                  className={`flex items-center gap-2 rounded-full px-4 py-2 text-xs font-medium ring-1 ${pill.color}`}
+                >
+                  <pill.icon className="h-3.5 w-3.5" />
+                  {pill.text}
+                </div>
+              ))}
+            </div>
+
+            {/* CTA */}
+            <div className="mt-12 text-center">
+              <button
+                onClick={() => setShowLogin(true)}
+                className="group inline-flex items-center gap-3 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 px-8 py-4 text-sm font-semibold text-white shadow-xl shadow-indigo-600/20 transition-all hover:shadow-indigo-500/30 hover:scale-[1.02]"
+              >
+                <Sparkles className="h-5 w-5" />
+                Create Your Live CV & Portfolio
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </button>
             </div>
           </div>
         </section>
