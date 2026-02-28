@@ -44,7 +44,7 @@ services:
       retries: 5
 
   # ---- NestJS Backend ----
-  backend:
+  gocv-backend:
     build:
       context: .
       dockerfile: apps/cv-backend/Dockerfile
@@ -117,7 +117,7 @@ services:
       - cu24-network
 
   # ---- Next.js Frontend ----
-  frontend:
+  gocv-frontend:
     build:
       context: .
       dockerfile: apps/cv-web/Dockerfile
@@ -147,7 +147,7 @@ services:
       retries: 3
       start_period: 30s
     depends_on:
-      backend:
+      gocv-backend:
         condition: service_healthy
     networks:
       - cu24-network
