@@ -5,7 +5,7 @@
 
 services:
   # ---- MongoDB ----
-  mongo:
+  gocv-mongo:
     image: mongo:8.0
     container_name: cv-mongo
     restart: always
@@ -26,7 +26,7 @@ services:
       retries: 5
 
   # ---- Redis ----
-  redis:
+  gocv-redis:
     image: redis:7-alpine
     container_name: cv-redis
     restart: always
@@ -84,6 +84,12 @@ services:
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
       AWS_REGION: ${AWS_REGION:-us-east-1}
       AWS_S3_BUCKET: ${AWS_S3_BUCKET:-cv-builder-uploads}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_SECURE: ${SMTP_SECURE:-false}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SMTP_FROM: ${SMTP_FROM:-noreply@gocv.live}
       FRONTEND_URL: ${FRONTEND_URL:-https://gocv.live}
       ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@cvbuilder.com}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
@@ -116,9 +122,9 @@ services:
       retries: 5
       start_period: 40s
     depends_on:
-      mongo:
+      gocv-mongo:
         condition: service_healthy
-      redis:
+      gocv-redis:
         condition: service_healthy
     networks:
       - cv-internal
