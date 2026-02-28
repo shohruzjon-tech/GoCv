@@ -100,6 +100,263 @@ export class StripeService implements OnModuleInit {
     return this.enabled && !!this.stripe;
   }
 
+  /** Gather Stripe health & analytics for the admin dashboard */
+  async getHealthAndAnalytics(): Promise<{
+    health: {
+      status: 'connected' | 'disconnected' | 'degraded';
+      latencyMs: number;
+      apiVersion: string;
+      lastCheckedAt: string;
+    };
+    overview: {
+      totalCustomers: number;
+      activeSubscriptions: number;
+      totalBalance: number;
+      currency: string;
+    };
+    recentCharges: {
+      total: number;
+      succeeded: number;
+      failed: number;
+      incomplete: number;
+      totalAmount: number;
+      failedAmount: number;
+    };
+    webhookEvents: {
+      recentEvents: Array<{
+        id: string;
+        type: string;
+        created: number;
+        status: string;
+      }>;
+      totalRecent: number;
+    };
+    subscriptionBreakdown: {
+      active: number;
+      pastDue: number;
+      canceled: number;
+      trialing: number;
+      incomplete: number;
+    };
+    revenueTimeline: Array<{
+      date: string;
+      amount: number;
+      count: number;
+    }>;
+  }> {
+    if (!this.isConfigured() || !this.stripe) {
+      return {
+        health: {
+          status: 'disconnected',
+          latencyMs: 0,
+          apiVersion: '',
+          lastCheckedAt: new Date().toISOString(),
+        },
+        overview: {
+          totalCustomers: 0,
+          activeSubscriptions: 0,
+          totalBalance: 0,
+          currency: 'usd',
+        },
+        recentCharges: {
+          total: 0,
+          succeeded: 0,
+          failed: 0,
+          incomplete: 0,
+          totalAmount: 0,
+          failedAmount: 0,
+        },
+        webhookEvents: { recentEvents: [], totalRecent: 0 },
+        subscriptionBreakdown: {
+          active: 0,
+          pastDue: 0,
+          canceled: 0,
+          trialing: 0,
+          incomplete: 0,
+        },
+        revenueTimeline: [],
+      };
+    }
+
+    const startTime = Date.now();
+    let healthStatus: 'connected' | 'disconnected' | 'degraded' = 'connected';
+    let latencyMs = 0;
+
+    try {
+      await this.stripe.customers.list({ limit: 1 });
+      latencyMs = Date.now() - startTime;
+      if (latencyMs > 3000) healthStatus = 'degraded';
+    } catch {
+      healthStatus = 'disconnected';
+      latencyMs = Date.now() - startTime;
+    }
+
+    // Run all data fetches in parallel
+    const thirtyDaysAgo = Math.floor(
+      (Date.now() - 30 * 24 * 60 * 60 * 1000) / 1000,
+    );
+    const now = Math.floor(Date.now() / 1000);
+
+    const [
+      customersRes,
+      activeSubsRes,
+      pastDueSubsRes,
+      canceledSubsRes,
+      trialingSubsRes,
+      incompleteSubsRes,
+      chargesRes,
+      balanceRes,
+      eventsRes,
+      invoicesRes,
+    ] = await Promise.allSettled([
+      this.stripe.customers.list({ limit: 1 }),
+      this.stripe.subscriptions.list({ status: 'active', limit: 1 }),
+      this.stripe.subscriptions.list({ status: 'past_due', limit: 1 }),
+      this.stripe.subscriptions.list({ status: 'canceled', limit: 1 }),
+      this.stripe.subscriptions.list({ status: 'trialing', limit: 1 }),
+      this.stripe.subscriptions.list({ status: 'incomplete', limit: 1 }),
+      this.stripe.charges.list({ limit: 100, created: { gte: thirtyDaysAgo } }),
+      this.stripe.balance.retrieve(),
+      this.stripe.events.list({ limit: 20 }),
+      this.stripe.invoices.list({
+        limit: 100,
+        created: { gte: thirtyDaysAgo },
+        status: 'paid',
+      }),
+    ]);
+
+    // Parse results safely
+    const safeVal = <T>(result: PromiseSettledResult<T>, fallback: T): T =>
+      result.status === 'fulfilled' ? result.value : fallback;
+
+    const customers = safeVal(customersRes, {
+      data: [],
+      has_more: false,
+    } as any);
+    const activeSubs = safeVal(activeSubsRes, {
+      data: [],
+      has_more: false,
+    } as any);
+    const pastDueSubs = safeVal(pastDueSubsRes, {
+      data: [],
+      has_more: false,
+    } as any);
+    const canceledSubs = safeVal(canceledSubsRes, {
+      data: [],
+      has_more: false,
+    } as any);
+    const trialingSubs = safeVal(trialingSubsRes, {
+      data: [],
+      has_more: false,
+    } as any);
+    const incompleteSubs = safeVal(incompleteSubsRes, {
+      data: [],
+      has_more: false,
+    } as any);
+    const charges = safeVal(chargesRes, { data: [] } as any);
+    const balance = safeVal(balanceRes, { available: [], pending: [] } as any);
+    const events = safeVal(eventsRes, { data: [] } as any);
+    const invoices = safeVal(invoicesRes, { data: [] } as any);
+
+    // Charges analytics
+    const chargeData = charges.data || [];
+    const succeededCharges = chargeData.filter(
+      (c: any) => c.status === 'succeeded',
+    );
+    const failedCharges = chargeData.filter((c: any) => c.status === 'failed');
+    const incompleteCharges = chargeData.filter(
+      (c: any) => c.status !== 'succeeded' && c.status !== 'failed',
+    );
+
+    // Revenue timeline — group invoices by day
+    const revenueMap = new Map<string, { amount: number; count: number }>();
+    for (let i = 29; i >= 0; i--) {
+      const date = new Date(Date.now() - i * 24 * 60 * 60 * 1000);
+      const key = date.toISOString().split('T')[0]!;
+      revenueMap.set(key, { amount: 0, count: 0 });
+    }
+    for (const inv of invoices.data || []) {
+      const date = new Date((inv as any).created * 1000)
+        .toISOString()
+        .split('T')[0]!;
+      const entry = revenueMap.get(date);
+      if (entry) {
+        entry.amount += ((inv as any).amount_paid || 0) / 100;
+        entry.count += 1;
+      }
+    }
+    const revenueTimeline = Array.from(revenueMap.entries()).map(
+      ([date, data]) => ({
+        date,
+        amount: Math.round(data.amount * 100) / 100,
+        count: data.count,
+      }),
+    );
+
+    // Balance
+    const availableBalance =
+      balance.available?.reduce((s: number, b: any) => s + (b.amount || 0), 0) /
+        100 || 0;
+
+    return {
+      health: {
+        status: healthStatus,
+        latencyMs,
+        apiVersion: '2026-02-25',
+        lastCheckedAt: new Date().toISOString(),
+      },
+      overview: {
+        totalCustomers: (customers as any).has_more
+          ? 100
+          : (customers.data?.length ?? 0),
+        activeSubscriptions: activeSubs.data?.length ?? 0,
+        totalBalance: Math.round(availableBalance * 100) / 100,
+        currency: 'usd',
+      },
+      recentCharges: {
+        total: chargeData.length,
+        succeeded: succeededCharges.length,
+        failed: failedCharges.length,
+        incomplete: incompleteCharges.length,
+        totalAmount:
+          Math.round(
+            (succeededCharges.reduce(
+              (s: number, c: any) => s + (c.amount || 0),
+              0,
+            ) /
+              100) *
+              100,
+          ) / 100,
+        failedAmount:
+          Math.round(
+            (failedCharges.reduce(
+              (s: number, c: any) => s + (c.amount || 0),
+              0,
+            ) /
+              100) *
+              100,
+          ) / 100,
+      },
+      webhookEvents: {
+        recentEvents: (events.data || []).slice(0, 15).map((e: any) => ({
+          id: e.id,
+          type: e.type,
+          created: e.created,
+          status: e.data?.object?.status || 'processed',
+        })),
+        totalRecent: events.data?.length || 0,
+      },
+      subscriptionBreakdown: {
+        active: activeSubs.data?.length ?? 0,
+        pastDue: pastDueSubs.data?.length ?? 0,
+        canceled: canceledSubs.data?.length ?? 0,
+        trialing: trialingSubs.data?.length ?? 0,
+        incomplete: incompleteSubs.data?.length ?? 0,
+      },
+      revenueTimeline,
+    };
+  }
+
   private ensureConfigured() {
     if (!this.isConfigured() || !this.stripe) {
       throw new Error(

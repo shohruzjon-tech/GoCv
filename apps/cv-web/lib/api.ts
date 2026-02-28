@@ -481,6 +481,7 @@ export const adminApi = {
   testStripeConnection: (secretKey: string) =>
     api.post("/api/site-settings/stripe/test", { secretKey }),
   reloadStripe: () => api.post("/api/site-settings/stripe/reload"),
+  getStripeHealth: () => api.get("/api/site-settings/stripe/health"),
 };
 
 // ========== Site Settings (Public) ==========

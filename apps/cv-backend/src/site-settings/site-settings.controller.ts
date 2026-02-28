@@ -70,4 +70,11 @@ export class SiteSettingsController {
   async reloadStripe() {
     return this.stripeService.reloadConfig();
   }
+
+  @Get('stripe/health')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  async getStripeHealth() {
+    return this.stripeService.getHealthAndAnalytics();
+  }
 }
