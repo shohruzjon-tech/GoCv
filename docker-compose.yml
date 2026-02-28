@@ -1,6 +1,7 @@
-# Production: Everything runs in Docker with Traefik reverse proxy
-# Usage: docker compose -f docker-compose.prod.yml --env-file .env.prod up -d --build
-# Traefik must already be running on the cu24-network external network
+# Production: Everything runs in Docker behind Traefik reverse proxy
+# Usage: docker compose --env-file .env.prod up -d --build
+# Traefik must already be running and joined to the cv-network external network
+# Domains: gocv.live (frontend), api.gocv.live (backend) — SSL via Let's Encrypt
 
 services:
   # ---- MongoDB ----
@@ -87,20 +88,27 @@ services:
       ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@cvbuilder.com}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
     labels:
-      - "traefik.enable=true"
-      # HTTP router
-      - "traefik.http.routers.cv-backend.rule=Host(`api.gocv.live`)"
-      - "traefik.http.routers.cv-backend.entrypoints=websecure"
-      - "traefik.http.routers.cv-backend.tls=true"
-      - "traefik.http.routers.cv-backend.tls.certresolver=letsencrypt"
-      # Service
-      - "traefik.http.services.cv-backend.loadbalancer.server.port=4000"
-      # CORS headers middleware
-      - "traefik.http.middlewares.cv-backend-headers.headers.accesscontrolalloworiginlist=https://gocv.live"
-      - "traefik.http.middlewares.cv-backend-headers.headers.accesscontrolallowmethods=GET,POST,PUT,PATCH,DELETE,OPTIONS"
-      - "traefik.http.middlewares.cv-backend-headers.headers.accesscontrolallowheaders=Content-Type,Authorization"
-      - "traefik.http.middlewares.cv-backend-headers.headers.accesscontrolallowcredentials=true"
-      - "traefik.http.routers.cv-backend.middlewares=cv-backend-headers"
+      - traefik.enable=true
+      - traefik.docker.network=cv-network
+      # ── HTTP router ──
+      - traefik.http.routers.cv-backend.rule=Host(`${API_HOST:-api.gocv.live}`)
+      - traefik.http.routers.cv-backend.entrypoints=websecure
+      - traefik.http.routers.cv-backend.tls=true
+      - traefik.http.routers.cv-backend.tls.certresolver=letsencrypt
+      - traefik.http.routers.cv-backend.service=cv-backend
+      # ── Service ──
+      - traefik.http.services.cv-backend.loadbalancer.server.port=4000
+      - traefik.http.services.cv-backend.loadbalancer.server.scheme=http
+      # ── WebSocket support (Socket.IO) ──
+      - traefik.http.services.cv-backend.loadbalancer.sticky.cookie=true
+      - traefik.http.services.cv-backend.loadbalancer.sticky.cookie.name=cv_backend_id
+      - traefik.http.services.cv-backend.loadbalancer.sticky.cookie.httponly=true
+      # ── CORS headers middleware ──
+      - traefik.http.middlewares.cv-backend-headers.headers.accesscontrolalloworiginlist=https://${WEB_HOST:-gocv.live}
+      - traefik.http.middlewares.cv-backend-headers.headers.accesscontrolallowmethods=GET,POST,PUT,PATCH,DELETE,OPTIONS
+      - traefik.http.middlewares.cv-backend-headers.headers.accesscontrolallowheaders=Content-Type,Authorization
+      - traefik.http.middlewares.cv-backend-headers.headers.accesscontrolallowcredentials=true
+      - traefik.http.routers.cv-backend.middlewares=cv-backend-headers
     healthcheck:
       test: ["CMD-SHELL", "curl -sf http://localhost:4000/ || exit 1"]
       interval: 30s
@@ -114,7 +122,7 @@ services:
         condition: service_healthy
     networks:
       - cv-internal
-      - cu24-network
+      - cv-network
 
   # ---- Next.js Frontend ----
   gocv-frontend:
@@ -132,14 +140,16 @@ services:
       NODE_ENV: production
       PORT: 3002
     labels:
-      - "traefik.enable=true"
-      # HTTP router
-      - "traefik.http.routers.cv-frontend.rule=Host(`gocv.live`)"
-      - "traefik.http.routers.cv-frontend.entrypoints=websecure"
-      - "traefik.http.routers.cv-frontend.tls=true"
-      - "traefik.http.routers.cv-frontend.tls.certresolver=letsencrypt"
-      # Service
-      - "traefik.http.services.cv-frontend.loadbalancer.server.port=3002"
+      - traefik.enable=true
+      - traefik.docker.network=cv-network
+      # ── HTTP router ──
+      - traefik.http.routers.cv-frontend.rule=Host(`${WEB_HOST:-gocv.live}`)
+      - traefik.http.routers.cv-frontend.entrypoints=websecure
+      - traefik.http.routers.cv-frontend.tls=true
+      - traefik.http.routers.cv-frontend.tls.certresolver=letsencrypt
+      - traefik.http.routers.cv-frontend.service=cv-frontend
+      # ── Service ──
+      - traefik.http.services.cv-frontend.loadbalancer.server.port=3002
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:3002/ || exit 1"]
       interval: 30s
@@ -150,7 +160,7 @@ services:
       gocv-backend:
         condition: service_healthy
     networks:
-      - cu24-network
+      - cv-network
 
 volumes:
   mongo_data:
@@ -159,5 +169,6 @@ volumes:
 networks:
   cv-internal:
     driver: bridge
-  cu24-network:
+  cv-network:
     external: true
+    name: cv-network
