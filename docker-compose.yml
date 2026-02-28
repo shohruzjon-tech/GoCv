@@ -1,7 +1,13 @@
 # Production: GoCV services behind cu24 Traefik reverse proxy
 # Usage: docker compose --env-file .env.prod up -d --build
-# Traefik is managed by the cu24 compose and joins cv-network (external)
-# Domains: gocv.live (frontend), api.gocv.live (backend) — SSL via Let's Encrypt
+#
+# Traefik is managed by the cu24 compose stack and joins cv-network (external).
+# ACME: TLS-ALPN-01 challenge (certresolver=letsencrypt) — NOT HTTP-01.
+# HTTP→HTTPS redirect is handled globally by Traefik's entrypoint config.
+# Domains: gocv.live (frontend), api.gocv.live (backend)
+#
+# ⚠ Cloudflare DNS: gocv.live & api.gocv.live MUST be DNS-only (gray cloud)
+#   so Let's Encrypt TLS-ALPN-01 challenge can reach Traefik directly.
 
 services:
   # ── MongoDB ───────────────────────────────────────────────
@@ -90,19 +96,13 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=cv-network
-      # ── HTTP router ──
+      # ── HTTPS router ──
       - traefik.http.routers.cv-backend.rule=Host(`${API_HOST:-api.gocv.live}`)
       - traefik.http.routers.cv-backend.entrypoints=websecure
       - traefik.http.routers.cv-backend.tls=true
       - traefik.http.routers.cv-backend.tls.certresolver=letsencrypt
       - traefik.http.routers.cv-backend.priority=10
       - traefik.http.routers.cv-backend.service=cv-backend
-      # ── HTTP → HTTPS redirect (also needed for ACME HTTP-01 challenge) ──
-      - traefik.http.routers.cv-backend-http.rule=Host(`${API_HOST:-api.gocv.live}`)
-      - traefik.http.routers.cv-backend-http.entrypoints=web
-      - traefik.http.routers.cv-backend-http.middlewares=cv-https-redirect
-      - traefik.http.middlewares.cv-https-redirect.redirectscheme.scheme=https
-      - traefik.http.middlewares.cv-https-redirect.redirectscheme.permanent=true
       # ── Service ──
       - traefik.http.services.cv-backend.loadbalancer.server.port=4000
       - traefik.http.services.cv-backend.loadbalancer.server.scheme=http
@@ -159,10 +159,6 @@ services:
       - traefik.http.routers.cv-frontend.tls=true
       - traefik.http.routers.cv-frontend.tls.certresolver=letsencrypt
       - traefik.http.routers.cv-frontend.service=cv-frontend
-      # ── HTTP → HTTPS redirect ──
-      - traefik.http.routers.cv-frontend-http.rule=Host(`${WEB_HOST:-gocv.live}`)
-      - traefik.http.routers.cv-frontend-http.entrypoints=web
-      - traefik.http.routers.cv-frontend-http.middlewares=cv-https-redirect
       # ── Service ──
       - traefik.http.services.cv-frontend.loadbalancer.server.port=3002
     healthcheck:
