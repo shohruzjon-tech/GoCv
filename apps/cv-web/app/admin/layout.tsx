@@ -21,6 +21,7 @@ import {
   Bell,
   Tag,
   UserCircle,
+  Wallet,
 } from "lucide-react";
 
 export default function AdminLayout({
@@ -80,6 +81,7 @@ export default function AdminLayout({
       title: "AI & System",
       links: [
         { href: "/admin/ai-usage", icon: Brain, label: "AI Usage" },
+        { href: "/admin/stripe", icon: Wallet, label: "Stripe Settings" },
         { href: "/admin/feature-flags", icon: Flag, label: "Feature Flags" },
         { href: "/admin/audit-logs", icon: ScrollText, label: "Audit Logs" },
         { href: "/admin/sessions", icon: Key, label: "Sessions" },

@@ -474,6 +474,13 @@ export const adminApi = {
   // Site Settings
   getSiteSettings: () => api.get("/api/site-settings"),
   updateSiteSettings: (data: any) => api.put("/api/site-settings", data),
+
+  // Stripe Configuration
+  getStripeConfig: () => api.get("/api/site-settings/stripe"),
+  updateStripeConfig: (data: any) => api.put("/api/site-settings/stripe", data),
+  testStripeConnection: (secretKey: string) =>
+    api.post("/api/site-settings/stripe/test", { secretKey }),
+  reloadStripe: () => api.post("/api/site-settings/stripe/reload"),
 };
 
 // ========== Site Settings (Public) ==========

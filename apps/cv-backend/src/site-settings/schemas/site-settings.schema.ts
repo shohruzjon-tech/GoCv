@@ -36,6 +36,29 @@ export class SiteSettings extends Document {
 
   @Prop({ default: '' })
   creatorLocation: string;
+
+  // ─── Stripe Configuration ───
+
+  @Prop({ default: false })
+  stripeEnabled: boolean;
+
+  @Prop({ default: '' })
+  stripeSecretKey: string;
+
+  @Prop({ default: '' })
+  stripeWebhookSecret: string;
+
+  @Prop({ default: '' })
+  stripePremiumMonthlyPriceId: string;
+
+  @Prop({ default: '' })
+  stripePremiumYearlyPriceId: string;
+
+  @Prop({ default: '' })
+  stripeEnterpriseMonthlyPriceId: string;
+
+  @Prop({ default: '' })
+  stripeEnterpriseYearlyPriceId: string;
 }
 
 export const SiteSettingsSchema = SchemaFactory.createForClass(SiteSettings);

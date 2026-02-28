@@ -1,7 +1,10 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
 import { SubscriptionPlan } from '../common/enums/subscription-plan.enum.js';
+import {
+  SiteSettingsService,
+  StripeConfig,
+} from '../site-settings/site-settings.service.js';
 
 export interface StripePriceIds {
   premium_monthly: string;
@@ -13,45 +16,96 @@ export interface StripePriceIds {
 @Injectable()
 export class StripeService implements OnModuleInit {
   private readonly logger = new Logger(StripeService.name);
-  public stripe: Stripe;
-  private priceIds: StripePriceIds;
+  public stripe: Stripe | null = null;
+  private priceIds: StripePriceIds = {
+    premium_monthly: '',
+    premium_yearly: '',
+    enterprise_monthly: '',
+    enterprise_yearly: '',
+  };
+  private webhookSecret = '';
+  private enabled = false;
 
-  constructor(private configService: ConfigService) {
-    const secretKey = this.configService.get<string>('stripe.secretKey');
-    this.stripe = new Stripe(secretKey || '', {
-      apiVersion: '2026-02-25.clover' as any,
-    });
-
-    this.priceIds = {
-      premium_monthly:
-        this.configService.get<string>('stripe.prices.premiumMonthly') || '',
-      premium_yearly:
-        this.configService.get<string>('stripe.prices.premiumYearly') || '',
-      enterprise_monthly:
-        this.configService.get<string>('stripe.prices.enterpriseMonthly') || '',
-      enterprise_yearly:
-        this.configService.get<string>('stripe.prices.enterpriseYearly') || '',
-    };
-  }
+  constructor(private siteSettingsService: SiteSettingsService) {}
 
   async onModuleInit() {
-    // Verify Stripe connection on startup
+    await this.reloadConfig();
+  }
+
+  /**
+   * Reload Stripe configuration from DB. Called on startup and
+   * whenever the admin updates Stripe settings.
+   */
+  async reloadConfig(): Promise<{ ok: boolean; error?: string }> {
     try {
-      if (this.configService.get<string>('stripe.secretKey')) {
-        await this.stripe.customers.list({ limit: 1 });
-        this.logger.log('✅ Stripe connected successfully');
-      } else {
+      const config = await this.siteSettingsService.getStripeConfig();
+      this.enabled = config.enabled;
+
+      if (!config.enabled || !config.secretKey) {
+        this.stripe = null;
+        this.webhookSecret = '';
+        this.priceIds = {
+          premium_monthly: '',
+          premium_yearly: '',
+          enterprise_monthly: '',
+          enterprise_yearly: '',
+        };
         this.logger.warn(
-          '⚠️ Stripe secret key not configured — payments disabled',
+          '⚠️ Stripe is disabled or secret key not configured — payments disabled',
         );
+        return { ok: true };
       }
+
+      this.stripe = new Stripe(config.secretKey, {
+        apiVersion: '2026-02-25.clover' as any,
+      });
+
+      this.webhookSecret = config.webhookSecret;
+
+      this.priceIds = {
+        premium_monthly: config.premiumMonthlyPriceId,
+        premium_yearly: config.premiumYearlyPriceId,
+        enterprise_monthly: config.enterpriseMonthlyPriceId,
+        enterprise_yearly: config.enterpriseYearlyPriceId,
+      };
+
+      // Verify connection
+      await this.stripe.customers.list({ limit: 1 });
+      this.logger.log('✅ Stripe connected successfully');
+      return { ok: true };
     } catch (error: any) {
+      this.stripe = null;
+      this.enabled = false;
       this.logger.error(`❌ Stripe connection failed: ${error.message}`);
+      return { ok: false, error: error.message };
+    }
+  }
+
+  /** Test a Stripe secret key without persisting it */
+  async testConnection(
+    secretKey: string,
+  ): Promise<{ ok: boolean; error?: string }> {
+    try {
+      const testStripe = new Stripe(secretKey, {
+        apiVersion: '2026-02-25.clover' as any,
+      });
+      await testStripe.customers.list({ limit: 1 });
+      return { ok: true };
+    } catch (error: any) {
+      return { ok: false, error: error.message };
     }
   }
 
   isConfigured(): boolean {
-    return !!this.configService.get<string>('stripe.secretKey');
+    return this.enabled && !!this.stripe;
+  }
+
+  private ensureConfigured() {
+    if (!this.isConfigured() || !this.stripe) {
+      throw new Error(
+        'Stripe is not configured. Ask an admin to enable Stripe in Site Settings.',
+      );
+    }
   }
 
   // ─── Customer Management ───
@@ -61,7 +115,8 @@ export class StripeService implements OnModuleInit {
     name: string,
     metadata?: Record<string, string>,
   ): Promise<Stripe.Customer> {
-    return this.stripe.customers.create({
+    this.ensureConfigured();
+    return this.stripe!.customers.create({
       email,
       name,
       metadata: { ...metadata },
@@ -69,7 +124,8 @@ export class StripeService implements OnModuleInit {
   }
 
   async getCustomer(customerId: string): Promise<Stripe.Customer> {
-    return this.stripe.customers.retrieve(
+    this.ensureConfigured();
+    return this.stripe!.customers.retrieve(
       customerId,
     ) as Promise<Stripe.Customer>;
   }
@@ -78,7 +134,8 @@ export class StripeService implements OnModuleInit {
     customerId: string,
     data: Stripe.CustomerUpdateParams,
   ): Promise<Stripe.Customer> {
-    return this.stripe.customers.update(customerId, data);
+    this.ensureConfigured();
+    return this.stripe!.customers.update(customerId, data);
   }
 
   // ─── Checkout Session ───
@@ -91,6 +148,7 @@ export class StripeService implements OnModuleInit {
     cancelUrl: string;
     userId: string;
   }): Promise<Stripe.Checkout.Session> {
+    this.ensureConfigured();
     const priceId = this.getPriceId(params.plan, params.billingCycle);
     if (!priceId) {
       throw new Error(
@@ -98,7 +156,7 @@ export class StripeService implements OnModuleInit {
       );
     }
 
-    return this.stripe.checkout.sessions.create({
+    return this.stripe!.checkout.sessions.create({
       customer: params.customerId,
       mode: 'subscription',
       payment_method_types: ['card'],
@@ -126,7 +184,8 @@ export class StripeService implements OnModuleInit {
     customerId: string,
     returnUrl: string,
   ): Promise<Stripe.BillingPortal.Session> {
-    return this.stripe.billingPortal.sessions.create({
+    this.ensureConfigured();
+    return this.stripe!.billingPortal.sessions.create({
       customer: customerId,
       return_url: returnUrl,
     });
@@ -135,25 +194,28 @@ export class StripeService implements OnModuleInit {
   // ─── Subscription Management ───
 
   async getSubscription(subscriptionId: string): Promise<Stripe.Subscription> {
-    return this.stripe.subscriptions.retrieve(subscriptionId);
+    this.ensureConfigured();
+    return this.stripe!.subscriptions.retrieve(subscriptionId);
   }
 
   async cancelSubscription(
     subscriptionId: string,
     cancelAtPeriodEnd = true,
   ): Promise<Stripe.Subscription> {
+    this.ensureConfigured();
     if (cancelAtPeriodEnd) {
-      return this.stripe.subscriptions.update(subscriptionId, {
+      return this.stripe!.subscriptions.update(subscriptionId, {
         cancel_at_period_end: true,
       });
     }
-    return this.stripe.subscriptions.cancel(subscriptionId);
+    return this.stripe!.subscriptions.cancel(subscriptionId);
   }
 
   async resumeSubscription(
     subscriptionId: string,
   ): Promise<Stripe.Subscription> {
-    return this.stripe.subscriptions.update(subscriptionId, {
+    this.ensureConfigured();
+    return this.stripe!.subscriptions.update(subscriptionId, {
       cancel_at_period_end: false,
     });
   }
@@ -163,17 +225,18 @@ export class StripeService implements OnModuleInit {
     newPlan: SubscriptionPlan,
     billingCycle: 'monthly' | 'yearly',
   ): Promise<Stripe.Subscription> {
+    this.ensureConfigured();
     const priceId = this.getPriceId(newPlan, billingCycle);
     if (!priceId) {
       throw new Error(`No price configured for ${newPlan} ${billingCycle}`);
     }
 
     const subscription =
-      await this.stripe.subscriptions.retrieve(subscriptionId);
+      await this.stripe!.subscriptions.retrieve(subscriptionId);
     const itemId = subscription.items.data[0]?.id;
     if (!itemId) throw new Error('No subscription item found');
 
-    return this.stripe.subscriptions.update(subscriptionId, {
+    return this.stripe!.subscriptions.update(subscriptionId, {
       items: [{ id: itemId, price: priceId }],
       proration_behavior: 'create_prorations',
       metadata: { plan: newPlan },
@@ -183,7 +246,8 @@ export class StripeService implements OnModuleInit {
   // ─── Invoice / Payment History ───
 
   async getInvoices(customerId: string, limit = 10): Promise<Stripe.Invoice[]> {
-    const list = await this.stripe.invoices.list({
+    this.ensureConfigured();
+    const list = await this.stripe!.invoices.list({
       customer: customerId,
       limit,
     });
@@ -191,8 +255,9 @@ export class StripeService implements OnModuleInit {
   }
 
   async getUpcomingInvoice(customerId: string): Promise<Stripe.Invoice | null> {
+    this.ensureConfigured();
     try {
-      return await (this.stripe.invoices as any).retrieveUpcoming({
+      return await (this.stripe!.invoices as any).retrieveUpcoming({
         customer: customerId,
       });
     } catch {
@@ -203,13 +268,15 @@ export class StripeService implements OnModuleInit {
   // ─── Webhooks ───
 
   constructWebhookEvent(body: Buffer, signature: string): Stripe.Event {
-    const webhookSecret = this.configService.get<string>(
-      'stripe.webhookSecret',
-    );
-    if (!webhookSecret) {
+    this.ensureConfigured();
+    if (!this.webhookSecret) {
       throw new Error('Stripe webhook secret not configured');
     }
-    return this.stripe.webhooks.constructEvent(body, signature, webhookSecret);
+    return this.stripe!.webhooks.constructEvent(
+      body,
+      signature,
+      this.webhookSecret,
+    );
   }
 
   // ─── Helpers ───

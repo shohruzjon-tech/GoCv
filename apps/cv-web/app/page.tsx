@@ -372,7 +372,7 @@ export default function Home() {
             {/* Subheading */}
             <p className="animate-fade-up delay-200 mx-auto mb-12 max-w-2xl text-lg leading-relaxed text-content sm:text-xl">
               Describe yourself or upload an existing CV — our AI crafts a
-              stunning, ATS-optimized resume in minutes.
+              stunning, ATS-optimized resume and shareable landing page in minutes.
             </p>
 
             {/* Smart Input */}
