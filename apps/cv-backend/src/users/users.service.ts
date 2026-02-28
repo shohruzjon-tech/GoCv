@@ -54,6 +54,20 @@ export class UsersService {
       .exec();
   }
 
+  async setEmailVerified(
+    id: string,
+    isEmailVerified: boolean,
+  ): Promise<UserDocument | null> {
+    return this.userModel
+      .findByIdAndUpdate(id, { isEmailVerified }, { new: true })
+      .exec();
+  }
+
+  async updatePassword(id: string, newPassword: string): Promise<void> {
+    const hashed = await bcrypt.hash(newPassword, 12);
+    await this.userModel.findByIdAndUpdate(id, { password: hashed }).exec();
+  }
+
   async findAll(
     page = 1,
     limit = 20,

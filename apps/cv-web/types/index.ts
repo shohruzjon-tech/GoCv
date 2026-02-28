@@ -3,6 +3,7 @@ export interface User {
   name: string;
   email: string;
   role: "user" | "admin" | "super_admin";
+  isEmailVerified?: boolean;
   avatar?: string;
   username?: string;
   bio?: string;

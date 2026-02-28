@@ -3,18 +3,26 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FileText, ArrowRight, Eye, EyeOff, Mail, Lock } from "lucide-react";
+import {
+  FileText,
+  ArrowRight,
+  Eye,
+  EyeOff,
+  Mail,
+  Lock,
+  User,
+} from "lucide-react";
 import { authApi } from "@/lib/api";
-import { useAuthStore } from "@/lib/store";
 import toast from "react-hot-toast";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const router = useRouter();
-  const setAuth = useAuthStore((s) => s.setAuth);
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -24,37 +32,33 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) return;
+    if (!name || !email || !password) return;
+
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+
+    if (password.length < 8) {
+      toast.error("Password must be at least 8 characters");
+      return;
+    }
 
     setLoading(true);
     try {
-      const res = await authApi.login(email, password);
-      const { access_token, user } = res.data;
-      setAuth(user, access_token);
-      toast.success("Logged in successfully!");
-      const pendingWizard = localStorage.getItem("pending_cv_wizard");
-      if (pendingWizard) {
-        router.push("/dashboard/cv/generate");
-      } else {
-        router.push("/dashboard");
-      }
+      await authApi.register(name, email, password);
+      toast.success("Verification code sent to your email!");
+      router.push(`/auth/verify-email?email=${encodeURIComponent(email)}`);
     } catch (err: any) {
       const data = err.response?.data;
-      if (data?.requiresVerification) {
-        toast("Please verify your email first. A new code has been sent.", {
-          icon: "📧",
-        });
-        router.push(`/auth/verify-email?email=${encodeURIComponent(email)}`);
-      } else {
-        toast.error(data?.message || "Invalid email or password");
-      }
+      toast.error(data?.message || "Registration failed. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-page px-4">
+    <div className="flex min-h-screen items-center justify-center bg-page px-4 py-12">
       <div className="w-full max-w-md animate-fade-up">
         <div className="rounded-3xl border border-edge bg-popover p-8 shadow-2xl shadow-black/10 backdrop-blur-xl">
           {/* Logo */}
@@ -68,14 +72,14 @@ export default function LoginPage() {
               </span>
             </Link>
             <h1 className="text-2xl font-bold tracking-tight text-content">
-              Welcome back
+              Create your account
             </h1>
             <p className="mt-2 text-sm text-content-2">
-              Sign in to your account
+              Start building your professional CV today
             </p>
           </div>
 
-          {/* Google Sign In */}
+          {/* Google Sign Up */}
           <button
             onClick={handleGoogleLogin}
             className="group flex w-full items-center justify-center gap-3 rounded-2xl border border-edge bg-card px-6 py-3.5 text-sm font-medium text-content transition-all hover:bg-card-hover"
@@ -105,13 +109,30 @@ export default function LoginPage() {
           <div className="my-6 flex items-center gap-3">
             <div className="h-px flex-1 bg-edge" />
             <span className="text-xs font-medium text-content-4">
-              or sign in with email
+              or register with email
             </span>
             <div className="h-px flex-1 bg-edge" />
           </div>
 
-          {/* Email/Password Form */}
+          {/* Registration Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-content-2">
+                Full Name
+              </label>
+              <div className="relative">
+                <User className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-content-4" />
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="John Doe"
+                  className="w-full rounded-xl border border-field-edge bg-field py-3 pl-10 pr-4 text-sm text-content placeholder:text-content-4 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                  required
+                />
+              </div>
+            </div>
+
             <div>
               <label className="mb-1.5 block text-sm font-medium text-content-2">
                 Email
@@ -139,9 +160,10 @@ export default function LoginPage() {
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
+                  placeholder="At least 8 characters"
                   className="w-full rounded-xl border border-field-edge bg-field py-3 pl-10 pr-11 text-sm text-content placeholder:text-content-4 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
                   required
+                  minLength={8}
                 />
                 <button
                   type="button"
@@ -157,6 +179,24 @@ export default function LoginPage() {
               </div>
             </div>
 
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-content-2">
+                Confirm Password
+              </label>
+              <div className="relative">
+                <Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-content-4" />
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Repeat your password"
+                  className="w-full rounded-xl border border-field-edge bg-field py-3 pl-10 pr-4 text-sm text-content placeholder:text-content-4 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                  required
+                  minLength={8}
+                />
+              </div>
+            </div>
+
             <button
               type="submit"
               disabled={loading}
@@ -166,26 +206,26 @@ export default function LoginPage() {
                 <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
               ) : (
                 <>
-                  Sign In
+                  Create Account
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                 </>
               )}
             </button>
           </form>
 
-          {/* Register link */}
+          {/* Login link */}
           <p className="mt-6 text-center text-sm text-content-3">
-            Don&apos;t have an account?{" "}
+            Already have an account?{" "}
             <Link
-              href="/auth/register"
+              href="/login"
               className="font-semibold text-indigo-400 hover:text-indigo-300 transition"
             >
-              Create one
+              Sign in
             </Link>
           </p>
 
           <p className="mt-4 text-center text-xs text-content-4">
-            By signing in, you agree to our{" "}
+            By creating an account, you agree to our{" "}
             <Link
               href="/terms-of-service"
               className="text-indigo-400 hover:text-indigo-300"

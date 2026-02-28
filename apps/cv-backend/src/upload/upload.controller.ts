@@ -6,11 +6,15 @@ import {
   UseGuards,
   UseInterceptors,
   BadRequestException,
+  Logger,
 } from '@nestjs/common';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { UploadService } from './upload.service.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import 'multer';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const pdfParse = require('pdf-parse');
+import * as mammoth from 'mammoth';
 
 @Controller('api/upload')
 @UseGuards(JwtAuthGuard)
@@ -82,33 +86,55 @@ export class UploadController {
     }),
   )
   async parseCvFile(@UploadedFile() file: Express.Multer.File) {
+    const logger = new Logger('ParseCV');
     if (!file) {
       throw new BadRequestException('No file provided');
     }
-    // Extract text content from the file buffer
+
     let text = '';
-    if (
-      file.mimetype === 'text/plain' ||
-      file.mimetype === 'application/octet-stream'
-    ) {
-      text = file.buffer.toString('utf-8');
-    } else {
-      // For PDF/DOC, extract readable text from the buffer
-      // Convert buffer to string, stripping binary noise
-      const raw = file.buffer.toString('utf-8');
-      // Extract text-like sequences (basic extraction for PDF text layer)
-      text = raw
-        .replace(/[^\x20-\x7E\n\r\t]/g, ' ')
-        .replace(/\s{3,}/g, '\n')
-        .replace(/\n{3,}/g, '\n\n')
-        .trim();
+
+    try {
+      if (file.mimetype === 'text/plain') {
+        // Plain text files
+        text = file.buffer.toString('utf-8');
+      } else if (file.mimetype === 'application/pdf') {
+        // PDF — use pdf-parse for proper text extraction
+        const pdfData = await pdfParse(file.buffer);
+        text = pdfData.text || '';
+      } else if (
+        file.mimetype ===
+          'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
+        file.mimetype === 'application/msword'
+      ) {
+        // DOCX — use mammoth for text extraction
+        const result = await mammoth.extractRawText({ buffer: file.buffer });
+        text = result.value || '';
+      } else {
+        // Fallback for other types
+        text = file.buffer.toString('utf-8');
+      }
+    } catch (err) {
+      logger.error(`File parsing failed for ${file.mimetype}: ${err.message}`);
+      throw new BadRequestException(
+        'Could not parse this file. Please try a different format or paste the content manually.',
+      );
     }
+
+    // Clean up whitespace
+    text = text
+      .replace(/\r\n/g, '\n')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
 
     if (!text || text.length < 20) {
       throw new BadRequestException(
         'Could not extract text from this file. Please paste the content manually.',
       );
     }
+
+    logger.log(
+      `Parsed ${file.mimetype} — extracted ${text.length} chars of text`,
+    );
     return { text: text.substring(0, 15000) };
   }
 }

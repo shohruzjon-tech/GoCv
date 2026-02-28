@@ -25,6 +25,11 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401 && typeof window !== "undefined") {
+      // Don't clear auth if the error is about email verification
+      const data = error.response?.data;
+      if (data?.requiresVerification) {
+        return Promise.reject(error);
+      }
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       window.location.href = "/";
@@ -35,6 +40,18 @@ api.interceptors.response.use(
 
 // ========== Auth API ==========
 export const authApi = {
+  register: (name: string, email: string, password: string) =>
+    api.post("/api/auth/register", { name, email, password }),
+
+  login: (email: string, password: string) =>
+    api.post("/api/auth/login", { email, password }),
+
+  verifyEmail: (email: string, code: string) =>
+    api.post("/api/auth/verify-email", { email, code }),
+
+  resendVerification: (email: string) =>
+    api.post("/api/auth/resend-verification", { email }),
+
   adminLogin: (email: string, password: string) =>
     api.post("/api/auth/admin/login", { email, password }),
 

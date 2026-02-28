@@ -17,6 +17,10 @@ import { GoogleAuthGuard } from './guards/google-auth.guard.js';
 import { JwtAuthGuard } from './guards/jwt-auth.guard.js';
 import { CurrentUser } from './decorators/current-user.decorator.js';
 import { AdminLoginDto } from './dto/admin-login.dto.js';
+import { RegisterDto } from './dto/register.dto.js';
+import { LoginDto } from './dto/login.dto.js';
+import { VerifyEmailDto } from './dto/verify-email.dto.js';
+import { ResendVerificationDto } from './dto/resend-verification.dto.js';
 import type { Request, Response } from 'express';
 
 @Controller('api/auth')
@@ -26,6 +30,39 @@ export class AuthController {
     private apiKeyService: ApiKeyService,
     private configService: ConfigService,
   ) {}
+
+  // ─── Email/Password Auth ───
+
+  @Post('register')
+  @HttpCode(HttpStatus.CREATED)
+  async register(@Body() dto: RegisterDto) {
+    return this.authService.register(dto.name, dto.email, dto.password);
+  }
+
+  @Post('login')
+  @HttpCode(HttpStatus.OK)
+  async login(@Body() dto: LoginDto, @Req() req: Request) {
+    return this.authService.login(
+      dto.email,
+      dto.password,
+      req.headers['user-agent'],
+      req.ip,
+    );
+  }
+
+  @Post('verify-email')
+  @HttpCode(HttpStatus.OK)
+  async verifyEmail(@Body() dto: VerifyEmailDto) {
+    return this.authService.verifyEmail(dto.email, dto.code);
+  }
+
+  @Post('resend-verification')
+  @HttpCode(HttpStatus.OK)
+  async resendVerification(@Body() dto: ResendVerificationDto) {
+    return this.authService.resendVerification(dto.email);
+  }
+
+  // ─── Google OAuth ───
 
   @Get('google')
   @UseGuards(GoogleAuthGuard)
@@ -40,6 +77,8 @@ export class AuthController {
     const frontendUrl = this.configService.get<string>('frontendUrl');
     res.redirect(`${frontendUrl}/auth/callback?token=${result.access_token}`);
   }
+
+  // ─── Admin Login ───
 
   @Post('admin/login')
   @HttpCode(HttpStatus.OK)

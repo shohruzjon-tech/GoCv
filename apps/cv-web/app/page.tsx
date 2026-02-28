@@ -73,7 +73,10 @@ export default function Home() {
         localStorage.setItem("pending_cv_wizard", JSON.stringify(payload));
         const token = localStorage.getItem("token");
         if (token) {
-          window.location.href = "/dashboard/cv/generate";
+          window.location.href =
+            wizardMode === "polish"
+              ? "/dashboard/cv/generate/polish"
+              : "/dashboard/cv/generate/ai";
         } else {
           setShowLogin(true);
         }
@@ -84,7 +87,10 @@ export default function Home() {
     localStorage.setItem("pending_cv_wizard", JSON.stringify(payload));
     const token = localStorage.getItem("token");
     if (token) {
-      window.location.href = "/dashboard/cv/generate";
+      window.location.href =
+        wizardMode === "polish"
+          ? "/dashboard/cv/generate/polish"
+          : "/dashboard/cv/generate/ai";
     } else {
       setShowLogin(true);
     }
@@ -199,6 +205,29 @@ export default function Home() {
                 Continue with Google
                 <ArrowRight className="h-4 w-4 text-content-3 transition-transform group-hover:translate-x-0.5 group-hover:text-content" />
               </button>
+
+              <div className="my-5 flex items-center gap-3">
+                <div className="h-px flex-1 bg-edge" />
+                <span className="text-xs font-medium text-content-4">or</span>
+                <div className="h-px flex-1 bg-edge" />
+              </div>
+
+              <div className="flex gap-3">
+                <Link
+                  href="/login"
+                  onClick={() => setShowLogin(false)}
+                  className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-edge bg-card px-4 py-3 text-sm font-medium text-content transition-all hover:bg-card-hover"
+                >
+                  Sign In with Email
+                </Link>
+                <Link
+                  href="/auth/register"
+                  onClick={() => setShowLogin(false)}
+                  className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-600/20 transition-all hover:bg-indigo-500"
+                >
+                  Create Account
+                </Link>
+              </div>
 
               <p className="mt-6 text-center text-xs text-content-4">
                 By signing in, you agree to our{" "}

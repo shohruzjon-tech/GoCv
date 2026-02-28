@@ -8,7 +8,12 @@ import { AuthController } from './auth.controller.js';
 import { GoogleStrategy } from './strategies/google.strategy.js';
 import { JwtStrategy } from './strategies/jwt.strategy.js';
 import { ApiKeyService } from './api-key.service.js';
+import { EmailService } from './email.service.js';
 import { ApiKey, ApiKeySchema } from './schemas/api-key.schema.js';
+import {
+  EmailVerification,
+  EmailVerificationSchema,
+} from './schemas/email-verification.schema.js';
 import { UsersModule } from '../users/users.module.js';
 import { SessionsModule } from '../sessions/sessions.module.js';
 
@@ -16,7 +21,10 @@ import { SessionsModule } from '../sessions/sessions.module.js';
   imports: [
     UsersModule,
     SessionsModule,
-    MongooseModule.forFeature([{ name: ApiKey.name, schema: ApiKeySchema }]),
+    MongooseModule.forFeature([
+      { name: ApiKey.name, schema: ApiKeySchema },
+      { name: EmailVerification.name, schema: EmailVerificationSchema },
+    ]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
@@ -30,8 +38,14 @@ import { SessionsModule } from '../sessions/sessions.module.js';
       }),
     }),
   ],
-  providers: [AuthService, GoogleStrategy, JwtStrategy, ApiKeyService],
+  providers: [
+    AuthService,
+    GoogleStrategy,
+    JwtStrategy,
+    ApiKeyService,
+    EmailService,
+  ],
   controllers: [AuthController],
-  exports: [AuthService, ApiKeyService],
+  exports: [AuthService, ApiKeyService, EmailService],
 })
 export class AuthModule {}
