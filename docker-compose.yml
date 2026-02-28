@@ -1,63 +1,63 @@
-# Production: Everything runs in Docker behind Traefik reverse proxy
+# Production: GoCV services behind cu24 Traefik reverse proxy
 # Usage: docker compose --env-file .env.prod up -d --build
-# Traefik must already be running and joined to the cv-network external network
+# Traefik is managed by the cu24 compose and joins cv-network (external)
 # Domains: gocv.live (frontend), api.gocv.live (backend) — SSL via Let's Encrypt
 
 services:
-  # ---- MongoDB ----
+  # ── MongoDB ───────────────────────────────────────────────
   gocv-mongo:
     image: mongo:8.0
     container_name: cv-mongo
-    restart: always
+    restart: unless-stopped
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME:-cvadmin}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-cvpassword}
       MONGO_INITDB_DATABASE: cv-builder
     ports:
-      - "127.0.0.1:4002:27017"
+      - "${MONGO_PORT:-4002}:27017"
     volumes:
       - mongo_data:/data/db
     networks:
       - cv-internal
     healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')", "--quiet"]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 20s
 
-  # ---- Redis ----
+  # ── Redis ─────────────────────────────────────────────────
   gocv-redis:
     image: redis:7-alpine
     container_name: cv-redis
-    restart: always
-    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-redispassword}
-    ports:
-      - "127.0.0.1:4003:6379"
+    restart: unless-stopped
+    command: redis-server --requirepass ${REDIS_PASSWORD:-redispassword} --appendonly yes
     volumes:
       - redis_data:/data
     networks:
       - cv-internal
     healthcheck:
-      test:
-        ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-redispassword}", "ping"]
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
 
-  # ---- NestJS Backend ----
+  # ── NestJS Backend (HTTP + WebSocket) ─────────────────────
   gocv-backend:
     build:
       context: .
       dockerfile: apps/cv-backend/Dockerfile
+      args:
+        NODE_ENV: production
     container_name: cv-backend
-    restart: always
+    restart: unless-stopped
     expose:
       - "4000"
     environment:
       NODE_ENV: production
       PORT: 4000
-      MONGODB_URI: mongodb://${MONGO_USERNAME:-cvadmin}:${MONGO_PASSWORD:-cvpassword}@mongo:27017/cv-builder?authSource=admin
-      REDIS_HOST: redis
+      MONGODB_URI: mongodb://${MONGO_USERNAME:-cvadmin}:${MONGO_PASSWORD:-cvpassword}@gocv-mongo:27017/cv-builder?authSource=admin
+      REDIS_HOST: gocv-redis
       REDIS_PORT: 6379
       REDIS_PASSWORD: ${REDIS_PASSWORD:-redispassword}
       JWT_SECRET: ${JWT_SECRET}
@@ -101,6 +101,7 @@ services:
       - traefik.http.routers.cv-backend.entrypoints=websecure
       - traefik.http.routers.cv-backend.tls=true
       - traefik.http.routers.cv-backend.tls.certresolver=letsencrypt
+      - traefik.http.routers.cv-backend.priority=10
       - traefik.http.routers.cv-backend.service=cv-backend
       # ── Service ──
       - traefik.http.services.cv-backend.loadbalancer.server.port=4000
@@ -116,11 +117,15 @@ services:
       - traefik.http.middlewares.cv-backend-headers.headers.accesscontrolallowcredentials=true
       - traefik.http.routers.cv-backend.middlewares=cv-backend-headers
     healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://localhost:4000/ || exit 1"]
-      interval: 30s
-      timeout: 5s
-      retries: 5
-      start_period: 40s
+      test:
+        [
+          "CMD-SHELL",
+          'node -e "const http=require(''http'');const r=http.get(''http://localhost:4000/api'',res=>{process.exit(res.statusCode<500?0:1)});r.on(''error'',()=>process.exit(1));r.setTimeout(5000,()=>{r.destroy();process.exit(1)})"',
+        ]
+      interval: 15s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
     depends_on:
       gocv-mongo:
         condition: service_healthy
@@ -130,7 +135,7 @@ services:
       - cv-internal
       - cv-network
 
-  # ---- Next.js Frontend ----
+  # ── Next.js Frontend ──────────────────────────────────────
   gocv-frontend:
     build:
       context: .
@@ -139,7 +144,7 @@ services:
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-https://api.gocv.live}
         NEXT_PUBLIC_WS_URL: ${NEXT_PUBLIC_WS_URL:-wss://api.gocv.live}
     container_name: cv-frontend
-    restart: always
+    restart: unless-stopped
     expose:
       - "3002"
     environment:
@@ -170,7 +175,9 @@ services:
 
 volumes:
   mongo_data:
+    driver: local
   redis_data:
+    driver: local
 
 networks:
   cv-internal:
