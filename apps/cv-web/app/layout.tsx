@@ -149,7 +149,7 @@ export const metadata: Metadata = {
       "Build your professional resume for free with AI. Generate ATS-optimized CVs, get a shareable online page, and download stunning PDF resumes. No watermarks, no hidden fees.",
     images: [
       {
-        url: "/og-image.png",
+        url: "/open_graph.png",
         width: 1200,
         height: 630,
         alt: "GoCV — Free AI-Powered Resume Builder",
@@ -163,7 +163,7 @@ export const metadata: Metadata = {
     title: "GoCV — Free AI Resume Builder | Create Professional CV in Minutes",
     description:
       "Build your professional resume for free with AI. ATS-optimized, shareable online page, PDF export. Better than Zety, Resume.io & Canva.",
-    images: ["/og-image.png"],
+    images: ["/open_graph.png"],
     creator: "@gocv_live",
     site: "@gocv_live",
   },
@@ -269,7 +269,7 @@ export default function RootLayout({
         },
         featureList:
           "AI Resume Generation, ATS Optimization, PDF Export, Shareable Online Page, Project Portfolio, Beautiful Templates, AI Chat Assistant",
-        screenshot: `${SITE_URL}/og-image.png`,
+        screenshot: `${SITE_URL}/open_graph.png`,
       },
       {
         "@type": "WebPage",
