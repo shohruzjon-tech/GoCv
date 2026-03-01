@@ -3,8 +3,12 @@ import { FileText, ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Terms of Service - GoCV",
-  description: "Terms of Service for GoCV AI-Powered Resume Builder",
+  title: "Terms of Service",
+  description:
+    "GoCV Terms of Service. Understand the terms and conditions for using our free AI-powered resume builder, shareable CV pages, and PDF export features.",
+  alternates: {
+    canonical: "/terms-of-service",
+  },
 };
 
 export default function TermsOfServicePage() {

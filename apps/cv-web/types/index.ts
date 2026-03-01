@@ -359,6 +359,56 @@ export interface DashboardStats {
   estimatedMrr?: number;
 }
 
+// ─── Admin Analytics Types ───
+
+export interface RegistrationStats {
+  total: number;
+  verified: number;
+  unverified: number;
+  withPassword: number;
+  googleOnly: number;
+  verificationRate: number;
+  last24h: number;
+  last7d: number;
+  last30d: number;
+}
+
+export interface JoiningDynamics {
+  daily: { date: string; count: number }[];
+  hourly: { hour: string; count: number }[];
+  cumulative: { date: string; total: number }[];
+}
+
+export interface RequestDataPoint {
+  timestamp: number;
+  count: number;
+  methods: Record<string, number>;
+  statuses: Record<string, number>;
+}
+
+export interface RequestDynamics {
+  dataPoints: RequestDataPoint[];
+  summary: {
+    totalRequests: number;
+    avgRps: number;
+    peakRps: number;
+    currentRps: number;
+    methodBreakdown: Record<string, number>;
+    statusBreakdown: Record<string, number>;
+  };
+}
+
+export interface LiveSnapshot {
+  activeSessions: number;
+  registrationStats: {
+    total: number;
+    verified: number;
+    unverified: number;
+    last24h: number;
+  };
+  requestDynamics: RequestDynamics;
+}
+
 // ─── Enterprise Types ───
 
 export type OrgRole = "owner" | "admin" | "recruiter" | "member" | "viewer";

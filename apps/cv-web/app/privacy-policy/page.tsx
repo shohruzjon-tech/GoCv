@@ -3,8 +3,12 @@ import { FileText, ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy - GoCV",
-  description: "Privacy Policy for GoCV AI-Powered Resume Builder",
+  title: "Privacy Policy",
+  description:
+    "Read GoCV's Privacy Policy. Learn how we protect your data, handle your resume information, and ensure your privacy when using our free AI resume builder.",
+  alternates: {
+    canonical: "/privacy-policy",
+  },
 };
 
 export default function PrivacyPolicyPage() {

@@ -10,6 +10,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AdminService } from './admin.service.js';
+import { AdminAnalyticsService } from './admin-analytics.service.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../auth/guards/roles.guard.js';
 import { Roles } from '../auth/decorators/roles.decorator.js';
@@ -20,7 +21,10 @@ import { CurrentUser } from '../auth/decorators/current-user.decorator.js';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(Role.ADMIN)
 export class AdminController {
-  constructor(private adminService: AdminService) {}
+  constructor(
+    private adminService: AdminService,
+    private analyticsService: AdminAnalyticsService,
+  ) {}
 
   // ─── Dashboard ───
 
@@ -286,5 +290,27 @@ export class AdminController {
   @Get('revenue')
   async getRevenueOverview() {
     return this.adminService.getRevenueOverview();
+  }
+
+  // ─── Analytics (REST fallback for initial load) ───
+
+  @Get('analytics/registration-stats')
+  async getRegistrationStats() {
+    return this.analyticsService.getRegistrationStats();
+  }
+
+  @Get('analytics/joining-dynamics')
+  async getJoiningDynamics(@Query('days') days?: string) {
+    return this.analyticsService.getUserJoiningDynamics(Number(days) || 7);
+  }
+
+  @Get('analytics/request-dynamics')
+  async getRequestDynamics(@Query('seconds') seconds?: string) {
+    return this.analyticsService.getRequestDynamics(Number(seconds) || 300);
+  }
+
+  @Get('analytics/live-snapshot')
+  async getLiveSnapshot() {
+    return this.analyticsService.getLiveSnapshot();
   }
 }

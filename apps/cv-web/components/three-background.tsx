@@ -332,24 +332,49 @@ function Scene({ reduced }: { reduced: boolean }) {
 export default function ThreeBackground() {
   const [reduced, setReduced] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     const mql = window.matchMedia("(prefers-reduced-motion: reduce)");
     setReduced(mql.matches);
     const onChange = (e: MediaQueryListEvent) => setReduced(e.matches);
     mql.addEventListener("change", onChange);
 
-    setIsMobile(window.innerWidth < 768);
-    const onResize = () => setIsMobile(window.innerWidth < 768);
-    window.addEventListener("resize", onResize, { passive: true });
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile, { passive: true });
 
     return () => {
       mql.removeEventListener("change", onChange);
-      window.removeEventListener("resize", onResize);
+      window.removeEventListener("resize", checkMobile);
     };
   }, []);
 
+  // Don't render Three.js on mobile at all — use CSS fallback
+  if (!mounted) return null;
+
   const effectiveReduced = reduced || isMobile;
+
+  // On mobile, render a lightweight CSS gradient animation instead
+  if (isMobile) {
+    return (
+      <div
+        className="fixed inset-0 z-0 pointer-events-none w-screen h-screen"
+        style={{ opacity: "var(--t-three-opacity, 0.6)" }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-br from-indigo-950/40 via-transparent to-purple-950/30" />
+        <div
+          className="absolute top-1/4 left-1/2 -translate-x-1/2 h-[300px] w-[300px] rounded-full bg-indigo-600/10 blur-[100px]"
+          style={{ animation: "float 8s ease-in-out infinite" }}
+        />
+        <div
+          className="absolute bottom-1/4 right-1/4 h-[200px] w-[200px] rounded-full bg-purple-600/10 blur-[80px]"
+          style={{ animation: "float 10s ease-in-out infinite reverse" }}
+        />
+      </div>
+    );
+  }
 
   return (
     <div
@@ -358,9 +383,9 @@ export default function ThreeBackground() {
     >
       <Canvas
         camera={{ position: [0, 0, 12], fov: 50 }}
-        dpr={isMobile ? [1, 1] : [1, 1.5]}
+        dpr={[1, 1.5]}
         gl={{
-          antialias: !isMobile,
+          antialias: true,
           alpha: true,
           powerPreference: "high-performance",
         }}

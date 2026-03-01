@@ -1,13 +1,27 @@
-import { Injectable, NestMiddleware, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  NestMiddleware,
+  Logger,
+  Inject,
+  Optional,
+} from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
+import { AdminAnalyticsService } from '../../admin/admin-analytics.service.js';
 
 /**
  * Request logging middleware for observability.
  * Logs method, URL, status code, response time, and correlation ID.
+ * Also feeds request metrics into AdminAnalyticsService for real-time dashboard.
  */
 @Injectable()
 export class RequestLoggerMiddleware implements NestMiddleware {
   private readonly logger = new Logger('HTTP');
+
+  constructor(
+    @Optional()
+    @Inject(AdminAnalyticsService)
+    private analyticsService?: AdminAnalyticsService,
+  ) {}
 
   use(req: Request, res: Response, next: NextFunction) {
     const startTime = Date.now();
@@ -28,6 +42,11 @@ export class RequestLoggerMiddleware implements NestMiddleware {
         this.logger.warn(logMessage);
       } else {
         this.logger.log(logMessage);
+      }
+
+      // Feed into analytics for real-time dashboard
+      if (this.analyticsService) {
+        this.analyticsService.trackRequest(method, statusCode);
       }
     });
 

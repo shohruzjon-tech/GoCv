@@ -471,6 +471,15 @@ export const adminApi = {
   // Revenue
   getRevenue: () => api.get("/api/admin/revenue"),
 
+  // Analytics (real-time dashboard)
+  getRegistrationStats: () =>
+    api.get("/api/admin/analytics/registration-stats"),
+  getJoiningDynamics: (days = 7) =>
+    api.get(`/api/admin/analytics/joining-dynamics?days=${days}`),
+  getRequestDynamics: (seconds = 300) =>
+    api.get(`/api/admin/analytics/request-dynamics?seconds=${seconds}`),
+  getLiveSnapshot: () => api.get("/api/admin/analytics/live-snapshot"),
+
   // Site Settings
   getSiteSettings: () => api.get("/api/site-settings"),
   updateSiteSettings: (data: any) => api.put("/api/site-settings", data),
