@@ -327,10 +327,17 @@ export default function TermsOfServicePage() {
             <p>
               <strong>Email:</strong>{" "}
               <a
-                href="mailto:legal@cvbuilder.com"
+                href="mailto:support@gocv.live"
                 className="text-indigo-400 underline hover:text-indigo-300"
               >
-                legal@cvbuilder.com
+                support@gocv.live
+              </a>{" "}
+              or{" "}
+              <a
+                href="mailto:abdivakilov1981@gmail.com"
+                className="text-indigo-400 underline hover:text-indigo-300"
+              >
+                abdivakilov1981@gmail.com
               </a>
             </p>
           </section>

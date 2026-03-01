@@ -291,10 +291,17 @@ export default function PrivacyPolicyPage() {
             <p>
               <strong>Email:</strong>{" "}
               <a
-                href="mailto:privacy@cvbuilder.com"
+                href="mailto:support@gocv.live"
                 className="text-indigo-400 underline hover:text-indigo-300"
               >
-                privacy@cvbuilder.com
+                support@gocv.live
+              </a>{" "}
+              or{" "}
+              <a
+                href="mailto:abdivakilov1981@gmail.com"
+                className="text-indigo-400 underline hover:text-indigo-300"
+              >
+                abdivakilov1981@gmail.com
               </a>
             </p>
           </section>
