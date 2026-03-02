@@ -60,7 +60,7 @@ export class ProjectsService {
       throw new ForbiddenException('Not authorized');
     }
     const updated = await this.projectModel
-      .findByIdAndUpdate(id, { $set: dto }, { new: true })
+      .findByIdAndUpdate(id, { $set: dto }, { returnDocument: 'after' })
       .exec();
     if (!updated) throw new NotFoundException('Project not found after update');
     return updated;

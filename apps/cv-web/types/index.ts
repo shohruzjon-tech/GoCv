@@ -52,6 +52,7 @@ export interface Cv {
     website?: string;
     linkedin?: string;
     github?: string;
+    avatar?: string;
   };
   theme?: {
     primaryColor?: string;

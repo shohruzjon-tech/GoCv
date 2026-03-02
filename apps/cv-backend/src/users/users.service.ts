@@ -38,7 +38,7 @@ export class UsersService {
     updateData: UpdateUserDto,
   ): Promise<UserDocument | null> {
     return this.userModel
-      .findByIdAndUpdate(id, { $set: updateData }, { new: true })
+      .findByIdAndUpdate(id, { $set: updateData }, { returnDocument: 'after' })
       .exec();
   }
 
@@ -50,7 +50,7 @@ export class UsersService {
 
   async setActive(id: string, isActive: boolean): Promise<UserDocument | null> {
     return this.userModel
-      .findByIdAndUpdate(id, { isActive }, { new: true })
+      .findByIdAndUpdate(id, { isActive }, { returnDocument: 'after' })
       .exec();
   }
 
@@ -59,7 +59,7 @@ export class UsersService {
     isEmailVerified: boolean,
   ): Promise<UserDocument | null> {
     return this.userModel
-      .findByIdAndUpdate(id, { isEmailVerified }, { new: true })
+      .findByIdAndUpdate(id, { isEmailVerified }, { returnDocument: 'after' })
       .exec();
   }
 

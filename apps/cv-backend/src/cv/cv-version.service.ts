@@ -163,7 +163,7 @@ export class CvVersionService {
             aiGeneratedHtml: version.snapshot.aiGeneratedHtml,
           },
         },
-        { new: true },
+        { returnDocument: 'after' },
       )
       .exec();
 

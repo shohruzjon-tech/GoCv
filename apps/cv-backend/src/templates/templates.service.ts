@@ -49,7 +49,7 @@ export class TemplatesService {
 
   async update(id: string, dto: UpdateTemplateDto): Promise<TemplateDocument> {
     const updated = await this.templateModel
-      .findByIdAndUpdate(id, { $set: dto }, { new: true })
+      .findByIdAndUpdate(id, { $set: dto }, { returnDocument: 'after' })
       .exec();
     if (!updated) throw new NotFoundException('Template not found');
     return updated;

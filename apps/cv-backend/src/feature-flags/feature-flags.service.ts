@@ -60,7 +60,7 @@ export class FeatureFlagsService {
     data: Partial<FeatureFlag>,
   ): Promise<FeatureFlagDocument> {
     const updated = await this.flagModel
-      .findByIdAndUpdate(id, { $set: data }, { new: true })
+      .findByIdAndUpdate(id, { $set: data }, { returnDocument: 'after' })
       .exec();
     if (!updated) throw new NotFoundException('Feature flag not found');
     return updated;

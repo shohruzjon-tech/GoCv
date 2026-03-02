@@ -70,7 +70,7 @@ export class CvService {
     }
 
     const updated = await this.cvModel
-      .findByIdAndUpdate(id, { $set: dto }, { new: true })
+      .findByIdAndUpdate(id, { $set: dto }, { returnDocument: 'after' })
       .exec();
     if (!updated) throw new NotFoundException('CV not found after update');
     return updated;

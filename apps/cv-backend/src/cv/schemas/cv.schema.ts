@@ -53,6 +53,7 @@ export class Cv {
     website?: string;
     linkedin?: string;
     github?: string;
+    avatar?: string;
   };
 
   @Prop({ type: Object })

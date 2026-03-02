@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef, useMemo, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { cvApi, pdfApi, templatesApi } from "@/lib/api";
+import { cvApi, pdfApi, templatesApi, uploadApi } from "@/lib/api";
 import { Cv, CvSection, Template } from "@/types";
 import { useSubscriptionStore } from "@/lib/store";
 import {
@@ -17,7 +17,6 @@ import {
   Copy,
   Check,
   ExternalLink,
-  ChevronDown,
   Loader2,
   Share2,
   Palette,
@@ -41,6 +40,9 @@ import {
   CheckCircle2,
   ArrowRight,
   Info,
+  Camera,
+  PanelRightOpen,
+  ChevronRight,
   type LucideIcon,
 } from "lucide-react";
 import toast from "react-hot-toast";
@@ -69,7 +71,7 @@ function Field({
       </label>
       <input
         {...props}
-        className="w-full rounded-xl border border-edge bg-field px-3 py-2.5 text-sm text-content placeholder:text-content-4 focus:border-indigo-500/50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all duration-200"
+        className="w-full rounded-xl border border-white/[0.06] bg-white/[0.03] px-3.5 py-2.5 text-sm text-content placeholder:text-content-4 focus:border-indigo-500/40 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:bg-white/[0.05] transition-all duration-200 backdrop-blur-sm"
       />
     </div>
   );
@@ -100,7 +102,7 @@ function CompletionRing({
           r={r}
           fill="none"
           strokeWidth={3}
-          className="stroke-edge"
+          className="stroke-white/[0.06]"
         />
         <circle
           cx={size / 2}
@@ -121,75 +123,6 @@ function CompletionRing({
       >
         {score}%
       </span>
-    </div>
-  );
-}
-
-function SectionHeader({
-  icon: Icon,
-  color,
-  title,
-  subtitle,
-  action,
-}: {
-  icon: LucideIcon;
-  color: string;
-  title: string;
-  subtitle?: string;
-  action?: React.ReactNode;
-}) {
-  const colors: Record<string, { bg: string; text: string; ring: string }> = {
-    indigo: {
-      bg: "bg-indigo-500/10",
-      text: "text-indigo-400",
-      ring: "ring-indigo-500/20",
-    },
-    purple: {
-      bg: "bg-purple-500/10",
-      text: "text-purple-400",
-      ring: "ring-purple-500/20",
-    },
-    emerald: {
-      bg: "bg-emerald-500/10",
-      text: "text-emerald-400",
-      ring: "ring-emerald-500/20",
-    },
-    amber: {
-      bg: "bg-amber-500/10",
-      text: "text-amber-400",
-      ring: "ring-amber-500/20",
-    },
-    pink: {
-      bg: "bg-pink-500/10",
-      text: "text-pink-400",
-      ring: "ring-pink-500/20",
-    },
-    sky: {
-      bg: "bg-sky-500/10",
-      text: "text-sky-400",
-      ring: "ring-sky-500/20",
-    },
-    orange: {
-      bg: "bg-orange-500/10",
-      text: "text-orange-400",
-      ring: "ring-orange-500/20",
-    },
-  };
-  const c = colors[color] || colors.indigo;
-  return (
-    <div className="flex items-center justify-between gap-3 border-b border-edge bg-card/50 px-5 py-4">
-      <div className="flex items-center gap-3">
-        <div
-          className={`flex h-9 w-9 items-center justify-center rounded-xl ${c.bg} ${c.text} ring-1 ${c.ring}`}
-        >
-          <Icon className="h-4 w-4" />
-        </div>
-        <div>
-          <h3 className="text-sm font-semibold text-content">{title}</h3>
-          {subtitle && <p className="text-xs text-content-4">{subtitle}</p>}
-        </div>
-      </div>
-      {action}
     </div>
   );
 }
@@ -229,12 +162,12 @@ function TemplateSelector({
         {[...Array(4)].map((_, i) => (
           <div
             key={i}
-            className="animate-pulse shrink-0 w-32 h-40 rounded-xl border border-edge bg-card"
+            className="animate-pulse shrink-0 w-32 h-40 rounded-xl border border-white/[0.06] bg-white/[0.02]"
           >
-            <div className="h-20 rounded-t-xl bg-card-hover" />
+            <div className="h-20 rounded-t-xl bg-white/[0.04]" />
             <div className="p-2 space-y-2">
-              <div className="h-3 w-2/3 rounded bg-card-hover" />
-              <div className="h-2 w-full rounded bg-card-hover" />
+              <div className="h-3 w-2/3 rounded bg-white/[0.04]" />
+              <div className="h-2 w-full rounded bg-white/[0.04]" />
             </div>
           </div>
         ))}
@@ -270,8 +203,8 @@ function TemplateSelector({
               onClick={() => setFilterCategory(cat)}
               className={`rounded-full px-2.5 py-0.5 text-[10px] font-medium capitalize transition ${
                 filterCategory === cat
-                  ? "bg-indigo-600/20 text-indigo-300 ring-1 ring-indigo-500/30"
-                  : "text-content-3 hover:bg-card-hover hover:text-content-2"
+                  ? "bg-indigo-500/15 text-indigo-300 ring-1 ring-indigo-500/30"
+                  : "text-content-3 hover:bg-white/[0.04] hover:text-content-2"
               }`}
             >
               {cat === "all" ? "All" : cat}
@@ -279,7 +212,7 @@ function TemplateSelector({
           ),
         )}
       </div>
-      <div className="flex gap-2.5 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-edge scrollbar-track-transparent">
+      <div className="flex gap-2.5 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
         {filtered.map((template) => {
           const isSelected = selectedId === template._id;
           const locked = !canUse(template);
@@ -296,7 +229,7 @@ function TemplateSelector({
               className={`group relative shrink-0 w-32 overflow-hidden rounded-xl border-2 text-left transition-all duration-200 ${
                 isSelected
                   ? "border-indigo-500 ring-2 ring-indigo-500/30 scale-[1.02]"
-                  : "border-edge hover:border-content-4"
+                  : "border-white/[0.06] hover:border-white/[0.12]"
               } ${locked ? "opacity-60" : ""}`}
             >
               <div
@@ -332,7 +265,7 @@ function TemplateSelector({
                   </div>
                 )}
               </div>
-              <div className="bg-card p-1.5">
+              <div className="bg-white/[0.02] p-1.5">
                 <p className="truncate text-[10px] font-semibold text-content">
                   {template.name}
                 </p>
@@ -486,7 +419,7 @@ function ExperienceEditor({
       {items.map((item: any, i: number) => (
         <div
           key={i}
-          className="rounded-xl border border-edge bg-field/30 p-4 space-y-3"
+          className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 space-y-3 transition-all duration-200 hover:bg-white/[0.03]"
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-content-2">
@@ -544,7 +477,7 @@ function ExperienceEditor({
               onChange={(e) => updateItem(i, { description: e.target.value })}
               rows={2}
               placeholder="Brief description of your role..."
-              className="w-full resize-none rounded-xl border border-edge bg-field px-3 py-2.5 text-sm text-content placeholder:text-content-4 focus:border-indigo-500/50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition"
+              className="w-full resize-none rounded-xl border border-white/[0.06] bg-white/[0.03] px-3.5 py-2.5 text-sm text-content placeholder:text-content-4 focus:border-indigo-500/40 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition backdrop-blur-sm"
             />
           </div>
           {/* Highlights / Bullets */}
@@ -566,7 +499,7 @@ function ExperienceEditor({
                       updateItem(i, { highlights: hl });
                     }}
                     placeholder="Achieved X by doing Y resulting in Z..."
-                    className="flex-1 rounded-lg border border-edge bg-field px-3 py-2 text-sm text-content placeholder:text-content-4 focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/20 transition"
+                    className="flex-1 rounded-lg border border-white/[0.06] bg-white/[0.03] px-3 py-2 text-sm text-content placeholder:text-content-4 focus:border-indigo-500/40 focus:outline-none focus:ring-1 focus:ring-indigo-500/20 transition"
                   />
                   <button
                     onClick={() => {
@@ -599,7 +532,7 @@ function ExperienceEditor({
       ))}
       <button
         onClick={addItem}
-        className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-edge py-3 text-xs font-medium text-content-3 transition hover:border-indigo-500/40 hover:text-indigo-400 hover:bg-indigo-500/5"
+        className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-white/[0.08] py-3 text-xs font-medium text-content-3 transition hover:border-indigo-500/40 hover:text-indigo-400 hover:bg-indigo-500/5"
       >
         <Plus className="h-3.5 w-3.5" /> Add Experience
       </button>
@@ -646,7 +579,7 @@ function EducationEditor({
       {items.map((item: any, i: number) => (
         <div
           key={i}
-          className="rounded-xl border border-edge bg-field/30 p-4 space-y-3"
+          className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 space-y-3 transition-all duration-200 hover:bg-white/[0.03]"
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-content-2">
@@ -703,14 +636,14 @@ function EducationEditor({
               onChange={(e) => updateItem(i, { description: e.target.value })}
               rows={2}
               placeholder="Relevant coursework, honors, activities..."
-              className="w-full resize-none rounded-xl border border-edge bg-field px-3 py-2.5 text-sm text-content placeholder:text-content-4 focus:border-indigo-500/50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition"
+              className="w-full resize-none rounded-xl border border-white/[0.06] bg-white/[0.03] px-3.5 py-2.5 text-sm text-content placeholder:text-content-4 focus:border-indigo-500/40 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition backdrop-blur-sm"
             />
           </div>
         </div>
       ))}
       <button
         onClick={addItem}
-        className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-edge py-3 text-xs font-medium text-content-3 transition hover:border-sky-500/40 hover:text-sky-400 hover:bg-sky-500/5"
+        className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-white/[0.08] py-3 text-xs font-medium text-content-3 transition hover:border-sky-500/40 hover:text-sky-400 hover:bg-sky-500/5"
       >
         <Plus className="h-3.5 w-3.5" /> Add Education
       </button>
@@ -757,14 +690,14 @@ function SkillsEditor({
       {categories.map((cat, i) => (
         <div
           key={i}
-          className="rounded-xl border border-edge bg-field/30 p-4 space-y-3"
+          className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 space-y-3 transition-all duration-200 hover:bg-white/[0.03]"
         >
           <div className="flex items-center gap-3">
             <input
               value={cat.name}
               onChange={(e) => updateCat(i, { name: e.target.value })}
               placeholder="Category name (e.g. Programming Languages)"
-              className="flex-1 rounded-lg border border-edge bg-field px-3 py-2 text-sm font-medium text-content placeholder:text-content-4 focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/20 transition"
+              className="flex-1 rounded-lg border border-white/[0.06] bg-white/[0.03] px-3 py-2 text-sm font-medium text-content placeholder:text-content-4 focus:border-indigo-500/40 focus:outline-none focus:ring-1 focus:ring-indigo-500/20 transition"
             />
             <button
               onClick={() => removeCat(i)}
@@ -801,7 +734,7 @@ function SkillsEditor({
               onChange={(e) => setInputs({ ...inputs, [i]: e.target.value })}
               onKeyDown={(e) => e.key === "Enter" && addSkill(i)}
               placeholder="Type a skill and press Enter..."
-              className="flex-1 rounded-lg border border-edge bg-field px-3 py-2 text-sm text-content placeholder:text-content-4 focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/20 transition"
+              className="flex-1 rounded-lg border border-white/[0.06] bg-white/[0.03] px-3 py-2 text-sm text-content placeholder:text-content-4 focus:border-indigo-500/40 focus:outline-none focus:ring-1 focus:ring-indigo-500/20 transition"
             />
             <button
               onClick={() => addSkill(i)}
@@ -814,7 +747,7 @@ function SkillsEditor({
       ))}
       <button
         onClick={addCat}
-        className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-edge py-3 text-xs font-medium text-content-3 transition hover:border-emerald-500/40 hover:text-emerald-400 hover:bg-emerald-500/5"
+        className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-white/[0.08] py-3 text-xs font-medium text-content-3 transition hover:border-emerald-500/40 hover:text-emerald-400 hover:bg-emerald-500/5"
       >
         <Plus className="h-3.5 w-3.5" /> Add Skills Category
       </button>
@@ -851,7 +784,7 @@ function CertificationsEditor({
       {items.map((item: any, i: number) => (
         <div
           key={i}
-          className="rounded-xl border border-edge bg-field/30 p-4 space-y-3"
+          className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 space-y-3 transition-all duration-200 hover:bg-white/[0.03]"
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-content-2">
@@ -896,7 +829,7 @@ function CertificationsEditor({
       ))}
       <button
         onClick={addItem}
-        className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-edge py-3 text-xs font-medium text-content-3 transition hover:border-orange-500/40 hover:text-orange-400 hover:bg-orange-500/5"
+        className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-white/[0.08] py-3 text-xs font-medium text-content-3 transition hover:border-orange-500/40 hover:text-orange-400 hover:bg-orange-500/5"
       >
         <Plus className="h-3.5 w-3.5" /> Add Certification
       </button>
@@ -936,7 +869,7 @@ function ProjectsEditor({
       {items.map((item: any, i: number) => (
         <div
           key={i}
-          className="rounded-xl border border-edge bg-field/30 p-4 space-y-3"
+          className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 space-y-3 transition-all duration-200 hover:bg-white/[0.03]"
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-content-2">
@@ -981,14 +914,14 @@ function ProjectsEditor({
               onChange={(e) => updateItem(i, { description: e.target.value })}
               rows={2}
               placeholder="Brief description of the project..."
-              className="w-full resize-none rounded-xl border border-edge bg-field px-3 py-2.5 text-sm text-content placeholder:text-content-4 focus:border-indigo-500/50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition"
+              className="w-full resize-none rounded-xl border border-white/[0.06] bg-white/[0.03] px-3.5 py-2.5 text-sm text-content placeholder:text-content-4 focus:border-indigo-500/40 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition backdrop-blur-sm"
             />
           </div>
         </div>
       ))}
       <button
         onClick={addItem}
-        className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-edge py-3 text-xs font-medium text-content-3 transition hover:border-pink-500/40 hover:text-pink-400 hover:bg-pink-500/5"
+        className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-white/[0.08] py-3 text-xs font-medium text-content-3 transition hover:border-pink-500/40 hover:text-pink-400 hover:bg-pink-500/5"
       >
         <Plus className="h-3.5 w-3.5" /> Add Project
       </button>
@@ -1027,11 +960,21 @@ function GenericSectionEditor({
         onChange={(e) => setRaw(e.target.value)}
         onBlur={handleBlur}
         rows={8}
-        className="w-full resize-y rounded-xl border border-edge bg-field px-4 py-3 font-mono text-xs text-content placeholder:text-content-4 focus:border-indigo-500/50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition"
+        className="w-full resize-y rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-3 font-mono text-xs text-content placeholder:text-content-4 focus:border-indigo-500/40 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition backdrop-blur-sm"
       />
     </div>
   );
 }
+
+/* ═══════════════════════════════════════════════════════════
+   Navigation section definitions
+   ═══════════════════════════════════════════════════════════ */
+
+type NavSection =
+  | { type: "personal" }
+  | { type: "summary" }
+  | { type: "theme" }
+  | { type: "cv-section"; index: number; sectionType: string; title: string };
 
 /* ═══════════════════════════════════════════════════════════
    Main Page Component — Edit CV
@@ -1048,22 +991,31 @@ export default function EditCvPage() {
   const [publishing, setPublishing] = useState(false);
   const [regenerating, setRegenerating] = useState(false);
   const [aiEditingSection, setAiEditingSection] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<"content" | "preview">("content");
   const [previewDevice, setPreviewDevice] = useState<"desktop" | "mobile">(
     "desktop",
-  );
-  const [expandedSections, setExpandedSections] = useState<Set<string>>(
-    new Set(),
   );
   const [slugCopied, setSlugCopied] = useState(false);
   const [showPublishSuccess, setShowPublishSuccess] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  // ── Section-based navigation ──
+  const [activeSection, setActiveSection] = useState<string>("personal");
+
+  // ── Preview Drawer ──
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  // ── Avatar Upload ──
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
 
   // ── Auto-save ──
   const autoSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [lastSaved, setLastSaved] = useState<string | null>(null);
   const [hasUnsaved, setHasUnsaved] = useState(false);
   const initialLoad = useRef(true);
+  const savingRef = useRef(false);
+  const downloadingRef = useRef(false);
+  const skipAutoSave = useRef(false);
 
   // ── Template State ──
   const [templates, setTemplates] = useState<Template[]>([]);
@@ -1088,6 +1040,25 @@ export default function EditCvPage() {
     [subscription],
   );
 
+  /* ─── Build nav sections ─── */
+
+  const navSections = useMemo<NavSection[]>(() => {
+    const items: NavSection[] = [
+      { type: "personal" },
+      { type: "summary" },
+      { type: "theme" },
+    ];
+    cv?.sections?.forEach((section, index) => {
+      items.push({
+        type: "cv-section",
+        index,
+        sectionType: section.type,
+        title: section.title,
+      });
+    });
+    return items;
+  }, [cv?.sections]);
+
   /* ─── Load CV ─── */
 
   useEffect(() => {
@@ -1096,12 +1067,6 @@ export default function EditCvPage() {
         const res = await cvApi.getById(id);
         setCv(res.data);
         if (res.data.templateId) setSelectedTemplateId(res.data.templateId);
-        // Expand all sections by default
-        const expanded = new Set<string>();
-        res.data.sections?.forEach((_: CvSection, i: number) => {
-          expanded.add(String(i));
-        });
-        setExpandedSections(expanded);
       } catch (err: any) {
         if (err.response?.status === 403) {
           toast.error("You don\u2019t have permission to edit this CV");
@@ -1137,7 +1102,8 @@ export default function EditCvPage() {
   /* ─── Auto-save (debounced) ─── */
 
   const handleSave = useCallback(async () => {
-    if (!cv) return;
+    if (!cv || savingRef.current) return;
+    savingRef.current = true;
     setSaving(true);
     try {
       const res = await cvApi.update(cv._id, {
@@ -1149,7 +1115,22 @@ export default function EditCvPage() {
         isPublic: cv.isPublic,
         ...(selectedTemplateId ? { templateId: selectedTemplateId } : {}),
       });
-      setCv(res.data);
+      // Only merge back server-managed metadata — do NOT replace the whole cv
+      // object, because the response creates new object references for sections,
+      // personalInfo, etc., which would re-trigger the auto-save useEffect and
+      // cause an infinite save loop.
+      const serverData = res.data;
+      setCv((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          status: serverData.status ?? prev.status,
+          slug: serverData.slug ?? prev.slug,
+          updatedAt: serverData.updatedAt ?? prev.updatedAt,
+          aiGeneratedHtml: serverData.aiGeneratedHtml ?? prev.aiGeneratedHtml,
+          templateId: serverData.templateId ?? prev.templateId,
+        };
+      });
       setHasUnsaved(false);
       setLastSaved(
         new Date().toLocaleTimeString([], {
@@ -1165,6 +1146,7 @@ export default function EditCvPage() {
       }
     } finally {
       setSaving(false);
+      savingRef.current = false;
     }
   }, [cv, selectedTemplateId]);
 
@@ -1172,6 +1154,12 @@ export default function EditCvPage() {
     if (!cv) return;
     if (initialLoad.current) {
       initialLoad.current = false;
+      return;
+    }
+    // Skip auto-save when cv was just replaced by a server response
+    // (publish, regenerate, AI edit, etc.)
+    if (skipAutoSave.current) {
+      skipAutoSave.current = false;
       return;
     }
     setHasUnsaved(true);
@@ -1240,6 +1228,7 @@ export default function EditCvPage() {
     setPublishing(true);
     try {
       const res = await cvApi.publish(cv._id);
+      skipAutoSave.current = true;
       setCv(res.data);
       setShowPublishSuccess(true);
       toast.success("CV published! It\u2019s now live.");
@@ -1256,7 +1245,8 @@ export default function EditCvPage() {
   };
 
   const handleDownloadPdf = async () => {
-    if (!cv) return;
+    if (!cv || downloadingRef.current) return;
+    downloadingRef.current = true;
     try {
       const res = await pdfApi.download(cv._id);
       const blob = new Blob([res.data], { type: "application/pdf" });
@@ -1269,6 +1259,8 @@ export default function EditCvPage() {
       toast.success("PDF downloaded!");
     } catch {
       toast.error("Failed to download PDF");
+    } finally {
+      downloadingRef.current = false;
     }
   };
 
@@ -1277,6 +1269,7 @@ export default function EditCvPage() {
     setRegenerating(true);
     try {
       const res = await cvApi.regenerateHtml(cv._id);
+      skipAutoSave.current = true;
       setCv(res.data);
       toast.success("Preview regenerated!");
     } catch {
@@ -1291,6 +1284,7 @@ export default function EditCvPage() {
     setAiEditingSection(sectionType);
     try {
       const res = await cvApi.aiEditSection(cv._id, { prompt, sectionType });
+      skipAutoSave.current = true;
       setCv(res.data);
       toast.success("Section updated with AI!");
     } catch (err: any) {
@@ -1301,6 +1295,35 @@ export default function EditCvPage() {
       }
     } finally {
       setAiEditingSection(null);
+    }
+  };
+
+  const handleAvatarUpload = async (file: File) => {
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("Image must be under 2 MB");
+      return;
+    }
+    setAvatarUploading(true);
+    try {
+      const res = await uploadApi.uploadImage(file);
+      const url = res.data?.url || res.data?.imageUrl || "";
+      if (url) {
+        setCv((prev) =>
+          prev
+            ? {
+                ...prev,
+                personalInfo: { ...prev.personalInfo, avatar: url },
+              }
+            : prev,
+        );
+        toast.success("Photo uploaded!");
+      } else {
+        toast.error("Upload failed — no URL returned.");
+      }
+    } catch {
+      toast.error("Photo upload failed.");
+    } finally {
+      setAvatarUploading(false);
     }
   };
 
@@ -1317,16 +1340,6 @@ export default function EditCvPage() {
     const sections = [...cv.sections];
     sections[index] = { ...sections[index], ...updates };
     setCv({ ...cv, sections });
-  };
-
-  const toggleSection = (index: number) => {
-    setExpandedSections((prev) => {
-      const next = new Set(prev);
-      const key = String(index);
-      if (next.has(key)) next.delete(key);
-      else next.add(key);
-      return next;
-    });
   };
 
   const copySlugUrl = () => {
@@ -1376,6 +1389,82 @@ export default function EditCvPage() {
     }
   };
 
+  /* ─── Nav helpers ─── */
+
+  const getNavKey = (nav: NavSection) => {
+    if (nav.type === "cv-section") return `section-${nav.index}`;
+    return nav.type;
+  };
+
+  const getNavIcon = (nav: NavSection): LucideIcon => {
+    if (nav.type === "personal") return User;
+    if (nav.type === "summary") return FileText;
+    if (nav.type === "theme") return Palette;
+    return sectionIconMap[nav.sectionType]?.icon || FileText;
+  };
+
+  const getNavColor = (nav: NavSection): string => {
+    if (nav.type === "personal") return "indigo";
+    if (nav.type === "summary") return "purple";
+    if (nav.type === "theme") return "amber";
+    return sectionIconMap[nav.sectionType]?.color || "indigo";
+  };
+
+  const getNavLabel = (nav: NavSection): string => {
+    if (nav.type === "personal") return "Personal Info";
+    if (nav.type === "summary") return "Summary";
+    if (nav.type === "theme") return "Theme & Template";
+    return nav.title;
+  };
+
+  const colorMap: Record<
+    string,
+    { bg: string; text: string; ring: string; activeBg: string }
+  > = {
+    indigo: {
+      bg: "bg-indigo-500/10",
+      text: "text-indigo-400",
+      ring: "ring-indigo-500/20",
+      activeBg: "bg-indigo-500/15",
+    },
+    purple: {
+      bg: "bg-purple-500/10",
+      text: "text-purple-400",
+      ring: "ring-purple-500/20",
+      activeBg: "bg-purple-500/15",
+    },
+    emerald: {
+      bg: "bg-emerald-500/10",
+      text: "text-emerald-400",
+      ring: "ring-emerald-500/20",
+      activeBg: "bg-emerald-500/15",
+    },
+    amber: {
+      bg: "bg-amber-500/10",
+      text: "text-amber-400",
+      ring: "ring-amber-500/20",
+      activeBg: "bg-amber-500/15",
+    },
+    pink: {
+      bg: "bg-pink-500/10",
+      text: "text-pink-400",
+      ring: "ring-pink-500/20",
+      activeBg: "bg-pink-500/15",
+    },
+    sky: {
+      bg: "bg-sky-500/10",
+      text: "text-sky-400",
+      ring: "ring-sky-500/20",
+      activeBg: "bg-sky-500/15",
+    },
+    orange: {
+      bg: "bg-orange-500/10",
+      text: "text-orange-400",
+      ring: "ring-orange-500/20",
+      activeBg: "bg-orange-500/15",
+    },
+  };
+
   /* ═══════════════════════════════════════════════════════════
      Render
      ═══════════════════════════════════════════════════════════ */
@@ -1407,36 +1496,275 @@ export default function EditCvPage() {
     { key: "github", label: "GitHub" },
   ];
 
-  const sectionColors: Record<
-    string,
-    { bg: string; text: string; ring: string }
-  > = {
-    amber: {
-      bg: "bg-amber-500/10",
-      text: "text-amber-400",
-      ring: "ring-amber-500/20",
-    },
-    sky: { bg: "bg-sky-500/10", text: "text-sky-400", ring: "ring-sky-500/20" },
-    emerald: {
-      bg: "bg-emerald-500/10",
-      text: "text-emerald-400",
-      ring: "ring-emerald-500/20",
-    },
-    orange: {
-      bg: "bg-orange-500/10",
-      text: "text-orange-400",
-      ring: "ring-orange-500/20",
-    },
-    pink: {
-      bg: "bg-pink-500/10",
-      text: "text-pink-400",
-      ring: "ring-pink-500/20",
-    },
-    indigo: {
-      bg: "bg-indigo-500/10",
-      text: "text-indigo-400",
-      ring: "ring-indigo-500/20",
-    },
+  /* ─── Active section content renderer ─── */
+
+  const renderActiveSection = () => {
+    // Personal Info
+    if (activeSection === "personal") {
+      return (
+        <div className="space-y-6 animate-in fade-in slide-in-from-right-2 duration-300">
+          {/* Avatar Upload */}
+          <div className="flex items-center gap-5">
+            <button
+              type="button"
+              onClick={() => avatarInputRef.current?.click()}
+              className="group relative flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-white/[0.1] bg-white/[0.02] transition-all hover:border-indigo-500/40 hover:bg-indigo-500/5 hover:shadow-lg hover:shadow-indigo-500/5"
+            >
+              {cv.personalInfo?.avatar ? (
+                <img
+                  src={cv.personalInfo.avatar}
+                  alt="Avatar"
+                  className="h-full w-full object-cover rounded-2xl"
+                />
+              ) : (
+                <Camera className="h-7 w-7 text-content-4 transition group-hover:text-indigo-400 group-hover:scale-110" />
+              )}
+              {avatarUploading && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-2xl backdrop-blur-sm">
+                  <Loader2 className="h-6 w-6 animate-spin text-white" />
+                </div>
+              )}
+              {cv.personalInfo?.avatar && !avatarUploading && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/40 rounded-2xl transition-all duration-200">
+                  <Camera className="h-5 w-5 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                </div>
+              )}
+              <input
+                ref={avatarInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) handleAvatarUpload(f);
+                }}
+              />
+            </button>
+            <div>
+              <p className="text-sm font-semibold text-content">
+                {cv.personalInfo?.avatar ? "Change photo" : "Upload photo"}
+              </p>
+              <p className="text-xs text-content-4 mt-0.5">
+                Optional · JPG, PNG up to 2 MB
+              </p>
+              {cv.personalInfo?.avatar && (
+                <button
+                  onClick={() => updatePersonalInfo("avatar", "")}
+                  className="mt-1.5 text-[11px] text-red-400/70 hover:text-red-400 transition"
+                >
+                  Remove photo
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Fields */}
+          <div className="grid gap-4 sm:grid-cols-2">
+            {personalFields.map(({ key, label, required }) => (
+              <div key={key}>
+                <label className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-content-3">
+                  {label}
+                  {required ? (
+                    <span className="text-indigo-400 text-[10px]">*</span>
+                  ) : (
+                    <span className="text-content-4 font-normal text-[10px]">
+                      (optional)
+                    </span>
+                  )}
+                </label>
+                <input
+                  value={(cv.personalInfo as any)?.[key] || ""}
+                  onChange={(e) => updatePersonalInfo(key, e.target.value)}
+                  placeholder={label}
+                  className="w-full rounded-xl border border-white/[0.06] bg-white/[0.03] px-3.5 py-2.5 text-sm text-content placeholder:text-content-4 focus:border-indigo-500/40 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:bg-white/[0.05] transition-all duration-200 backdrop-blur-sm"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    // Summary
+    if (activeSection === "summary") {
+      return (
+        <div className="space-y-4 animate-in fade-in slide-in-from-right-2 duration-300">
+          <div className="flex items-center justify-between">
+            <p className="text-xs text-content-3">
+              A compelling overview of your career and professional identity.
+            </p>
+            <AiEditInline
+              sectionType="summary"
+              loading={aiEditingSection === "summary"}
+              onSubmit={(prompt) => handleAiEditSection("summary", prompt)}
+            />
+          </div>
+          <textarea
+            value={cv.summary || ""}
+            onChange={(e) => setCv({ ...cv, summary: e.target.value })}
+            rows={6}
+            placeholder="Write a compelling professional summary..."
+            className="w-full resize-none rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-3.5 text-sm leading-relaxed text-content placeholder:text-content-4 focus:border-indigo-500/40 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:bg-white/[0.05] transition-all duration-200 backdrop-blur-sm"
+          />
+          <div className="flex items-center justify-between text-[11px] text-content-4">
+            <span>{cv.summary?.length || 0} characters</span>
+            {cv.summary && cv.summary.length < 50 && (
+              <span className="text-amber-400">
+                Aim for at least 50 characters
+              </span>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    // Theme & Template
+    if (activeSection === "theme") {
+      return (
+        <div className="space-y-6 animate-in fade-in slide-in-from-right-2 duration-300">
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div>
+              <label className="mb-1.5 block text-xs font-medium text-content-3">
+                Primary Color
+              </label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={cv.theme?.primaryColor || "#4f46e5"}
+                  onChange={(e) =>
+                    setCv({
+                      ...cv,
+                      theme: {
+                        ...cv.theme,
+                        primaryColor: e.target.value,
+                      },
+                    })
+                  }
+                  className="h-10 w-10 cursor-pointer rounded-lg border border-white/[0.06] bg-transparent"
+                />
+                <input
+                  value={cv.theme?.primaryColor || "#4f46e5"}
+                  onChange={(e) =>
+                    setCv({
+                      ...cv,
+                      theme: {
+                        ...cv.theme,
+                        primaryColor: e.target.value,
+                      },
+                    })
+                  }
+                  className="flex-1 rounded-xl border border-white/[0.06] bg-white/[0.03] px-3 py-2.5 text-sm text-content focus:border-indigo-500/40 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="mb-1.5 block text-xs font-medium text-content-3">
+                Font Family
+              </label>
+              <select
+                value={cv.theme?.fontFamily || "Inter"}
+                onChange={(e) =>
+                  setCv({
+                    ...cv,
+                    theme: { ...cv.theme, fontFamily: e.target.value },
+                  })
+                }
+                className="w-full rounded-xl border border-white/[0.06] bg-white/[0.03] px-3 py-2.5 text-sm text-content focus:border-indigo-500/40 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition"
+              >
+                {[
+                  "Inter",
+                  "Roboto",
+                  "Open Sans",
+                  "Lato",
+                  "Merriweather",
+                  "Georgia",
+                  "Playfair Display",
+                ].map((f) => (
+                  <option key={f} value={f}>
+                    {f}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="mb-1.5 block text-xs font-medium text-content-3">
+                Layout
+              </label>
+              <select
+                value={cv.theme?.layout || "modern"}
+                onChange={(e) =>
+                  setCv({
+                    ...cv,
+                    theme: { ...cv.theme, layout: e.target.value },
+                  })
+                }
+                className="w-full rounded-xl border border-white/[0.06] bg-white/[0.03] px-3 py-2.5 text-sm text-content focus:border-indigo-500/40 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition"
+              >
+                {["modern", "classic", "minimal", "creative"].map((l) => (
+                  <option key={l} value={l}>
+                    {l.charAt(0).toUpperCase() + l.slice(1)}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div className="border-t border-white/[0.06] pt-5">
+            <TemplateSelector
+              templates={templates}
+              selectedId={selectedTemplateId}
+              onSelect={setSelectedTemplateId}
+              loading={templatesLoading}
+              canUse={canUseTemplate}
+            />
+          </div>
+        </div>
+      );
+    }
+
+    // CV Dynamic Sections
+    const sectionMatch = activeSection.match(/^section-(\d+)$/);
+    if (sectionMatch) {
+      const idx = parseInt(sectionMatch[1], 10);
+      const section = cv.sections?.[idx];
+      if (!section) return null;
+      const iconConfig = sectionIconMap[section.type] || {
+        icon: FileText,
+        color: "indigo",
+      };
+      const c = colorMap[iconConfig.color] || colorMap.indigo;
+
+      return (
+        <div className="space-y-4 animate-in fade-in slide-in-from-right-2 duration-300">
+          {/* Section toolbar */}
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={() => updateSection(idx, { visible: !section.visible })}
+              className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition ring-1 ${
+                section.visible
+                  ? `${c.bg} ${c.text} ${c.ring}`
+                  : "bg-white/[0.03] text-content-4 ring-white/[0.06] hover:bg-white/[0.05]"
+              }`}
+            >
+              {section.visible ? (
+                <Eye className="h-3 w-3" />
+              ) : (
+                <EyeOff className="h-3 w-3" />
+              )}
+              {section.visible ? "Visible" : "Hidden"}
+            </button>
+            <AiEditInline
+              sectionType={section.type}
+              loading={aiEditingSection === section.type}
+              onSubmit={(prompt) => handleAiEditSection(section.type, prompt)}
+            />
+          </div>
+          {/* Section content editor */}
+          {renderSectionEditor(section, idx)}
+        </div>
+      );
+    }
+
+    return null;
   };
 
   return (
@@ -1446,7 +1774,7 @@ export default function EditCvPage() {
         <div className="flex items-center gap-3 min-w-0">
           <button
             onClick={() => router.push("/dashboard")}
-            className="flex-shrink-0 rounded-xl p-2.5 text-content-3 transition hover:bg-card-hover hover:text-content"
+            className="flex-shrink-0 rounded-xl p-2.5 text-content-3 transition hover:bg-white/[0.04] hover:text-content"
           >
             <ArrowLeft className="h-5 w-5" />
           </button>
@@ -1464,11 +1792,11 @@ export default function EditCvPage() {
                     ? "bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/20"
                     : cv.status === "archived"
                       ? "bg-amber-500/10 text-amber-400 ring-1 ring-amber-500/20"
-                      : "bg-content-4/10 text-content-3 ring-1 ring-edge"
+                      : "bg-white/[0.04] text-content-3 ring-1 ring-white/[0.06]"
                 }`}
               >
                 {cv.status === "published" && (
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
                 )}
                 {cv.status.charAt(0).toUpperCase() + cv.status.slice(1)}
               </span>
@@ -1509,7 +1837,7 @@ export default function EditCvPage() {
           <button
             onClick={handleSave}
             disabled={saving}
-            className="inline-flex items-center gap-2 rounded-xl border border-edge bg-card px-3 py-2.5 text-sm font-medium text-content-2 transition hover:bg-card-hover disabled:opacity-50 sm:px-4"
+            className="inline-flex items-center gap-2 rounded-xl border border-white/[0.06] bg-white/[0.02] px-3 py-2.5 text-sm font-medium text-content-2 transition hover:bg-white/[0.05] disabled:opacity-50 sm:px-4 backdrop-blur-sm"
           >
             {saving ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -1521,8 +1849,15 @@ export default function EditCvPage() {
             </span>
           </button>
           <button
+            onClick={() => setDrawerOpen(true)}
+            className="inline-flex items-center gap-2 rounded-xl border border-indigo-500/20 bg-indigo-500/10 px-3 py-2.5 text-sm font-medium text-indigo-400 transition hover:bg-indigo-500/15 sm:px-4"
+          >
+            <PanelRightOpen className="h-4 w-4" />
+            <span className="hidden sm:inline">Preview</span>
+          </button>
+          <button
             onClick={() => router.push(`/dashboard/cv/${id}/versions`)}
-            className="inline-flex items-center gap-2 rounded-xl border border-edge bg-card px-3 py-2.5 text-sm font-medium text-content-2 transition hover:bg-card-hover sm:px-4"
+            className="inline-flex items-center gap-2 rounded-xl border border-white/[0.06] bg-white/[0.02] px-3 py-2.5 text-sm font-medium text-content-2 transition hover:bg-white/[0.05] sm:px-4 backdrop-blur-sm"
           >
             <History className="h-4 w-4" />
             <span className="hidden sm:inline">History</span>
@@ -1530,7 +1865,7 @@ export default function EditCvPage() {
           <button
             onClick={handlePublish}
             disabled={publishing}
-            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-3 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-600/20 transition hover:shadow-emerald-500/30 disabled:opacity-50 sm:px-4"
+            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-3 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-600/20 transition hover:shadow-emerald-500/30 hover:brightness-110 disabled:opacity-50 sm:px-4"
           >
             {publishing ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -1543,7 +1878,7 @@ export default function EditCvPage() {
           </button>
           <button
             onClick={handleDownloadPdf}
-            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 px-3 py-2.5 text-sm font-semibold text-white shadow-lg shadow-purple-600/20 transition hover:shadow-purple-500/30 sm:px-4"
+            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 px-3 py-2.5 text-sm font-semibold text-white shadow-lg shadow-purple-600/20 transition hover:shadow-purple-500/30 hover:brightness-110 sm:px-4"
           >
             <Download className="h-4 w-4" />
             <span className="hidden sm:inline">PDF</span>
@@ -1553,7 +1888,7 @@ export default function EditCvPage() {
 
       {/* ══════════════ Publish Success Banner ══════════════ */}
       {showPublishSuccess && cv.slug && (
-        <div className="mb-6 flex flex-col gap-3 rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-4 sm:flex-row sm:items-center sm:justify-between animate-fade-up">
+        <div className="mb-6 flex flex-col gap-3 rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-4 sm:flex-row sm:items-center sm:justify-between backdrop-blur-sm">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 ring-1 ring-emerald-500/20">
               <Globe className="h-5 w-5 text-emerald-400" />
@@ -1599,7 +1934,7 @@ export default function EditCvPage() {
       )}
 
       {/* ══════════════ Completion Score Bar ══════════════ */}
-      <div className="mb-6 rounded-2xl border border-edge bg-card/80 backdrop-blur-sm p-4">
+      <div className="mb-6 rounded-2xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-md p-4">
         <div className="flex items-center gap-4">
           <CompletionRing score={completionScore} size={52} />
           <div className="flex-1 min-w-0">
@@ -1673,7 +2008,7 @@ export default function EditCvPage() {
                 className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[10px] font-medium ${
                   item.filled
                     ? "bg-emerald-500/10 text-emerald-400"
-                    : "bg-field text-content-4"
+                    : "bg-white/[0.03] text-content-4"
                 }`}
               >
                 {item.filled && <CheckCircle2 className="h-2.5 w-2.5" />}
@@ -1684,360 +2019,228 @@ export default function EditCvPage() {
         </div>
       </div>
 
-      {/* ══════════════ Mobile Tab Switcher ══════════════ */}
-      <div className="mb-6 flex gap-1 rounded-2xl border border-edge bg-card p-1 lg:hidden">
-        <button
-          onClick={() => setActiveTab("content")}
-          className={`flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition ${
-            activeTab === "content"
-              ? "bg-indigo-600/10 text-indigo-400 ring-1 ring-indigo-500/20"
-              : "text-content-3 hover:text-content"
-          }`}
-        >
-          <FileText className="h-4 w-4" />
-          Editor
-        </button>
-        <button
-          onClick={() => setActiveTab("preview")}
-          className={`flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition ${
-            activeTab === "preview"
-              ? "bg-indigo-600/10 text-indigo-400 ring-1 ring-indigo-500/20"
-              : "text-content-3 hover:text-content"
-          }`}
-        >
-          <Eye className="h-4 w-4" />
-          Preview
-        </button>
-      </div>
-
-      {/* ══════════════ Two-Column Layout ══════════════ */}
-      <div className="grid gap-6 lg:grid-cols-[1fr,400px] xl:grid-cols-[1fr,440px]">
-        {/* ── Editor Panel ── */}
-        <div
-          className={`space-y-5 ${activeTab === "preview" ? "hidden lg:block" : ""}`}
-        >
-          {/* Personal Information */}
-          <div className="rounded-2xl border border-edge bg-card overflow-hidden">
-            <SectionHeader
-              icon={User}
-              color="indigo"
-              title="Personal Information"
-              subtitle="Contact details & social links"
-            />
-            <div className="grid gap-3 p-5 sm:grid-cols-2">
-              {personalFields.map(({ key, label, required }) => (
-                <div key={key}>
-                  <label className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-content-3">
-                    {label}
-                    {required ? (
-                      <span className="text-indigo-400 text-[10px]">*</span>
-                    ) : (
-                      <span className="text-content-4 font-normal text-[10px]">
-                        (optional)
-                      </span>
-                    )}
-                  </label>
-                  <input
-                    value={(cv.personalInfo as any)?.[key] || ""}
-                    onChange={(e) => updatePersonalInfo(key, e.target.value)}
-                    placeholder={label}
-                    className="w-full rounded-xl border border-edge bg-field px-3 py-2.5 text-sm text-content placeholder:text-content-4 focus:border-indigo-500/50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition"
-                  />
-                </div>
-              ))}
+      {/* ══════════════ Section-Based Layout ══════════════ */}
+      <div className="grid gap-6 lg:grid-cols-[260px,1fr]">
+        {/* ── Section Navigation Sidebar ── */}
+        <div className="lg:sticky lg:top-4 lg:self-start">
+          <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-md overflow-hidden">
+            <div className="px-4 py-3 border-b border-white/[0.06]">
+              <p className="text-[11px] font-semibold text-content-3 uppercase tracking-wider">
+                Sections
+              </p>
             </div>
-          </div>
+            <nav className="p-2 space-y-0.5">
+              {navSections.map((nav) => {
+                const key = getNavKey(nav);
+                const Icon = getNavIcon(nav);
+                const color = getNavColor(nav);
+                const label = getNavLabel(nav);
+                const c = colorMap[color] || colorMap.indigo;
+                const isActive = activeSection === key;
 
-          {/* Summary */}
-          <div className="rounded-2xl border border-edge bg-card overflow-hidden">
-            <SectionHeader
-              icon={FileText}
-              color="purple"
-              title="Professional Summary"
-              subtitle="A compelling overview of your career"
-              action={
-                <AiEditInline
-                  sectionType="summary"
-                  loading={aiEditingSection === "summary"}
-                  onSubmit={(prompt) => handleAiEditSection("summary", prompt)}
-                />
-              }
-            />
-            <div className="p-5">
-              <textarea
-                value={cv.summary || ""}
-                onChange={(e) => setCv({ ...cv, summary: e.target.value })}
-                rows={4}
-                placeholder="Write a compelling professional summary..."
-                className="w-full resize-none rounded-xl border border-edge bg-field px-4 py-3 text-sm text-content placeholder:text-content-4 focus:border-indigo-500/50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition"
-              />
-              <div className="mt-2 flex items-center justify-between text-[10px] text-content-4">
-                <span>{cv.summary?.length || 0} characters</span>
-                {cv.summary && cv.summary.length < 50 && (
-                  <span className="text-amber-400">
-                    Aim for at least 50 characters
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
+                // Item count for CV sections
+                let itemCount = "";
+                if (nav.type === "cv-section") {
+                  const section = cv.sections?.[nav.index];
+                  if (section?.content?.items?.length > 0) {
+                    itemCount = `${section.content.items.length}`;
+                  } else if (section?.content?.categories?.length > 0) {
+                    const count = section.content.categories.reduce(
+                      (a: number, cat: any) => a + (cat.skills?.length || 0),
+                      0,
+                    );
+                    if (count > 0) itemCount = `${count}`;
+                  }
+                }
 
-          {/* Theme & Template */}
-          <div className="rounded-2xl border border-edge bg-card overflow-hidden">
-            <SectionHeader
-              icon={Palette}
-              color="amber"
-              title="Theme & Template"
-              subtitle="Customize the look and feel"
-            />
-            <div className="p-5 space-y-5">
-              {/* Theme Settings */}
-              <div className="grid gap-3 sm:grid-cols-3">
-                <div>
-                  <label className="mb-1.5 block text-xs font-medium text-content-3">
-                    Primary Color
-                  </label>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="color"
-                      value={cv.theme?.primaryColor || "#4f46e5"}
-                      onChange={(e) =>
-                        setCv({
-                          ...cv,
-                          theme: {
-                            ...cv.theme,
-                            primaryColor: e.target.value,
-                          },
-                        })
-                      }
-                      className="h-10 w-10 cursor-pointer rounded-lg border border-edge bg-transparent"
-                    />
-                    <input
-                      value={cv.theme?.primaryColor || "#4f46e5"}
-                      onChange={(e) =>
-                        setCv({
-                          ...cv,
-                          theme: {
-                            ...cv.theme,
-                            primaryColor: e.target.value,
-                          },
-                        })
-                      }
-                      className="flex-1 rounded-xl border border-edge bg-field px-3 py-2.5 text-sm text-content focus:border-indigo-500/50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="mb-1.5 block text-xs font-medium text-content-3">
-                    Font Family
-                  </label>
-                  <select
-                    value={cv.theme?.fontFamily || "Inter"}
-                    onChange={(e) =>
-                      setCv({
-                        ...cv,
-                        theme: { ...cv.theme, fontFamily: e.target.value },
-                      })
-                    }
-                    className="w-full rounded-xl border border-edge bg-field px-3 py-2.5 text-sm text-content focus:border-indigo-500/50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition"
+                return (
+                  <button
+                    key={key}
+                    onClick={() => setActiveSection(key)}
+                    className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-all duration-200 group ${
+                      isActive
+                        ? `${c.activeBg} ${c.text} shadow-sm`
+                        : "text-content-3 hover:bg-white/[0.03] hover:text-content-2"
+                    }`}
                   >
-                    {[
-                      "Inter",
-                      "Roboto",
-                      "Open Sans",
-                      "Lato",
-                      "Merriweather",
-                      "Georgia",
-                      "Playfair Display",
-                    ].map((f) => (
-                      <option key={f} value={f}>
-                        {f}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="mb-1.5 block text-xs font-medium text-content-3">
-                    Layout
-                  </label>
-                  <select
-                    value={cv.theme?.layout || "modern"}
-                    onChange={(e) =>
-                      setCv({
-                        ...cv,
-                        theme: { ...cv.theme, layout: e.target.value },
-                      })
-                    }
-                    className="w-full rounded-xl border border-edge bg-field px-3 py-2.5 text-sm text-content focus:border-indigo-500/50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition"
-                  >
-                    {["modern", "classic", "minimal", "creative"].map((l) => (
-                      <option key={l} value={l}>
-                        {l.charAt(0).toUpperCase() + l.slice(1)}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              {/* Template Selector */}
-              <div className="border-t border-edge pt-5">
-                <TemplateSelector
-                  templates={templates}
-                  selectedId={selectedTemplateId}
-                  onSelect={setSelectedTemplateId}
-                  loading={templatesLoading}
-                  canUse={canUseTemplate}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Sections */}
-          {cv.sections?.map((section, idx) => {
-            const iconConfig = sectionIconMap[section.type] || {
-              icon: FileText,
-              color: "indigo",
-            };
-            const colorStyle =
-              sectionColors[iconConfig.color] || sectionColors.indigo;
-            const isExpanded = expandedSections.has(String(idx));
-            const SectionIcon = iconConfig.icon;
-            return (
-              <div
-                key={idx}
-                className="rounded-2xl border border-edge bg-card overflow-hidden"
-              >
-                <button
-                  onClick={() => toggleSection(idx)}
-                  className="flex w-full items-center justify-between px-5 py-4 transition hover:bg-card-hover"
-                >
-                  <div className="flex items-center gap-3">
                     <div
-                      className={`flex h-9 w-9 items-center justify-center rounded-xl ${colorStyle.bg} ${colorStyle.text} ring-1 ${colorStyle.ring}`}
-                    >
-                      <SectionIcon className="h-4 w-4" />
-                    </div>
-                    <div className="text-left">
-                      <h3 className="text-sm font-semibold text-content">
-                        {section.title}
-                      </h3>
-                      <span className="text-[10px] text-content-4 capitalize">
-                        {section.type}
-                        {section.content?.items?.length > 0 &&
-                          ` \u00B7 ${section.content.items.length} item${section.content.items.length > 1 ? "s" : ""}`}
-                        {section.content?.categories?.length > 0 &&
-                          ` \u00B7 ${section.content.categories.reduce((a: number, c: any) => a + (c.skills?.length || 0), 0)} skills`}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span
-                      className={`rounded-md px-2 py-0.5 text-[10px] font-medium ${
-                        section.visible
-                          ? "bg-emerald-500/10 text-emerald-400"
-                          : "bg-content-4/10 text-content-4"
+                      className={`flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-200 ${
+                        isActive
+                          ? `${c.bg} ${c.text} ring-1 ${c.ring}`
+                          : "bg-white/[0.03] text-content-4"
                       }`}
                     >
-                      {section.visible ? "Visible" : "Hidden"}
-                    </span>
-                    <ChevronDown
-                      className={`h-4 w-4 text-content-4 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}
-                    />
-                  </div>
-                </button>
-
-                {isExpanded && (
-                  <div className="border-t border-edge">
-                    {/* Section toolbar */}
-                    <div className="flex flex-wrap items-center gap-2 px-5 py-3 border-b border-edge/50 bg-field/20">
-                      <button
-                        onClick={() =>
-                          updateSection(idx, { visible: !section.visible })
-                        }
-                        className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition ${
-                          section.visible
-                            ? "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
-                            : "bg-content-4/10 text-content-4 hover:bg-content-4/20"
+                      <Icon className="h-3.5 w-3.5" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <span className="text-xs font-medium truncate block">
+                        {label}
+                      </span>
+                    </div>
+                    {itemCount && (
+                      <span
+                        className={`text-[10px] font-medium px-1.5 py-0.5 rounded-md ${
+                          isActive
+                            ? `${c.bg} ${c.text}`
+                            : "bg-white/[0.04] text-content-4"
                         }`}
                       >
-                        {section.visible ? (
-                          <Eye className="h-3 w-3" />
-                        ) : (
-                          <EyeOff className="h-3 w-3" />
-                        )}
-                        {section.visible ? "Visible" : "Hidden"}
-                      </button>
-                      <AiEditInline
-                        sectionType={section.type}
-                        loading={aiEditingSection === section.type}
-                        onSubmit={(prompt) =>
-                          handleAiEditSection(section.type, prompt)
-                        }
+                        {itemCount}
+                      </span>
+                    )}
+                    {nav.type === "cv-section" && (
+                      <span
+                        className={`h-1.5 w-1.5 rounded-full flex-shrink-0 ${
+                          cv.sections?.[nav.index]?.visible
+                            ? "bg-emerald-400"
+                            : "bg-content-4/30"
+                        }`}
                       />
-                    </div>
-                    {/* Section content editor */}
-                    <div className="p-5">
-                      {renderSectionEditor(section, idx)}
-                    </div>
-                  </div>
-                )}
-              </div>
-            );
-          })}
+                    )}
+                    <ChevronRight
+                      className={`h-3 w-3 flex-shrink-0 transition-all duration-200 ${
+                        isActive
+                          ? `${c.text} opacity-100`
+                          : "text-content-4/50 opacity-0 group-hover:opacity-100"
+                      }`}
+                    />
+                  </button>
+                );
+              })}
+            </nav>
+          </div>
         </div>
 
-        {/* ── Preview Panel (sticky) ── */}
-        <div className={`${activeTab === "content" ? "hidden lg:block" : ""}`}>
-          <div className="lg:sticky lg:top-4">
-            {/* Preview header */}
-            <div className="mb-3 flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-content flex items-center gap-2">
-                <Eye className="h-4 w-4 text-content-3" />
-                Live Preview
-              </h3>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={handleRegenerateHtml}
-                  disabled={regenerating}
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-edge bg-card px-2.5 py-1.5 text-[11px] font-medium text-content-2 transition hover:bg-card-hover disabled:opacity-50"
-                  title="Regenerate preview from current data"
-                >
-                  {regenerating ? (
-                    <Loader2 className="h-3 w-3 animate-spin" />
-                  ) : (
-                    <RefreshCw className="h-3 w-3" />
-                  )}
-                  Regenerate
-                </button>
-                <div className="flex items-center gap-0.5 rounded-lg border border-edge bg-card p-0.5">
-                  <button
-                    onClick={() => setPreviewDevice("desktop")}
-                    className={`rounded-md p-1.5 transition ${
-                      previewDevice === "desktop"
-                        ? "bg-indigo-600/10 text-indigo-400"
-                        : "text-content-4 hover:text-content-2"
-                    }`}
-                    title="Desktop preview"
-                  >
-                    <Monitor className="h-3.5 w-3.5" />
-                  </button>
-                  <button
-                    onClick={() => setPreviewDevice("mobile")}
-                    className={`rounded-md p-1.5 transition ${
-                      previewDevice === "mobile"
-                        ? "bg-indigo-600/10 text-indigo-400"
-                        : "text-content-4 hover:text-content-2"
-                    }`}
-                    title="Mobile preview"
-                  >
-                    <Smartphone className="h-3.5 w-3.5" />
-                  </button>
-                </div>
+        {/* ── Section Content Area ── */}
+        <div className="min-w-0">
+          {/* Section Header */}
+          <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-md overflow-hidden">
+            {(() => {
+              const activeNav = navSections.find(
+                (n) => getNavKey(n) === activeSection,
+              );
+              if (!activeNav) return null;
+              const Icon = getNavIcon(activeNav);
+              const color = getNavColor(activeNav);
+              const label = getNavLabel(activeNav);
+              const c = colorMap[color] || colorMap.indigo;
+
+              let subtitle = "";
+              if (activeNav.type === "personal")
+                subtitle = "Contact details, social links & photo";
+              else if (activeNav.type === "summary")
+                subtitle = "A compelling overview of your career";
+              else if (activeNav.type === "theme")
+                subtitle = "Customize the look and feel";
+              else if (activeNav.type === "cv-section")
+                subtitle = `Manage your ${activeNav.sectionType} entries`;
+
+              return (
+                <>
+                  <div className="flex items-center justify-between gap-3 px-6 py-5 border-b border-white/[0.06]">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={`flex h-10 w-10 items-center justify-center rounded-xl ${c.bg} ${c.text} ring-1 ${c.ring}`}
+                      >
+                        <Icon className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <h2 className="text-base font-bold text-content">
+                          {label}
+                        </h2>
+                        <p className="text-xs text-content-4 mt-0.5">
+                          {subtitle}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="p-6">{renderActiveSection()}</div>
+                </>
+              );
+            })()}
+          </div>
+        </div>
+      </div>
+
+      {/* ══════════════ Preview Drawer (Slide-in from right) ══════════════ */}
+      {/* Backdrop */}
+      <div
+        className={`fixed inset-0 z-50 bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${
+          drawerOpen
+            ? "opacity-100 pointer-events-auto"
+            : "opacity-0 pointer-events-none"
+        }`}
+        onClick={() => setDrawerOpen(false)}
+      />
+      {/* Drawer panel */}
+      <div
+        className={`fixed top-0 right-0 z-50 h-full w-full max-w-[520px] border-l border-white/[0.06] shadow-2xl shadow-black/30 transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+          drawerOpen ? "translate-x-0" : "translate-x-full"
+        }`}
+        style={{ background: "var(--bg-base, #0a0a0f)" }}
+      >
+        <div className="flex h-full flex-col">
+          {/* Drawer Header */}
+          <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.06] bg-white/[0.02]">
+            <div className="flex items-center gap-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-500/10 ring-1 ring-indigo-500/20">
+                <Eye className="h-4 w-4 text-indigo-400" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-content">Live Preview</h3>
+                <p className="text-[11px] text-content-4">
+                  See how your CV looks
+                </p>
               </div>
             </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleRegenerateHtml}
+                disabled={regenerating}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-white/[0.06] bg-white/[0.02] px-2.5 py-1.5 text-[11px] font-medium text-content-2 transition hover:bg-white/[0.05] disabled:opacity-50 backdrop-blur-sm"
+              >
+                {regenerating ? (
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                ) : (
+                  <RefreshCw className="h-3 w-3" />
+                )}
+                Regenerate
+              </button>
+              <div className="flex items-center gap-0.5 rounded-lg border border-white/[0.06] bg-white/[0.02] p-0.5">
+                <button
+                  onClick={() => setPreviewDevice("desktop")}
+                  className={`rounded-md p-1.5 transition ${
+                    previewDevice === "desktop"
+                      ? "bg-indigo-500/15 text-indigo-400"
+                      : "text-content-4 hover:text-content-2"
+                  }`}
+                >
+                  <Monitor className="h-3.5 w-3.5" />
+                </button>
+                <button
+                  onClick={() => setPreviewDevice("mobile")}
+                  className={`rounded-md p-1.5 transition ${
+                    previewDevice === "mobile"
+                      ? "bg-indigo-500/15 text-indigo-400"
+                      : "text-content-4 hover:text-content-2"
+                  }`}
+                >
+                  <Smartphone className="h-3.5 w-3.5" />
+                </button>
+              </div>
+              <button
+                onClick={() => setDrawerOpen(false)}
+                className="rounded-lg p-2 text-content-4 transition hover:bg-white/[0.04] hover:text-content-2"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
 
-            {/* Preview frame */}
+          {/* Preview Content */}
+          <div className="flex-1 overflow-auto p-5">
             <div
-              className={`mx-auto overflow-hidden rounded-2xl border border-edge bg-white shadow-xl shadow-black/5 transition-all duration-300 ${
+              className={`mx-auto overflow-hidden rounded-2xl border border-white/[0.06] bg-white shadow-xl shadow-black/10 transition-all duration-300 ${
                 previewDevice === "mobile" ? "max-w-[375px]" : "w-full"
               }`}
             >
@@ -2051,14 +2254,14 @@ export default function EditCvPage() {
                   title="CV Preview"
                 />
               ) : (
-                <div className="flex h-80 flex-col items-center justify-center text-center p-8">
-                  <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-content-4/10 ring-1 ring-edge">
-                    <FileText className="h-6 w-6 text-content-4" />
+                <div className="flex h-80 flex-col items-center justify-center text-center p-8 bg-white">
+                  <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-gray-100 ring-1 ring-gray-200">
+                    <FileText className="h-6 w-6 text-gray-400" />
                   </div>
-                  <p className="mb-1 text-sm font-medium text-content-2">
+                  <p className="mb-1 text-sm font-medium text-gray-700">
                     No preview available
                   </p>
-                  <p className="text-xs text-content-4 mb-4">
+                  <p className="text-xs text-gray-500 mb-4">
                     Click &quot;Regenerate&quot; to create a preview from your
                     current content
                   </p>
@@ -2077,22 +2280,24 @@ export default function EditCvPage() {
                 </div>
               )}
             </div>
+          </div>
 
-            {/* Public link */}
-            {cv.slug && cv.isPublic && (
-              <div className="mt-4 flex items-center gap-2">
+          {/* Drawer Footer */}
+          {cv.slug && cv.isPublic && (
+            <div className="border-t border-white/[0.06] px-5 py-3 bg-white/[0.02]">
+              <div className="flex items-center gap-2">
                 <a
                   href={`/cv/${cv.slug}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-edge bg-card px-4 py-2.5 text-xs font-medium text-content-2 transition hover:bg-card-hover"
+                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-2.5 text-xs font-medium text-content-2 transition hover:bg-white/[0.05]"
                 >
                   <ExternalLink className="h-3.5 w-3.5" />
                   View Public Page
                 </a>
                 <button
                   onClick={copySlugUrl}
-                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-edge bg-card px-4 py-2.5 text-xs font-medium text-content-2 transition hover:bg-card-hover"
+                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-2.5 text-xs font-medium text-content-2 transition hover:bg-white/[0.05]"
                 >
                   {slugCopied ? (
                     <Check className="h-3.5 w-3.5 text-emerald-400" />
@@ -2102,8 +2307,8 @@ export default function EditCvPage() {
                   {slugCopied ? "Copied!" : "Copy Share Link"}
                 </button>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -2112,7 +2317,7 @@ export default function EditCvPage() {
         <button
           onClick={handleSave}
           disabled={saving}
-          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-indigo-600 py-3.5 text-sm font-semibold text-white shadow-xl shadow-indigo-600/30 transition hover:bg-indigo-500 disabled:opacity-50"
+          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 py-3.5 text-sm font-semibold text-white shadow-xl shadow-indigo-600/30 transition hover:brightness-110 disabled:opacity-50"
         >
           {saving ? (
             <Loader2 className="h-4 w-4 animate-spin" />

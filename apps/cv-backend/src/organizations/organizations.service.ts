@@ -183,7 +183,7 @@ export class OrganizationsService {
   ): Promise<OrganizationDocument> {
     await this.assertRole(userId, orgId, OrgRole.ADMIN);
     const updated = await this.orgModel
-      .findByIdAndUpdate(orgId, { $set: dto }, { new: true })
+      .findByIdAndUpdate(orgId, { $set: dto }, { returnDocument: 'after' })
       .exec();
     if (!updated) throw new NotFoundException('Organization not found');
     return updated;
@@ -196,7 +196,11 @@ export class OrganizationsService {
   ): Promise<OrganizationDocument> {
     await this.assertRole(userId, orgId, OrgRole.ADMIN);
     const updated = await this.orgModel
-      .findByIdAndUpdate(orgId, { $set: { branding: dto } }, { new: true })
+      .findByIdAndUpdate(
+        orgId,
+        { $set: { branding: dto } },
+        { returnDocument: 'after' },
+      )
       .exec();
     if (!updated) throw new NotFoundException('Organization not found');
     return updated;
@@ -213,7 +217,11 @@ export class OrganizationsService {
       if (value !== undefined) updateFields[`settings.${key}`] = value;
     }
     const updated = await this.orgModel
-      .findByIdAndUpdate(orgId, { $set: updateFields }, { new: true })
+      .findByIdAndUpdate(
+        orgId,
+        { $set: updateFields },
+        { returnDocument: 'after' },
+      )
       .exec();
     if (!updated) throw new NotFoundException('Organization not found');
     return updated;
@@ -448,7 +456,7 @@ export class OrganizationsService {
     if (dto.leadId) update.leadId = new Types.ObjectId(dto.leadId);
 
     const updated = await this.teamModel
-      .findByIdAndUpdate(teamId, { $set: update }, { new: true })
+      .findByIdAndUpdate(teamId, { $set: update }, { returnDocument: 'after' })
       .exec();
     if (!updated) throw new NotFoundException('Team not found');
     return updated;

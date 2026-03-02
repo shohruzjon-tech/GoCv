@@ -34,7 +34,7 @@ export class SiteSettingsService {
     const settings = await this.siteSettingsModel.findOneAndUpdate(
       { key: 'default' },
       { $set: data },
-      { new: true, upsert: true },
+      { returnDocument: 'after', upsert: true },
     );
     return settings;
   }
