@@ -30,9 +30,17 @@ api.interceptors.response.use(
       if (data?.requiresVerification) {
         return Promise.reject(error);
       }
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      window.location.href = "/";
+
+      // Only clear auth & redirect when on protected routes
+      const path = window.location.pathname;
+      const isProtectedRoute =
+        path.startsWith("/dashboard") || path.startsWith("/admin");
+
+      if (isProtectedRoute) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        window.location.href = "/login";
+      }
     }
     return Promise.reject(error);
   },
@@ -56,6 +64,33 @@ export const authApi = {
     api.post("/api/auth/admin/login", { email, password }),
 
   getProfile: () => api.get("/api/auth/profile"),
+
+  updateProfile: (data: {
+    name?: string;
+    headline?: string;
+    bio?: string;
+    location?: string;
+    website?: string;
+    socialLinks?: { linkedin?: string; github?: string; twitter?: string };
+  }) => api.put("/api/auth/profile", data),
+
+  changePassword: (currentPassword: string, newPassword: string) =>
+    api.put("/api/auth/password", { currentPassword, newPassword }),
+
+  updatePreferences: (data: {
+    emailNotifications?: boolean;
+    marketingEmails?: boolean;
+    language?: string;
+    timezone?: string;
+  }) => api.put("/api/auth/preferences", data),
+
+  getSessions: () => api.get("/api/auth/sessions"),
+
+  terminateSession: (sessionId: string) =>
+    api.delete(`/api/auth/sessions/${sessionId}`),
+
+  deleteAccount: (password?: string) =>
+    api.delete("/api/auth/account", { data: { password } }),
 
   logout: () => api.post("/api/auth/logout"),
 };
@@ -224,6 +259,8 @@ export const subscriptionsApi = {
   getBillingPortal: () => api.post("/api/subscriptions/billing-portal"),
 
   getInvoices: () => api.get("/api/subscriptions/invoices"),
+
+  getTransactions: () => api.get("/api/subscriptions/transactions"),
 };
 
 // ========== Notifications API ==========
@@ -353,8 +390,20 @@ export const adminApi = {
   getDashboard: () => api.get("/api/admin/dashboard"),
 
   // Users
-  getUsers: (page = 1, limit = 20) =>
-    api.get(`/api/admin/users?page=${page}&limit=${limit}`),
+  getUsers: (
+    page = 1,
+    limit = 20,
+    filters?: {
+      search?: string;
+      role?: string;
+      status?: string;
+      sortBy?: string;
+      sortOrder?: string;
+    },
+  ) =>
+    api.get("/api/admin/users", {
+      params: { page, limit, ...filters },
+    }),
 
   getUser: (id: string) => api.get(`/api/admin/users/${id}`),
 
@@ -362,6 +411,9 @@ export const adminApi = {
 
   toggleUserActive: (id: string, isActive: boolean) =>
     api.put(`/api/admin/users/${id}/toggle-active`, { isActive }),
+
+  bulkUpdateUserStatus: (userIds: string[], isActive: boolean) =>
+    api.put("/api/admin/users/bulk-status", { userIds, isActive }),
 
   changeUserRole: (id: string, role: string) =>
     api.put(`/api/admin/users/${id}/role`, { role }),
@@ -431,6 +483,11 @@ export const adminApi = {
 
   deletePlan: (id: string) => api.delete(`/api/admin/plans/${id}`),
 
+  syncPlanToStripe: (id: string) =>
+    api.post(`/api/admin/plans/${id}/sync-stripe`),
+
+  syncAllPlansToStripe: () => api.post("/api/admin/plans/sync-stripe"),
+
   // AI Usage
   getAiUsage: (page = 1, limit = 50) =>
     api.get(`/api/admin/ai-usage?page=${page}&limit=${limit}`),
@@ -470,6 +527,14 @@ export const adminApi = {
 
   // Revenue
   getRevenue: () => api.get("/api/admin/revenue"),
+
+  getDetailedRevenue: (days = 30) =>
+    api.get(`/api/admin/revenue/detailed?days=${days}`),
+
+  getRevenueInvoices: (page = 1, limit = 50, status?: string) =>
+    api.get("/api/admin/revenue/invoices", {
+      params: { page, limit, status },
+    }),
 
   // Analytics (real-time dashboard)
   getRegistrationStats: () =>

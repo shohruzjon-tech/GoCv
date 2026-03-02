@@ -1,4 +1,13 @@
-import { Controller, Get, Put, Post, Body, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Put,
+  Post,
+  Body,
+  UseGuards,
+  Inject,
+  forwardRef,
+} from '@nestjs/common';
 import { SiteSettingsService } from './site-settings.service.js';
 import { StripeService } from '../stripe/stripe.service.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
@@ -10,6 +19,7 @@ import { Role } from '../common/enums/role.enum.js';
 export class SiteSettingsController {
   constructor(
     private siteSettingsService: SiteSettingsService,
+    @Inject(forwardRef(() => StripeService))
     private stripeService: StripeService,
   ) {}
 

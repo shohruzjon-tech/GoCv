@@ -153,4 +153,23 @@ export class AiUsageService {
     ]);
     return { usages, total };
   }
+
+  async findByUserId(
+    userId: string,
+    page = 1,
+    limit = 50,
+  ): Promise<{ usages: AiUsageDocument[]; total: number }> {
+    const skip = (page - 1) * limit;
+    const filter = { userId: new Types.ObjectId(userId) };
+    const [usages, total] = await Promise.all([
+      this.aiUsageModel
+        .find(filter)
+        .skip(skip)
+        .limit(limit)
+        .sort({ createdAt: -1 })
+        .exec(),
+      this.aiUsageModel.countDocuments(filter).exec(),
+    ]);
+    return { usages, total };
+  }
 }

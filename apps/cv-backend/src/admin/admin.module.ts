@@ -11,6 +11,7 @@ import { SessionsModule } from '../sessions/sessions.module.js';
 import { CvModule } from '../cv/cv.module.js';
 import { TemplatesModule } from '../templates/templates.module.js';
 import { SubscriptionsModule } from '../subscriptions/subscriptions.module.js';
+import { StripeModule } from '../stripe/stripe.module.js';
 import { AiUsageModule } from '../ai-usage/ai-usage.module.js';
 import { FeatureFlagsModule } from '../feature-flags/feature-flags.module.js';
 import { NotificationsModule } from '../notifications/notifications.module.js';
@@ -37,6 +38,7 @@ import { AuditLog, AuditLogSchema } from '../audit/schemas/audit-log.schema.js';
     CvModule,
     TemplatesModule,
     SubscriptionsModule,
+    StripeModule,
     AiUsageModule,
     FeatureFlagsModule,
     NotificationsModule,

@@ -71,16 +71,41 @@ export class UsersService {
   async findAll(
     page = 1,
     limit = 20,
+    filters?: {
+      search?: string;
+      role?: string;
+      status?: string;
+      sortBy?: string;
+      sortOrder?: string;
+    },
   ): Promise<{ users: UserDocument[]; total: number }> {
     const skip = (page - 1) * limit;
+    const query: any = {};
+
+    if (filters?.search) {
+      const regex = new RegExp(filters.search, 'i');
+      query.$or = [{ name: regex }, { email: regex }, { username: regex }];
+    }
+    if (filters?.role && filters.role !== 'all') {
+      query.role = filters.role;
+    }
+    if (filters?.status === 'active') {
+      query.isActive = true;
+    } else if (filters?.status === 'inactive') {
+      query.isActive = false;
+    } else if (filters?.status === 'verified') {
+      query.isEmailVerified = true;
+    } else if (filters?.status === 'unverified') {
+      query.isEmailVerified = false;
+    }
+
+    const sortField = filters?.sortBy || 'createdAt';
+    const sortDir = filters?.sortOrder === 'asc' ? 1 : -1;
+    const sort: any = { [sortField]: sortDir };
+
     const [users, total] = await Promise.all([
-      this.userModel
-        .find()
-        .skip(skip)
-        .limit(limit)
-        .sort({ createdAt: -1 })
-        .exec(),
-      this.userModel.countDocuments().exec(),
+      this.userModel.find(query).skip(skip).limit(limit).sort(sort).exec(),
+      this.userModel.countDocuments(query).exec(),
     ]);
     return { users, total };
   }

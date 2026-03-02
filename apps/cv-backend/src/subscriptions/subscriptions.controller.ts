@@ -17,18 +17,13 @@ import {
 } from './dto/subscription.dto.js';
 
 @Controller('api/subscriptions')
-@UseGuards(JwtAuthGuard)
 export class SubscriptionsController {
   constructor(
     private subscriptionsService: SubscriptionsService,
     private planConfigService: PlanConfigService,
   ) {}
 
-  @Get('my')
-  async getMySubscription(@CurrentUser('_id') userId: string) {
-    return this.subscriptionsService.getOrCreate(userId);
-  }
-
+  // Public endpoint — available to everyone (landing page pricing)
   @Get('plans')
   async getPlans() {
     const configs = await this.planConfigService.getActivePlans();
@@ -46,7 +41,14 @@ export class SubscriptionsController {
     };
   }
 
+  @Get('my')
+  @UseGuards(JwtAuthGuard)
+  async getMySubscription(@CurrentUser('_id') userId: string) {
+    return this.subscriptionsService.getOrCreate(userId);
+  }
+
   @Post('upgrade')
+  @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   async upgrade(@CurrentUser() user: any, @Body() dto: UpgradeSubscriptionDto) {
     const result = await this.subscriptionsService.upgrade(
@@ -67,6 +69,7 @@ export class SubscriptionsController {
   }
 
   @Post('cancel')
+  @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   async cancel(
     @CurrentUser('_id') userId: string,
@@ -76,6 +79,7 @@ export class SubscriptionsController {
   }
 
   @Get('usage')
+  @UseGuards(JwtAuthGuard)
   async getUsage(@CurrentUser('_id') userId: string) {
     const sub = await this.subscriptionsService.getOrCreate(userId);
     return {
@@ -87,6 +91,7 @@ export class SubscriptionsController {
   }
 
   @Post('billing-portal')
+  @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   async billingPortal(@CurrentUser('_id') userId: string) {
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:4001';
@@ -101,7 +106,14 @@ export class SubscriptionsController {
   }
 
   @Get('invoices')
+  @UseGuards(JwtAuthGuard)
   async getInvoices(@CurrentUser('_id') userId: string) {
     return this.subscriptionsService.getInvoices(userId);
+  }
+
+  @Get('transactions')
+  @UseGuards(JwtAuthGuard)
+  async getTransactions(@CurrentUser('_id') userId: string) {
+    return this.subscriptionsService.getTransactionHistory(userId);
   }
 }

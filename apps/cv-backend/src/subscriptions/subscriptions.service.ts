@@ -107,15 +107,12 @@ export class SubscriptionsService {
       return { subscription: await sub.save() };
     }
 
-    // If Stripe is not configured, do a direct upgrade (dev mode)
+    // If Stripe is not configured, reject paid upgrades
     if (!this.stripeService.isConfigured()) {
-      this.logger.warn('Stripe not configured — direct upgrade (dev mode)');
-      sub.plan = newPlan;
-      sub.limits = this.planConfigService.getPlanLimits(newPlan);
-      sub.status = SubscriptionStatus.ACTIVE;
-      sub.pricePerMonth = this.planConfigService.getMonthlyPrice(newPlan);
-      sub.pricePerYear = this.planConfigService.getYearlyPrice(newPlan);
-      return { subscription: await sub.save() };
+      this.logger.warn('Stripe not configured — paid upgrades are disabled');
+      throw new BadRequestException(
+        'Payment system is not configured. Please contact the administrator.',
+      );
     }
 
     // If user already has an active Stripe subscription, change it
@@ -525,5 +522,102 @@ export class SubscriptionsService {
       pdfUrl: inv.invoice_pdf,
       hostedUrl: inv.hosted_invoice_url,
     }));
+  }
+
+  // ─── Transaction History ───
+
+  async getTransactionHistory(userId: string) {
+    const sub = await this.findByUserId(userId);
+    const transactions: any[] = [];
+
+    // Add subscription creation as first transaction
+    if (sub) {
+      transactions.push({
+        id: `sub_created_${sub._id}`,
+        type: 'subscription_created',
+        description: 'Account created — Free plan activated',
+        amount: 0,
+        currency: 'usd',
+        status: 'completed',
+        date: sub.createdAt
+          ? new Date(sub.createdAt).toISOString()
+          : new Date().toISOString(),
+        plan: 'free',
+      });
+    }
+
+    // Add Stripe invoices as payment transactions
+    if (sub?.stripeCustomerId && this.stripeService.isConfigured()) {
+      try {
+        const invoices = await this.stripeService.getInvoices(
+          sub.stripeCustomerId,
+          50,
+        );
+        for (const inv of invoices) {
+          transactions.push({
+            id: inv.id,
+            type: 'payment',
+            description: inv.number
+              ? `Invoice ${inv.number}`
+              : `Payment — ${(sub.plan || 'plan').charAt(0).toUpperCase() + (sub.plan || 'plan').slice(1)} plan`,
+            amount: inv.amount_paid / 100,
+            currency: inv.currency || 'usd',
+            status:
+              inv.status === 'paid'
+                ? 'completed'
+                : inv.status === 'open'
+                  ? 'pending'
+                  : inv.status || 'unknown',
+            date: inv.created
+              ? new Date(inv.created * 1000).toISOString()
+              : null,
+            pdfUrl: inv.invoice_pdf,
+            hostedUrl: inv.hosted_invoice_url,
+            plan: sub.plan,
+          });
+        }
+      } catch (err) {
+        this.logger.warn(`Failed to fetch Stripe invoices: ${err}`);
+      }
+    }
+
+    // Add plan change events
+    if (sub && sub.plan !== SubscriptionPlan.FREE) {
+      transactions.push({
+        id: `plan_upgrade_${sub._id}`,
+        type: 'plan_change',
+        description: `Upgraded to ${sub.plan.charAt(0).toUpperCase() + sub.plan.slice(1)} plan`,
+        amount: (sub.pricePerMonth || 0) / 100,
+        currency: 'usd',
+        status: 'completed',
+        date: sub.updatedAt
+          ? new Date(sub.updatedAt).toISOString()
+          : new Date().toISOString(),
+        plan: sub.plan,
+      });
+    }
+
+    if (sub?.cancelledAt) {
+      transactions.push({
+        id: `sub_cancelled_${sub._id}`,
+        type: 'cancellation',
+        description: sub.cancelAtPeriodEnd
+          ? 'Subscription set to cancel at period end'
+          : 'Subscription cancelled',
+        amount: 0,
+        currency: 'usd',
+        status: 'completed',
+        date: new Date(sub.cancelledAt).toISOString(),
+        plan: sub.plan,
+      });
+    }
+
+    // Sort by date descending
+    transactions.sort(
+      (a, b) =>
+        new Date(b.date || 0).getTime() - new Date(a.date || 0).getTime(),
+    );
+
+    return transactions;
   }
 }

@@ -43,7 +43,7 @@ import {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
-import { siteSettingsApi } from "@/lib/api";
+import { siteSettingsApi, subscriptionsApi } from "@/lib/api";
 
 const ThreeBackground = dynamic(() => import("@/components/three-background"), {
   ssr: false,
@@ -149,6 +149,16 @@ export default function Home() {
   const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [creatorInfo, setCreatorInfo] = useState<any>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [pricingPlans, setPricingPlans] = useState<any[]>([]);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const user = localStorage.getItem("user");
+    if (token && user) {
+      setIsLoggedIn(true);
+    }
+  }, []);
 
   const { scrollYProgress } = useScroll();
   const headerBlur = useTransform(scrollYProgress, [0, 0.05], [0, 20]);
@@ -163,6 +173,15 @@ export default function Home() {
       .getCreatorInfo()
       .then((res) => {
         if (res.data?.name) setCreatorInfo(res.data);
+      })
+      .catch(() => {});
+    subscriptionsApi
+      .getPlans()
+      .then((res) => {
+        const plans = Array.isArray(res.data)
+          ? res.data
+          : res.data?.plans || [];
+        setPricingPlans(plans);
       })
       .catch(() => {});
   }, []);
@@ -412,19 +431,31 @@ export default function Home() {
           </nav>
 
           <div className="flex items-center gap-3">
-            <button
-              onClick={() => setShowLogin(true)}
-              className="hidden rounded-xl px-5 py-2.5 text-sm font-medium text-content-3 transition hover:text-content sm:inline-flex"
-            >
-              Sign In
-            </button>
-            <button
-              onClick={() => setShowLogin(true)}
-              className="hidden sm:inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-600/25 transition hover:bg-indigo-500 hover:shadow-indigo-500/30"
-            >
-              Get Started
-              <ArrowRight className="h-4 w-4" />
-            </button>
+            {isLoggedIn ? (
+              <Link
+                href="/dashboard"
+                className="hidden sm:inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-600/25 transition hover:bg-indigo-500 hover:shadow-indigo-500/30"
+              >
+                Dashboard
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            ) : (
+              <>
+                <button
+                  onClick={() => setShowLogin(true)}
+                  className="hidden rounded-xl px-5 py-2.5 text-sm font-medium text-content-3 transition hover:text-content sm:inline-flex"
+                >
+                  Sign In
+                </button>
+                <button
+                  onClick={() => setShowLogin(true)}
+                  className="hidden sm:inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-600/25 transition hover:bg-indigo-500 hover:shadow-indigo-500/30"
+                >
+                  Get Started
+                  <ArrowRight className="h-4 w-4" />
+                </button>
+              </>
+            )}
             {/* Mobile hamburger */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -457,24 +488,36 @@ export default function Home() {
                   </a>
                 ))}
                 <div className="mt-2 flex gap-2">
-                  <button
-                    onClick={() => {
-                      setShowLogin(true);
-                      setMobileMenuOpen(false);
-                    }}
-                    className="flex-1 rounded-xl border border-edge px-4 py-3 text-sm font-medium text-content-2 transition hover:bg-white/5"
-                  >
-                    Sign In
-                  </button>
-                  <button
-                    onClick={() => {
-                      setShowLogin(true);
-                      setMobileMenuOpen(false);
-                    }}
-                    className="flex-1 rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-600/25"
-                  >
-                    Get Started
-                  </button>
+                  {isLoggedIn ? (
+                    <Link
+                      href="/dashboard"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex-1 rounded-xl bg-indigo-600 px-4 py-3 text-center text-sm font-semibold text-white shadow-lg shadow-indigo-600/25"
+                    >
+                      Dashboard
+                    </Link>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => {
+                          setShowLogin(true);
+                          setMobileMenuOpen(false);
+                        }}
+                        className="flex-1 rounded-xl border border-edge px-4 py-3 text-sm font-medium text-content-2 transition hover:bg-white/5"
+                      >
+                        Sign In
+                      </button>
+                      <button
+                        onClick={() => {
+                          setShowLogin(true);
+                          setMobileMenuOpen(false);
+                        }}
+                        className="flex-1 rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-600/25"
+                      >
+                        Get Started
+                      </button>
+                    </>
+                  )}
                 </div>
               </nav>
             </motion.div>
@@ -1431,151 +1474,133 @@ export default function Home() {
             </FadeInWhenVisible>
 
             <div className="mx-auto grid max-w-5xl gap-4 sm:gap-6 md:grid-cols-3 md:gap-8">
-              {/* Free */}
-              <FadeInWhenVisible delay={0}>
-                <motion.div
-                  whileHover={{ y: -4 }}
-                  transition={{
-                    type: "spring",
-                    stiffness: 300,
-                    damping: 20,
-                  }}
-                  className="rounded-2xl border border-edge bg-[#0c0c24]/60 p-6 backdrop-blur-sm transition-all hover:border-edge md:rounded-3xl md:p-8"
-                >
-                  <h3 className="mb-2 text-lg font-semibold text-content">
-                    Free
-                  </h3>
-                  <p className="mb-6 text-sm text-content-3">
-                    Perfect for getting started
-                  </p>
-                  <div className="mb-8">
-                    <span className="text-4xl font-bold text-content">$0</span>
-                    <span className="text-content-3">/month</span>
-                  </div>
-                  <ul className="mb-8 space-y-3">
-                    {[
-                      "1 AI-generated CV",
-                      "Basic templates",
-                      "Shareable link",
-                      "PDF download",
-                    ].map((f) => (
-                      <li
-                        key={f}
-                        className="flex items-center gap-3 text-sm text-content-2"
-                      >
-                        <Check className="h-4 w-4 flex-shrink-0 text-emerald-400" />
-                        {f}
-                      </li>
-                    ))}
-                  </ul>
-                  <button
-                    onClick={() => setShowLogin(true)}
-                    className="block w-full rounded-xl border border-edge bg-white/5 py-3 text-center text-sm font-semibold text-content transition hover:bg-white/10"
-                  >
-                    Get Started
-                  </button>
-                </motion.div>
-              </FadeInWhenVisible>
+              {(pricingPlans.length > 0
+                ? pricingPlans
+                : [
+                    {
+                      plan: "free",
+                      name: "Free",
+                      description: "Perfect for getting started",
+                      monthlyPrice: 0,
+                      features: [
+                        "2 CVs",
+                        "3 Projects",
+                        "10 AI credits/month",
+                        "Basic templates",
+                      ],
+                      popular: false,
+                    },
+                    {
+                      plan: "premium",
+                      name: "Premium",
+                      description: "Everything you need to stand out",
+                      monthlyPrice: 12,
+                      features: [
+                        "20 CVs",
+                        "50 Projects",
+                        "200 AI credits/month",
+                        "All templates",
+                        "Advanced AI tools",
+                        "Priority support",
+                      ],
+                      popular: true,
+                    },
+                    {
+                      plan: "enterprise",
+                      name: "Enterprise",
+                      description: "For teams and power users",
+                      monthlyPrice: 49,
+                      features: [
+                        "Unlimited CVs",
+                        "Unlimited Projects",
+                        "Unlimited AI credits",
+                        "Custom branding",
+                        "Custom domain",
+                        "Priority support",
+                      ],
+                      popular: false,
+                    },
+                  ]
+              ).map((plan, i) => {
+                const isPopular = plan.popular;
+                const isFree = plan.plan === "free";
+                const isEnterprise = plan.plan === "enterprise";
+                const checkColor = isPopular
+                  ? "text-indigo-400"
+                  : isEnterprise
+                    ? "text-purple-400"
+                    : "text-emerald-400";
 
-              {/* Pro */}
-              <FadeInWhenVisible delay={0.1}>
-                <motion.div
-                  whileHover={{ y: -6 }}
-                  transition={{
-                    type: "spring",
-                    stiffness: 300,
-                    damping: 20,
-                  }}
-                  className="relative rounded-2xl border border-indigo-500/30 bg-gradient-to-b from-indigo-500/10 to-[#0c0c24]/80 p-6 shadow-lg shadow-indigo-600/10 backdrop-blur-sm md:rounded-3xl md:p-8"
-                >
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-indigo-600 px-4 py-1 text-xs font-bold uppercase tracking-wider text-white shadow-lg shadow-indigo-600/30">
-                    Popular
-                  </div>
-                  <h3 className="mb-2 text-lg font-semibold text-content">
-                    Pro
-                  </h3>
-                  <p className="mb-6 text-sm text-content-3">
-                    For serious job seekers
-                  </p>
-                  <div className="mb-8">
-                    <span className="text-4xl font-bold text-content">$9</span>
-                    <span className="text-content-3">/month</span>
-                  </div>
-                  <ul className="mb-8 space-y-3">
-                    {[
-                      "Unlimited CVs",
-                      "Premium templates",
-                      "AI chat assistant",
-                      "Custom domains",
-                      "Priority support",
-                      "Analytics dashboard",
-                    ].map((f) => (
-                      <li
-                        key={f}
-                        className="flex items-center gap-3 text-sm text-content-2"
+                return (
+                  <FadeInWhenVisible key={plan.plan} delay={i * 0.1}>
+                    <motion.div
+                      whileHover={{ y: isPopular ? -6 : -4 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 300,
+                        damping: 20,
+                      }}
+                      className={`relative rounded-2xl border p-6 backdrop-blur-sm transition-all md:rounded-3xl md:p-8 ${
+                        isPopular
+                          ? "border-indigo-500/30 bg-gradient-to-b from-indigo-500/10 to-[#0c0c24]/80 shadow-lg shadow-indigo-600/10"
+                          : "border-edge bg-[#0c0c24]/60 hover:border-edge"
+                      }`}
+                    >
+                      {isPopular && (
+                        <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-indigo-600 px-4 py-1 text-xs font-bold uppercase tracking-wider text-white shadow-lg shadow-indigo-600/30">
+                          Popular
+                        </div>
+                      )}
+                      <h3 className="mb-2 text-lg font-semibold text-content">
+                        {plan.name}
+                      </h3>
+                      <p className="mb-6 text-sm text-content-3">
+                        {plan.description}
+                      </p>
+                      <div className="mb-8">
+                        <span className="text-4xl font-bold text-content">
+                          ${plan.monthlyPrice}
+                        </span>
+                        <span className="text-content-3">/month</span>
+                      </div>
+                      <ul className="mb-8 space-y-3">
+                        {plan.features?.map((f: string) => (
+                          <li
+                            key={f}
+                            className="flex items-center gap-3 text-sm text-content-2"
+                          >
+                            <Check
+                              className={`h-4 w-4 flex-shrink-0 ${checkColor}`}
+                            />
+                            {f}
+                          </li>
+                        ))}
+                      </ul>
+                      <button
+                        onClick={() => {
+                          if (isLoggedIn) {
+                            window.location.href =
+                              "/dashboard/settings/billing";
+                          } else {
+                            setShowLogin(true);
+                          }
+                        }}
+                        className={`block w-full rounded-xl py-3 text-center text-sm font-semibold transition ${
+                          isPopular
+                            ? "bg-indigo-600 text-white shadow-lg shadow-indigo-600/25 hover:bg-indigo-500 neon-btn-glow"
+                            : "border border-edge bg-white/5 text-content hover:bg-white/10"
+                        }`}
                       >
-                        <Check className="h-4 w-4 flex-shrink-0 text-indigo-400" />
-                        {f}
-                      </li>
-                    ))}
-                  </ul>
-                  <button
-                    onClick={() => setShowLogin(true)}
-                    className="block w-full rounded-xl bg-indigo-600 py-3 text-center text-sm font-semibold text-white shadow-lg shadow-indigo-600/25 transition hover:bg-indigo-500 neon-btn-glow"
-                  >
-                    Start Free Trial
-                  </button>
-                </motion.div>
-              </FadeInWhenVisible>
-
-              {/* Enterprise */}
-              <FadeInWhenVisible delay={0.2}>
-                <motion.div
-                  whileHover={{ y: -4 }}
-                  transition={{
-                    type: "spring",
-                    stiffness: 300,
-                    damping: 20,
-                  }}
-                  className="rounded-2xl border border-edge bg-[#0c0c24]/60 p-6 backdrop-blur-sm transition-all hover:border-edge md:rounded-3xl md:p-8"
-                >
-                  <h3 className="mb-2 text-lg font-semibold text-content">
-                    Enterprise
-                  </h3>
-                  <p className="mb-6 text-sm text-content-3">
-                    For teams & organizations
-                  </p>
-                  <div className="mb-8">
-                    <span className="text-4xl font-bold text-content">
-                      Custom
-                    </span>
-                  </div>
-                  <ul className="mb-8 space-y-3">
-                    {[
-                      "Everything in Pro",
-                      "Team management",
-                      "SSO & SAML",
-                      "Custom branding",
-                      "API access",
-                      "Dedicated support",
-                    ].map((f) => (
-                      <li
-                        key={f}
-                        className="flex items-center gap-3 text-sm text-content-2"
-                      >
-                        <Check className="h-4 w-4 flex-shrink-0 text-purple-400" />
-                        {f}
-                      </li>
-                    ))}
-                  </ul>
-                  <button
-                    onClick={() => setShowLogin(true)}
-                    className="block w-full rounded-xl border border-edge bg-white/5 py-3 text-center text-sm font-semibold text-content transition hover:bg-white/10"
-                  >
-                    Contact Sales
-                  </button>
-                </motion.div>
-              </FadeInWhenVisible>
+                        {isFree
+                          ? "Get Started"
+                          : isPopular
+                            ? "Get Started"
+                            : "Get Started"}
+                      </button>
+                    </motion.div>
+                  </FadeInWhenVisible>
+                );
+              })}
             </div>
           </div>
         </section>

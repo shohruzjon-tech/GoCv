@@ -36,8 +36,30 @@ export class AdminController {
   // ─── Users ───
 
   @Get('users')
-  async getUsers(@Query('page') page?: string, @Query('limit') limit?: string) {
-    return this.adminService.getUsers(Number(page) || 1, Number(limit) || 20);
+  async getUsers(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('search') search?: string,
+    @Query('role') role?: string,
+    @Query('status') status?: string,
+    @Query('sortBy') sortBy?: string,
+    @Query('sortOrder') sortOrder?: string,
+  ) {
+    return this.adminService.getUsers(Number(page) || 1, Number(limit) || 20, {
+      search,
+      role,
+      status,
+      sortBy,
+      sortOrder,
+    });
+  }
+
+  @Put('users/bulk-status')
+  async bulkUpdateUserStatus(
+    @Body('userIds') userIds: string[],
+    @Body('isActive') isActive: boolean,
+  ) {
+    return this.adminService.bulkUpdateUserStatus(userIds, isActive);
   }
 
   @Get('users/:id')
@@ -205,6 +227,16 @@ export class AdminController {
     return this.adminService.deletePlan(id);
   }
 
+  @Post('plans/:id/sync-stripe')
+  async syncPlanToStripe(@Param('id') id: string) {
+    return this.adminService.syncPlanToStripe(id);
+  }
+
+  @Post('plans/sync-stripe')
+  async syncAllPlansToStripe() {
+    return this.adminService.syncAllPlansToStripe();
+  }
+
   // ─── AI Usage ───
 
   @Get('ai-usage')
@@ -290,6 +322,24 @@ export class AdminController {
   @Get('revenue')
   async getRevenueOverview() {
     return this.adminService.getRevenueOverview();
+  }
+
+  @Get('revenue/detailed')
+  async getDetailedRevenue(@Query('days') days?: string) {
+    return this.adminService.getDetailedRevenueStats(Number(days) || 30);
+  }
+
+  @Get('revenue/invoices')
+  async getRevenueInvoices(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('status') status?: string,
+  ) {
+    return this.adminService.getRevenueInvoices(
+      Number(page) || 1,
+      Number(limit) || 50,
+      status,
+    );
   }
 
   // ─── Analytics (REST fallback for initial load) ───

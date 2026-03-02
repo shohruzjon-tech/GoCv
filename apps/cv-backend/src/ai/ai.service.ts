@@ -65,8 +65,8 @@ export class AiService {
 
   private estimateCost(promptTokens: number, completionTokens: number): number {
     // GPT-5 pricing estimate (mills = 1/1000 USD)
-    const promptCost = (promptTokens / 1000) * 5; // $5/1M input tokens
-    const completionCost = (completionTokens / 1000) * 15; // $15/1M output tokens
+    const promptCost = (promptTokens / 1_000_000) * 5; // $5/1M input tokens
+    const completionCost = (completionTokens / 1_000_000) * 15; // $15/1M output tokens
     return Math.round((promptCost + completionCost) * 1000);
   }
 

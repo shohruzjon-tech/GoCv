@@ -140,10 +140,6 @@ export default function AdminStripePage() {
   const [enabled, setEnabled] = useState(false);
   const [secretKey, setSecretKey] = useState("");
   const [webhookSecret, setWebhookSecret] = useState("");
-  const [premiumMonthly, setPremiumMonthly] = useState("");
-  const [premiumYearly, setPremiumYearly] = useState("");
-  const [enterpriseMonthly, setEnterpriseMonthly] = useState("");
-  const [enterpriseYearly, setEnterpriseYearly] = useState("");
   const [showSecretKey, setShowSecretKey] = useState(false);
   const [showWebhookSecret, setShowWebhookSecret] = useState(false);
   const [showEvents, setShowEvents] = useState(false);
@@ -156,10 +152,6 @@ export default function AdminStripePage() {
       const d = res.data;
       setConfig(d);
       setEnabled(d.enabled);
-      setPremiumMonthly(d.premiumMonthlyPriceId || "");
-      setPremiumYearly(d.premiumYearlyPriceId || "");
-      setEnterpriseMonthly(d.enterpriseMonthlyPriceId || "");
-      setEnterpriseYearly(d.enterpriseYearlyPriceId || "");
       setSecretKey("");
       setWebhookSecret("");
       if (d.enabled && d.hasSecretKey) setConnectionOk(true);
@@ -217,10 +209,6 @@ export default function AdminStripePage() {
     try {
       const payload: any = {
         enabled,
-        premiumMonthlyPriceId: premiumMonthly,
-        premiumYearlyPriceId: premiumYearly,
-        enterpriseMonthlyPriceId: enterpriseMonthly,
-        enterpriseYearlyPriceId: enterpriseYearly,
       };
       if (secretKey) payload.secretKey = secretKey;
       if (webhookSecret) payload.webhookSecret = webhookSecret;
@@ -232,7 +220,7 @@ export default function AdminStripePage() {
       } else if (res.data?.connection?.ok === false) {
         setConnectionOk(false);
         toast.error(
-          `Saved but connection failed: ${res.data.connection.error}`
+          `Saved but connection failed: ${res.data.connection.error}`,
         );
       } else {
         toast.success("Stripe configuration saved!");
@@ -270,7 +258,7 @@ export default function AdminStripePage() {
   const successRate =
     health && health.recentCharges.total > 0
       ? Math.round(
-          (health.recentCharges.succeeded / health.recentCharges.total) * 100
+          (health.recentCharges.succeeded / health.recentCharges.total) * 100,
         )
       : 0;
 
@@ -952,10 +940,10 @@ export default function AdminStripePage() {
                             </div>
                             <span className="whitespace-nowrap text-[11px] text-content-3">
                               {new Date(
-                                evt.created * 1000
+                                evt.created * 1000,
                               ).toLocaleDateString()}{" "}
                               {new Date(
-                                evt.created * 1000
+                                evt.created * 1000,
                               ).toLocaleTimeString()}
                             </span>
                           </div>
@@ -1096,7 +1084,7 @@ export default function AdminStripePage() {
             </div>
           </div>
 
-          {/* Price IDs */}
+          {/* Price IDs — Managed in Plans */}
           <div className="rounded-2xl border border-edge bg-card overflow-hidden">
             <div className="flex items-center gap-3 border-b border-edge bg-gradient-to-r from-cyan-500/5 to-transparent px-6 py-4">
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-cyan-500/10 ring-1 ring-cyan-500/20">
@@ -1107,57 +1095,28 @@ export default function AdminStripePage() {
                   Subscription Price IDs
                 </p>
                 <p className="text-[11px] text-content-3">
-                  Map each Stripe Price to a subscription tier
+                  Stripe Price IDs are configured per-plan in the Plans page
                 </p>
               </div>
             </div>
             <div className="p-6">
-              <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-                {[
-                  {
-                    label: "Premium - Monthly",
-                    value: premiumMonthly,
-                    set: setPremiumMonthly,
-                    tier: "premium",
-                  },
-                  {
-                    label: "Premium - Yearly",
-                    value: premiumYearly,
-                    set: setPremiumYearly,
-                    tier: "premium",
-                  },
-                  {
-                    label: "Enterprise - Monthly",
-                    value: enterpriseMonthly,
-                    set: setEnterpriseMonthly,
-                    tier: "enterprise",
-                  },
-                  {
-                    label: "Enterprise - Yearly",
-                    value: enterpriseYearly,
-                    set: setEnterpriseYearly,
-                    tier: "enterprise",
-                  },
-                ].map((field) => (
-                  <div key={field.label}>
-                    <label className="mb-1.5 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-content-3">
-                      <span
-                        className={`h-2 w-2 rounded-full ${field.tier === "premium" ? "bg-amber-400" : "bg-violet-400"}`}
-                      />
-                      {field.label}
-                      {field.value && (
-                        <CheckCircle2 className="h-3 w-3 text-emerald-400" />
-                      )}
-                    </label>
-                    <input
-                      type="text"
-                      value={field.value}
-                      onChange={(e) => field.set(e.target.value)}
-                      placeholder="price_..."
-                      className="w-full rounded-xl border border-edge bg-surface px-4 py-3 font-mono text-sm text-content placeholder:font-sans placeholder:text-content-4 focus:border-cyan-500/50 focus:outline-none focus:ring-1 focus:ring-cyan-500/30"
-                    />
-                  </div>
-                ))}
+              <div className="flex items-center gap-4 rounded-xl border border-cyan-500/10 bg-cyan-500/5 px-5 py-4">
+                <Tag className="h-5 w-5 shrink-0 text-cyan-400" />
+                <div>
+                  <p className="text-sm font-medium text-content">
+                    Price IDs are now managed in{" "}
+                    <a
+                      href="/admin/plans"
+                      className="text-cyan-400 underline decoration-cyan-400/30 hover:text-cyan-300"
+                    >
+                      Plan &amp; Pricing
+                    </a>
+                  </p>
+                  <p className="mt-0.5 text-xs text-content-3">
+                    Edit each plan to set its Stripe Monthly and Yearly Price
+                    IDs. These are automatically used for checkout sessions.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -1229,7 +1188,7 @@ export default function AdminStripePage() {
                   },
                   {
                     step: 4,
-                    title: "Add Price IDs",
+                    title: "Add Price IDs to Plans",
                     desc: (
                       <>
                         Go to{" "}
@@ -1241,8 +1200,14 @@ export default function AdminStripePage() {
                         >
                           Stripe Dashboard - Products
                         </a>{" "}
-                        and copy each Price ID (price_...) for your subscription
-                        tiers
+                        and copy each Price ID (price_...), then set them in the{" "}
+                        <a
+                          href="/admin/plans"
+                          className="text-orange-400 underline decoration-orange-400/30"
+                        >
+                          Plan &amp; Pricing
+                        </a>{" "}
+                        page
                       </>
                     ),
                   },

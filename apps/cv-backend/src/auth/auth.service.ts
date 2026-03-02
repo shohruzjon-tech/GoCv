@@ -341,6 +341,133 @@ export class AuthService {
       location: user.location,
       website: user.website,
       socialLinks: user.socialLinks,
+      preferences: user.preferences,
+      isEmailVerified: user.isEmailVerified,
+      createdAt: user.createdAt,
+      lastLoginAt: user.lastLoginAt,
     };
+  }
+
+  async updateProfile(
+    userId: string,
+    data: {
+      name?: string;
+      headline?: string;
+      bio?: string;
+      location?: string;
+      website?: string;
+      socialLinks?: { linkedin?: string; github?: string; twitter?: string };
+    },
+  ) {
+    const user = await this.usersService.update(userId, data);
+    if (!user) throw new UnauthorizedException('User not found');
+    return {
+      _id: user._id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      avatar: user.avatar,
+      username: user.username,
+      bio: user.bio,
+      headline: user.headline,
+      location: user.location,
+      website: user.website,
+      socialLinks: user.socialLinks,
+      preferences: user.preferences,
+      isEmailVerified: user.isEmailVerified,
+      createdAt: user.createdAt,
+      lastLoginAt: user.lastLoginAt,
+    };
+  }
+
+  async changePassword(
+    userId: string,
+    currentPassword: string,
+    newPassword: string,
+  ) {
+    const user = await this.usersService.findById(userId);
+    if (!user) throw new UnauthorizedException('User not found');
+
+    // If user has a password (not Google-only), verify current password
+    if (user.password) {
+      const valid = await this.usersService.validatePassword(
+        user.email,
+        currentPassword,
+      );
+      if (!valid) {
+        throw new BadRequestException('Current password is incorrect');
+      }
+    }
+
+    if (newPassword.length < 8) {
+      throw new BadRequestException(
+        'Password must be at least 8 characters long',
+      );
+    }
+
+    await this.usersService.updatePassword(userId, newPassword);
+    return { message: 'Password updated successfully' };
+  }
+
+  async updatePreferences(
+    userId: string,
+    preferences: {
+      emailNotifications?: boolean;
+      marketingEmails?: boolean;
+      language?: string;
+      timezone?: string;
+    },
+  ) {
+    const user = await this.usersService.findById(userId);
+    if (!user) throw new UnauthorizedException('User not found');
+
+    const merged = { ...(user.preferences || {}), ...preferences };
+    const updated = await this.usersService.update(userId, {
+      preferences: merged,
+    } as any);
+    return updated?.preferences || merged;
+  }
+
+  async getUserSessions(userId: string) {
+    const sessions = await this.sessionsService.findByUserId(userId);
+    return sessions.map((s) => ({
+      _id: s._id,
+      userAgent: s.userAgent,
+      ipAddress: s.ipAddress,
+      isActive: s.isActive,
+      lastActivityAt: s.lastActivityAt,
+      createdAt: s.createdAt,
+      expiresAt: s.expiresAt,
+    }));
+  }
+
+  async terminateSession(userId: string, sessionId: string) {
+    const sessions = await this.sessionsService.findByUserId(userId);
+    const session = sessions.find((s) => s._id.toString() === sessionId);
+    if (!session) throw new BadRequestException('Session not found');
+
+    await this.sessionsService.deactivate(sessionId);
+    return { message: 'Session terminated' };
+  }
+
+  async deleteAccount(userId: string, password?: string) {
+    const user = await this.usersService.findById(userId);
+    if (!user) throw new UnauthorizedException('User not found');
+
+    // Verify password if they have one
+    if (user.password && password) {
+      const valid = await this.usersService.validatePassword(
+        user.email,
+        password,
+      );
+      if (!valid) {
+        throw new BadRequestException('Password is incorrect');
+      }
+    }
+
+    // Deactivate instead of hard delete
+    await this.usersService.setActive(userId, false);
+    await this.sessionsService.deactivateAllForUser(userId);
+    return { message: 'Account deactivated successfully' };
   }
 }

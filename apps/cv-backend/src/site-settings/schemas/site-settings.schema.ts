@@ -3,7 +3,7 @@ import { Document } from 'mongoose';
 
 @Schema({ timestamps: true })
 export class SiteSettings extends Document {
-  @Prop({ default: 'default' })
+  @Prop({ default: 'default', unique: true })
   key: string;
 
   // Creator / About section

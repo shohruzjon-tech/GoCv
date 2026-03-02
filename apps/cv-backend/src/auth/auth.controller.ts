@@ -2,6 +2,8 @@ import {
   Controller,
   Get,
   Post,
+  Put,
+  Delete,
   Body,
   Param,
   UseGuards,
@@ -103,6 +105,78 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   async getProfile(@CurrentUser('_id') userId: string) {
     return this.authService.getProfile(userId);
+  }
+
+  @Put('profile')
+  @UseGuards(JwtAuthGuard)
+  async updateProfile(
+    @CurrentUser('_id') userId: string,
+    @Body()
+    body: {
+      name?: string;
+      headline?: string;
+      bio?: string;
+      location?: string;
+      website?: string;
+      socialLinks?: { linkedin?: string; github?: string; twitter?: string };
+    },
+  ) {
+    return this.authService.updateProfile(userId, body);
+  }
+
+  @Put('password')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async changePassword(
+    @CurrentUser('_id') userId: string,
+    @Body() body: { currentPassword: string; newPassword: string },
+  ) {
+    return this.authService.changePassword(
+      userId,
+      body.currentPassword,
+      body.newPassword,
+    );
+  }
+
+  @Put('preferences')
+  @UseGuards(JwtAuthGuard)
+  async updatePreferences(
+    @CurrentUser('_id') userId: string,
+    @Body()
+    body: {
+      emailNotifications?: boolean;
+      marketingEmails?: boolean;
+      language?: string;
+      timezone?: string;
+    },
+  ) {
+    return this.authService.updatePreferences(userId, body);
+  }
+
+  @Get('sessions')
+  @UseGuards(JwtAuthGuard)
+  async getUserSessions(@CurrentUser('_id') userId: string) {
+    return this.authService.getUserSessions(userId);
+  }
+
+  @Delete('sessions/:id')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async terminateSession(
+    @CurrentUser('_id') userId: string,
+    @Param('id') sessionId: string,
+  ) {
+    return this.authService.terminateSession(userId, sessionId);
+  }
+
+  @Delete('account')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async deleteAccount(
+    @CurrentUser('_id') userId: string,
+    @Body() body: { password?: string },
+  ) {
+    return this.authService.deleteAccount(userId, body.password);
   }
 
   // ─── API Keys ───

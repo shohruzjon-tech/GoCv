@@ -20,6 +20,10 @@ import {
   ToggleRight,
   GripVertical,
   Check,
+  RefreshCw,
+  AlertTriangle,
+  CheckCircle2,
+  ExternalLink,
 } from "lucide-react";
 
 const EMPTY_LIMITS = {
@@ -44,6 +48,7 @@ export default function AdminPlansPage() {
   // Edit form state
   const [formName, setFormName] = useState("");
   const [formDescription, setFormDescription] = useState("");
+  const [formPlanKey, setFormPlanKey] = useState("");
   const [formMonthlyPrice, setFormMonthlyPrice] = useState(0);
   const [formYearlyPrice, setFormYearlyPrice] = useState(0);
   const [formPopular, setFormPopular] = useState(false);
@@ -54,6 +59,7 @@ export default function AdminPlansPage() {
   const [newFeature, setNewFeature] = useState("");
   const [formStripePriceIdMonthly, setFormStripePriceIdMonthly] = useState("");
   const [formStripePriceIdYearly, setFormStripePriceIdYearly] = useState("");
+  const [syncing, setSyncing] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -102,6 +108,37 @@ export default function AdminPlansPage() {
     setFormStripePriceIdYearly(plan.stripePriceIdYearly || "");
   };
 
+  const openCreate = () => {
+    setEditingPlan({
+      _id: "__new__",
+      plan: "" as any,
+      name: "",
+      description: "",
+      monthlyPrice: 0,
+      yearlyPrice: 0,
+      currency: "usd",
+      limits: { ...EMPTY_LIMITS },
+      features: [],
+      displayOrder: plans.length,
+      popular: false,
+      isActive: true,
+      createdAt: "",
+      updatedAt: "",
+    } as any);
+    setIsNew(true);
+    setFormName("");
+    setFormDescription("");
+    setFormMonthlyPrice(0);
+    setFormYearlyPrice(0);
+    setFormPopular(false);
+    setFormIsActive(true);
+    setFormDisplayOrder(plans.length);
+    setFormLimits({ ...EMPTY_LIMITS });
+    setFormFeatures([]);
+    setFormStripePriceIdMonthly("");
+    setFormStripePriceIdYearly("");
+  };
+
   const handleSave = async () => {
     if (!editingPlan) return;
     setSaving(true);
@@ -120,12 +157,20 @@ export default function AdminPlansPage() {
         stripePriceIdYearly: formStripePriceIdYearly || undefined,
       };
 
-      await adminApi.updatePlan(editingPlan._id, payload);
-      toast.success("Plan updated successfully");
+      if (isNew) {
+        await adminApi.createPlan({
+          ...payload,
+          plan: formPlanKey.toLowerCase(),
+        });
+        toast.success("Plan created successfully");
+      } else {
+        await adminApi.updatePlan(editingPlan._id, payload);
+        toast.success("Plan updated successfully");
+      }
       setEditingPlan(null);
       load();
     } catch {
-      toast.error("Failed to update plan");
+      toast.error(isNew ? "Failed to create plan" : "Failed to update plan");
     } finally {
       setSaving(false);
     }
@@ -161,6 +206,62 @@ export default function AdminPlansPage() {
     setFormLimits((prev) => ({ ...prev, [key]: value }));
   };
 
+  const handleSyncToStripe = async () => {
+    if (!editingPlan || isNew) return;
+    setSyncing(true);
+    try {
+      const res = await adminApi.syncPlanToStripe(editingPlan._id);
+      const data = res.data;
+      if (data.monthlyPriceId) setFormStripePriceIdMonthly(data.monthlyPriceId);
+      if (data.yearlyPriceId) setFormStripePriceIdYearly(data.yearlyPriceId);
+      const createdItems = [];
+      if (data.created?.monthly) createdItems.push("monthly");
+      if (data.created?.yearly) createdItems.push("yearly");
+      if (createdItems.length > 0) {
+        toast.success(
+          `Created Stripe prices: ${createdItems.join(", ")}. Save to persist.`,
+        );
+      } else {
+        toast.success("All Stripe prices already configured");
+      }
+      // Reload plans to refresh card status
+      load();
+    } catch (err: any) {
+      const message =
+        err?.response?.data?.message || err?.message || "Sync failed";
+      toast.error(message);
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  const handleSyncAll = async () => {
+    setSyncing(true);
+    try {
+      const res = await adminApi.syncAllPlansToStripe();
+      const results = res.data;
+      const totalCreated = results.reduce(
+        (acc: number, r: any) =>
+          acc + (r.created?.monthly ? 1 : 0) + (r.created?.yearly ? 1 : 0),
+        0,
+      );
+      if (totalCreated > 0) {
+        toast.success(
+          `Created ${totalCreated} Stripe price(s) across ${results.length} plan(s)`,
+        );
+      } else {
+        toast.success("All plans already have Stripe prices configured");
+      }
+      load();
+    } catch (err: any) {
+      const message =
+        err?.response?.data?.message || err?.message || "Sync failed";
+      toast.error(message);
+    } finally {
+      setSyncing(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center py-20">
@@ -178,6 +279,23 @@ export default function AdminPlansPage() {
           <p className="text-sm text-content-3">
             Manage subscription plans, pricing, and features
           </p>
+        </div>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleSyncAll}
+            disabled={syncing}
+            className="flex items-center gap-2 rounded-xl border border-edge bg-card px-4 py-2.5 text-sm font-medium text-content-2 transition hover:bg-card-hover hover:text-content disabled:opacity-50"
+          >
+            <RefreshCw className={`h-4 w-4 ${syncing ? "animate-spin" : ""}`} />
+            Sync All to Stripe
+          </button>
+          <button
+            onClick={openCreate}
+            className="flex items-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-orange-500/20 transition hover:bg-orange-600 hover:shadow-orange-500/30"
+          >
+            <Plus className="h-4 w-4" />
+            Add Plan
+          </button>
         </div>
       </div>
 
@@ -311,6 +429,47 @@ export default function AdminPlansPage() {
               )}
             </div>
 
+            {/* Stripe Price Status */}
+            {(plan.monthlyPrice > 0 || plan.yearlyPrice > 0) && (
+              <div className="mb-4 rounded-lg border border-edge bg-card p-2.5">
+                <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-content-4">
+                  Stripe Prices
+                </p>
+                <div className="space-y-1">
+                  {plan.monthlyPrice > 0 && (
+                    <div className="flex items-center gap-1.5 text-[10px]">
+                      {plan.stripePriceIdMonthly ? (
+                        <CheckCircle2 className="h-3 w-3 text-emerald-400" />
+                      ) : (
+                        <AlertTriangle className="h-3 w-3 text-amber-400" />
+                      )}
+                      <span className="text-content-3">Monthly:</span>
+                      <span
+                        className={`font-mono truncate ${plan.stripePriceIdMonthly ? "text-emerald-400" : "text-amber-400"}`}
+                      >
+                        {plan.stripePriceIdMonthly || "Not configured"}
+                      </span>
+                    </div>
+                  )}
+                  {plan.yearlyPrice > 0 && (
+                    <div className="flex items-center gap-1.5 text-[10px]">
+                      {plan.stripePriceIdYearly ? (
+                        <CheckCircle2 className="h-3 w-3 text-emerald-400" />
+                      ) : (
+                        <AlertTriangle className="h-3 w-3 text-amber-400" />
+                      )}
+                      <span className="text-content-3">Yearly:</span>
+                      <span
+                        className={`font-mono truncate ${plan.stripePriceIdYearly ? "text-emerald-400" : "text-amber-400"}`}
+                      >
+                        {plan.stripePriceIdYearly || "Not configured"}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* Actions */}
             <div className="flex gap-2">
               <button
@@ -347,10 +506,14 @@ export default function AdminPlansPage() {
                 {planIcon(editingPlan.plan)}
                 <div>
                   <h2 className="text-lg font-bold text-content">
-                    Edit {editingPlan.name} Plan
+                    {isNew
+                      ? "Create New Plan"
+                      : `Edit ${editingPlan.name} Plan`}
                   </h2>
                   <p className="text-xs text-content-3 capitalize">
-                    {editingPlan.plan} plan configuration
+                    {isNew
+                      ? "Configure a new subscription plan"
+                      : `${editingPlan.plan} plan configuration`}
                   </p>
                 </div>
               </div>
@@ -369,6 +532,23 @@ export default function AdminPlansPage() {
                   Basic Information
                 </h3>
                 <div className="grid gap-4 sm:grid-cols-2">
+                  {isNew && (
+                    <div className="sm:col-span-2">
+                      <label className="mb-1 block text-xs text-content-3">
+                        Plan Key <span className="text-red-400">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={formPlanKey}
+                        onChange={(e) => setFormPlanKey(e.target.value)}
+                        placeholder="e.g. business, starter"
+                        className="w-full rounded-xl border border-edge bg-card px-3 py-2.5 text-sm text-content outline-none focus:border-orange-500/30"
+                      />
+                      <p className="mt-1 text-[10px] text-content-4">
+                        Unique identifier for this plan (lowercase, no spaces)
+                      </p>
+                    </div>
+                  )}
                   <div>
                     <label className="mb-1 block text-xs text-content-3">
                       Name
@@ -641,39 +821,127 @@ export default function AdminPlansPage() {
 
               {/* Stripe Config */}
               <div>
-                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-content-4">
-                  Stripe Configuration (optional)
-                </h3>
+                <div className="mb-3 flex items-center justify-between">
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-content-4">
+                    Stripe Configuration
+                  </h3>
+                  {!isNew && (formMonthlyPrice > 0 || formYearlyPrice > 0) && (
+                    <button
+                      onClick={handleSyncToStripe}
+                      disabled={syncing}
+                      className="flex items-center gap-1.5 rounded-lg bg-indigo-500/10 px-3 py-1.5 text-[11px] font-medium text-indigo-400 transition hover:bg-indigo-500/20 disabled:opacity-50"
+                    >
+                      <RefreshCw
+                        className={`h-3 w-3 ${syncing ? "animate-spin" : ""}`}
+                      />
+                      {syncing ? "Syncing…" : "Auto-Create Prices"}
+                    </button>
+                  )}
+                </div>
+                <p className="mb-3 text-[10px] text-content-4">
+                  Stripe Price IDs are required for checkout to work. Use
+                  &quot;Auto-Create Prices&quot; to automatically create Stripe
+                  Products &amp; Prices from the dollar amounts above, or enter
+                  existing Price IDs manually.
+                </p>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div>
                     <label className="mb-1 block text-xs text-content-3">
                       Monthly Price ID
                     </label>
-                    <input
-                      type="text"
-                      value={formStripePriceIdMonthly}
-                      onChange={(e) =>
-                        setFormStripePriceIdMonthly(e.target.value)
-                      }
-                      placeholder="price_xxx"
-                      className="w-full rounded-xl border border-edge bg-card px-3 py-2.5 text-xs font-mono text-content-2 outline-none focus:border-orange-500/30"
-                    />
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={formStripePriceIdMonthly}
+                        onChange={(e) =>
+                          setFormStripePriceIdMonthly(e.target.value)
+                        }
+                        placeholder="price_xxx"
+                        className={`w-full rounded-xl border bg-card px-3 py-2.5 text-xs font-mono text-content-2 outline-none focus:border-orange-500/30 ${
+                          formStripePriceIdMonthly
+                            ? formStripePriceIdMonthly.startsWith("price_")
+                              ? "border-emerald-500/30"
+                              : "border-amber-500/30"
+                            : "border-edge"
+                        }`}
+                      />
+                      {formStripePriceIdMonthly && (
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2">
+                          {formStripePriceIdMonthly.startsWith("price_") ? (
+                            <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
+                          ) : (
+                            <AlertTriangle className="h-3.5 w-3.5 text-amber-400" />
+                          )}
+                        </span>
+                      )}
+                    </div>
+                    {formStripePriceIdMonthly &&
+                      !formStripePriceIdMonthly.startsWith("price_") && (
+                        <p className="mt-1 text-[10px] text-amber-400">
+                          Should start with &quot;price_&quot;
+                        </p>
+                      )}
                   </div>
                   <div>
                     <label className="mb-1 block text-xs text-content-3">
                       Yearly Price ID
                     </label>
-                    <input
-                      type="text"
-                      value={formStripePriceIdYearly}
-                      onChange={(e) =>
-                        setFormStripePriceIdYearly(e.target.value)
-                      }
-                      placeholder="price_xxx"
-                      className="w-full rounded-xl border border-edge bg-card px-3 py-2.5 text-xs font-mono text-content-2 outline-none focus:border-orange-500/30"
-                    />
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={formStripePriceIdYearly}
+                        onChange={(e) =>
+                          setFormStripePriceIdYearly(e.target.value)
+                        }
+                        placeholder="price_xxx"
+                        className={`w-full rounded-xl border bg-card px-3 py-2.5 text-xs font-mono text-content-2 outline-none focus:border-orange-500/30 ${
+                          formStripePriceIdYearly
+                            ? formStripePriceIdYearly.startsWith("price_")
+                              ? "border-emerald-500/30"
+                              : "border-amber-500/30"
+                            : "border-edge"
+                        }`}
+                      />
+                      {formStripePriceIdYearly && (
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2">
+                          {formStripePriceIdYearly.startsWith("price_") ? (
+                            <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
+                          ) : (
+                            <AlertTriangle className="h-3.5 w-3.5 text-amber-400" />
+                          )}
+                        </span>
+                      )}
+                    </div>
+                    {formStripePriceIdYearly &&
+                      !formStripePriceIdYearly.startsWith("price_") && (
+                        <p className="mt-1 text-[10px] text-amber-400">
+                          Should start with &quot;price_&quot;
+                        </p>
+                      )}
                   </div>
                 </div>
+                {!formStripePriceIdMonthly &&
+                  !formStripePriceIdYearly &&
+                  (formMonthlyPrice > 0 || formYearlyPrice > 0) && (
+                    <div className="mt-3 flex items-start gap-2 rounded-lg border border-amber-500/20 bg-amber-500/5 p-2.5">
+                      <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-400" />
+                      <p className="text-[10px] text-amber-400">
+                        No Stripe Price IDs configured. Checkout will fail
+                        without valid Price IDs. Click &quot;Auto-Create
+                        Prices&quot; above to create them automatically, or{" "}
+                        <a
+                          href="https://docs.stripe.com/products-prices/manage-prices"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-0.5 underline"
+                        >
+                          create them in Stripe Dashboard
+                          <ExternalLink className="h-2.5 w-2.5" />
+                        </a>
+                        .
+                      </p>
+                    </div>
+                  )}
               </div>
             </div>
 
@@ -695,7 +963,7 @@ export default function AdminPlansPage() {
                 ) : (
                   <Save className="h-4 w-4" />
                 )}
-                Save Changes
+                {isNew ? "Create Plan" : "Save Changes"}
               </button>
             </div>
           </div>

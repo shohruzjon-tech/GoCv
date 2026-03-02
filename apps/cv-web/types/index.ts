@@ -24,6 +24,8 @@ export interface User {
     language?: string;
     timezone?: string;
   };
+  createdAt?: string;
+  lastLoginAt?: string;
 }
 
 export interface CvSection {
@@ -242,6 +244,139 @@ export interface Invoice {
   date: string | null;
   pdfUrl: string | null;
   hostedUrl: string | null;
+}
+
+// ─── Detailed Revenue Types ───
+
+export interface RevenueSummary {
+  mrr: number;
+  arr: number;
+  netRevenue: number;
+  profitMargin: number;
+  totalRevenue: number;
+  totalExpenses: number;
+  balance: number;
+}
+
+export interface RevenueSubscriptionBreakdown {
+  total: number;
+  free: number;
+  premium: number;
+  enterprise: number;
+  active: number;
+  cancelled: number;
+  trial: number;
+  expired: number;
+  pastDue: number;
+}
+
+export interface RevenuePlanDetail {
+  count: number;
+  monthlyPrice: number;
+  yearlyPrice: number;
+  monthlyRevenue: number;
+}
+
+export interface RevenueBookings {
+  completed: number;
+  incomplete: number;
+  cancelled: number;
+  conversionRate: number;
+}
+
+export interface ProfitLoss {
+  grossRevenue: number;
+  aiInfrastructureCost: number;
+  netProfit: number;
+  margin: number;
+  isProfit: boolean;
+}
+
+export interface CustomerMetrics {
+  totalCustomers: number;
+  payingCustomers: number;
+  freeCustomers: number;
+  arpu: number;
+  ltv: number;
+  cac: number;
+  churnRate: number;
+}
+
+export interface RevenueCharges {
+  total: number;
+  succeeded: number;
+  failed: number;
+  incomplete: number;
+  totalAmount: number;
+  failedAmount: number;
+}
+
+export interface DailyRevenuePoint {
+  date: string;
+  revenue: number;
+  cost: number;
+  profit: number;
+}
+
+export interface DetailedRevenueStats {
+  summary: RevenueSummary;
+  subscriptions: RevenueSubscriptionBreakdown;
+  revenueByPlan: {
+    premium: RevenuePlanDetail;
+    enterprise: RevenuePlanDetail;
+  };
+  bookings: RevenueBookings;
+  profitLoss: ProfitLoss;
+  customerMetrics: CustomerMetrics;
+  aiCosts: {
+    totalRequests: number;
+    totalTokens: number;
+    totalCostUsd: number;
+    byTool: Record<string, number>;
+    dailyUsage: { date: string; count: number; tokens: number }[];
+  };
+  charges: RevenueCharges;
+  dailyRevenue: DailyRevenuePoint[];
+  period: {
+    days: number;
+    startDate: string;
+    endDate: string;
+  };
+}
+
+export interface RevenueInvoice {
+  id: string;
+  number: string | null;
+  status: string | null;
+  amount: number;
+  amountDue: number;
+  currency: string;
+  date: string | null;
+  dueDate: string | null;
+  pdfUrl: string | null;
+  hostedUrl: string | null;
+  customerEmail: string;
+  customerName: string;
+  plan: string;
+  description: string;
+}
+
+export interface RevenueInvoicesResponse {
+  invoices: RevenueInvoice[];
+  total: number;
+  page: number;
+  limit: number;
+  totals: {
+    paid: number;
+    open: number;
+    void: number;
+    all: number;
+    paidCount: number;
+    openCount: number;
+    voidCount: number;
+    draftCount: number;
+    uncollectibleCount: number;
+  };
 }
 
 // ─── AI Tool Types ───
